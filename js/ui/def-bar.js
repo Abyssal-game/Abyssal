@@ -52,7 +52,7 @@ export function stampHost(dv) {
   return h;
 }
 
-export function playBar({ mid, dv, letters, tier = 'normal', win, beat = 0, titleHTML = '', reduced = false, alive = () => true, setTap, sfx = {}, hap = () => {}, T, onResult = null, focus = null }) {
+export function playBar({ mid, dv, letters, tier = 'normal', win, beat = 0, titleHTML = '', reduced = false, alive = () => true, setTap, sfx = {}, hap = () => {}, T, onResult = null }) {
   return new Promise((resolve) => {
     const n = letters.length, strong = tier !== 'normal';
     const bar = document.createElement('div');
@@ -174,14 +174,14 @@ export function playBar({ mid, dv, letters, tier = 'normal', win, beat = 0, titl
         if (hl) { x = x < ha ? x : x < ha + hl ? ha : x - hl; x = x / (1 - hl); }
         return x <= 1 ? x ** K : 1 + (x - 1) * 1.2;
       };
-      const S0 = 2.9, scaleAt = (t) => Math.max(0.45, S0 - (S0 - 1) * prog(t));
-      const host = stampHost(dv), fe = typeof focus === 'function' ? focus() : focus;
-      const hr = host.getBoundingClientRect(), fr = fe?.getBoundingClientRect?.() || (mid || host).getBoundingClientRect();
-      const size = Math.round(Math.max(72, Math.min(132, Math.min(fr.width, fr.height) * 0.74)));
+      const S0 = 1.8, scaleAt = (t) => Math.max(0.45, S0 - (S0 - 1) * prog(t));
+      /* v872 : le cercle prend la place de la barre, dans la case de défense en bas (demande du propriétaire) */
+      const hr = bar.getBoundingClientRect(), tr = bar.querySelector('.dv-dodge-t').getBoundingClientRect();
+      const size = 100, fr = { left: hr.left, width: hr.width, top: tr.bottom + 18, height: size }; /* sous la consigne, l'anneau au plus grand (×1,8) ne la touche pas */
       const box = document.createElement('div'); box.className = `cbr${fast ? ' fast' : ''}`;
       box.style.cssText = `left:${Math.round(fr.left - hr.left + fr.width / 2 - size / 2)}px;top:${Math.round(fr.top - hr.top + fr.height / 2 - size / 2)}px;width:${size}px;height:${size}px;--tw:${Math.max(2, Math.min(7, pw / 12)).toFixed(1)}px`;
       box.innerHTML = '<span class="cbr-glow"></span><span class="cbr-seal"></span><span class="cbr-tgt"></span><span class="cbr-ring"></span>';
-      host.appendChild(box);
+      bar.appendChild(box);
       const ringEl = box.querySelector('.cbr-ring');
       ringEl.style.transform = `scale(${S0})`;
       pips[i]?.classList.add('now');

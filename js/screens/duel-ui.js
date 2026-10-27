@@ -1192,8 +1192,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     const def = INTENTS[s.kind] || INTENTS.hit;
     const out = await playBar({ mid: $('.dv-mid'), dv: $('.dv'), letters: [...q], tier: e?.boss ? 'boss' : e?.elite ? 'elite' : 'normal',
       win: () => defenseWindow(st, s.a, s.t, T), beat, titleHTML: `${intentIcon(s.kind)} ${esc(title || `${def.name} !`)}`,
-      reduced, alive: () => alive_, setTap: (f) => { defTap = f; }, sfx: app.sfx, hap, T,
-      focus: () => (tEls.length > 1 ? $('.dv-row.ally') : tEls[0]) }); /* v871 : le cercle se pose sur la créature visée (sur la rangée pour un coup de zone) */
+      reduced, alive: () => alive_, setTap: (f) => { defTap = f; }, sfx: app.sfx, hap, T });
     el(s.a)?.classList.remove('aim'); tEls.forEach((x) => x?.classList.remove('aimed'));
     return out;
   }
