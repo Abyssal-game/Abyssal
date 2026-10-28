@@ -1,0 +1,12 @@
+// v885 : pack de ressources Google Play, livré avec l'installation (« install-time »).
+// Le Play Store refuse une application de base de plus de 200 Mo : les illustrations, les dos de cartes et les musiques
+// (≈ 130 Mo) sont déplacés ici juste avant la version du Play Store (.github/workflows/android.yml). Installés en même
+// temps que le jeu, ils sont lus comme les autres fichiers (même dossier public/ de l'application).
+apply plugin: 'com.android.asset-pack'
+
+assetPack {
+    packName = "ressources"
+    dynamicDelivery {
+        deliveryType = "install-time"
+    }
+}

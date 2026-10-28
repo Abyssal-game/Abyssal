@@ -6,6 +6,8 @@ def gameVersion = (rootProject.file('../js/config.js').text =~ /VERSION = 'v(\d+
 
 android {
     namespace = "com.abyssalgame.abyssal"
+    // v885 : illustrations, dos de cartes et musiques livrés dans un pack installé avec le jeu (limite de 200 Mo du Play Store)
+    assetPacks = [":ressources"]
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
         applicationId "com.abyssalgame.abyssal"

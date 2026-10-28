@@ -51,7 +51,14 @@ jobs:
           ABYSSAL_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 -d > "$RUNNER_TEMP/upload.jks"
+          # v885 : les gros dossiers partent dans le pack « ressources » (installé avec le jeu) : base sous 200 Mo
+          PACK=ressources/src/main/assets/public/assets
+          mkdir -p "$PACK"
+          for d in art backs music; do mv "app/src/main/assets/public/assets/$d" "$PACK/$d"; done
           ABYSSAL_KEYSTORE="$RUNNER_TEMP/upload.jks" ./gradlew bundleRelease --no-daemon
+          AAB=app/build/outputs/bundle/release/app-release.aab
+          ls -l "$AAB"
+          unzip -l "$AAB" | awk '{ split($4, p, "/"); s[p[1]] += $1 } END { for (k in s) printf "%-14s %8.1f Mo\n", k, s[k] / 1048576 }'
           rm -f "$RUNNER_TEMP/upload.jks"
       - uses: actions/upload-artifact@v4
         if: env.HAS_KEY == 'true'
