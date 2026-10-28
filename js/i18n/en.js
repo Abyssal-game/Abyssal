@@ -9531,6 +9531,8 @@ export default {
   "Le parrainage ouvre très bientôt.": "Referrals open very soon.",
   "Parraine {0} joueur (Sanctuaire › Amis › Parraine tes proches).": "Refer {0} player (Sanctuary › Friends › Invite your friends).",
   "Parraine {0} joueurs (Sanctuaire › Amis › Parraine tes proches).": "Refer {0} players (Sanctuary › Friends › Invite your friends).",
+  "Cadre vivant du Lien": "Living Frame of the Bond",
+  "Dos vivant du Héraut": "Living Back of the Herald",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

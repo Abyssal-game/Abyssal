@@ -1,7 +1,6 @@
 # Parrainage (v881) : images à générer avec Gemini
 
-Deux récompenses exclusives du parrainage. Elles sont déjà données par le jeu (clés `cx-vif-lien` et `dos-heraut`) mais
-restent invisibles tant que leurs images ne sont pas intégrées.
+Deux récompenses exclusives du parrainage, intégrées en v882 (runes réelles effacées des deux images).
 
 ## 5e filleul : cadre de profil « Le Lien »
 Intégration : `python3 tools/frame-art.py <image> cx-vif-lien --fit --hole=0.78 --suffix=4 --clip`, puis l'entrée dans `CODEX_FRAMES` et la règle CSS (comme les cadres v875).

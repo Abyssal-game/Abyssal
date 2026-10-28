@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v881'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v882'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -138,8 +138,8 @@ export const LEVEL_TITLES = [
 export const LEVEL_FRAMES = [[5, 'cx-vif-ambre'], [8, 'cx-vif-rouages'], [12, 'cx-vif-venin'], [18, 'cx-vif-obsidienne'], [25, 'cx-vif-maree'], [32, 'cx-vif-ames'], [40, 'cx-vif-sang'], [50, 'cx-vif-soleil-noir']];
 /* v881 : parrainage (demande du propriétaire du 28 octobre 2026). Le filleul entre le pseudo de son parrain dans ses
    7 premiers jours ; validé par le serveur quand il a joué 3 jours différents dans les 14 jours et vaincu le premier gardien.
-   Cadeau du filleul, puis 10 paliers du parrain, de plus en plus beaux ; au-delà, plus rien. Le cadre (5e) et le dos
-   vivant (10e) n'apparaissent qu'une fois leurs images ajoutées (clés réservées). */
+   Cadeau du filleul, puis 10 paliers du parrain, de plus en plus beaux ; au-delà, plus rien. Cadre vivant du Lien (5e)
+   et dos vivant du Héraut (10e) : images Gemini v882. */
 export const REFERRAL = {
   linkDays: 7, windowDays: 14, needDays: 3, max: 10,
   gift: { tickets: { standard: 3, premium: 1 }, shards: 500 },

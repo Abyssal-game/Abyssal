@@ -47,6 +47,7 @@ export const CODEX_XP_LABEL = { floor: 'Étage franchi (1re fois)', boss: 'Gardi
 
 // Cosmétiques propres au Codex et à l'Échoppe (v472 : cadres peints par Gemini, assets/frames/<clé>.webp, posés par .pf-<clé>)
 export const CODEX_FRAMES = {
+  /* v882 : parrainage, 5e filleul (REFERRAL) */ 'cx-vif-lien': 'Cadre vivant du Lien',
   /* v685 : Saison II « L’Hiver éternel » */ 'cx-vif-aurore': 'Cadre vivant de l’Aurore', 'cx-vif-blizzard': 'Cadre vivant du Blizzard',
   /* v630 : Saison I « La Nuit des Âmes », voie enluminée */ 'cx-vif-feux-follets': 'Cadre vivant des Feux follets', 'cx-vif-brume': 'Cadre vivant de la Brume des âmes',
     'cx-fondateur': 'Cadre du Fondateur', /* v638 */ 'cx-vif-fondateur': 'Cadre vivant du Fondateur',   /* v472 : réserve (saison II ou Échoppe), images prêtes dans assets/frames/ */
@@ -60,7 +61,7 @@ export const CODEX_FRAMES = {
   /* v552 : Saisons IV à XII (février à octobre 2027, images Gemini attendues) */
   'cx-coeur-maudit': 'Couronne du Cœur maudit',   /* v565 : remplacements après le tri du 21 octobre 2026 */   /* v532 */ 'cx-carnaval': 'Cadre du carnaval des ombres', 'cx-phalenes': 'Cadre des phalènes', };
 // Dos de cartes (v473 : images Gemini, assets/backs/<clé>.webp, tools/back-art.py ; choisis au Profil)
-export const CODEX_BACKS = { /* v685 */ 'dos-lac-gele': 'Dos vivant du Lac gelé', /* v687 */ 'dos-larme-givre': 'Dos vivant de la Larme de givre', /* v630 */ 'dos-vif-lanternes': 'Dos vivant des Lanternes flottantes', 'dos-codex': 'Dos du Codex', 'dos-abime': 'Dos de l’Abîme', 'dos-fondateur': 'Dos du Fondateur', /* v638 */ 'dos-vif-fondateur': 'Dos vivant du Fondateur',
+export const CODEX_BACKS = { /* v882 : parrainage, 10e filleul */ 'dos-heraut': 'Dos vivant du Héraut', /* v685 */ 'dos-lac-gele': 'Dos vivant du Lac gelé', /* v687 */ 'dos-larme-givre': 'Dos vivant de la Larme de givre', /* v630 */ 'dos-vif-lanternes': 'Dos vivant des Lanternes flottantes', 'dos-codex': 'Dos du Codex', 'dos-abime': 'Dos de l’Abîme', 'dos-fondateur': 'Dos du Fondateur', /* v638 */ 'dos-vif-fondateur': 'Dos vivant du Fondateur',
   /* réserve : collection « Les sept royaumes » (Échoppe ou saison II) */
   'dos-infernal': 'Dos du royaume Infernal', 'dos-abyssal': 'Dos du royaume Abyssal', 'dos-celeste': 'Dos du royaume Céleste', 'dos-sauvage': 'Dos du royaume Sauvage',
   'dos-necrotique': 'Dos du royaume Nécrotique', 'dos-primordial': 'Dos du royaume Primordial', 'dos-artificiel': 'Dos du royaume Artificiel',
@@ -129,7 +130,7 @@ const FN = (k, cost) => ({ id: k, kind: 'finish', give: { finish: k }, cost });
    décor CSS en attendant) et réactions en ligne (pendant une partie contre un joueur ; portraits des arbitres des jeux) */
 // v565 : « dos vivants » (WebP animés, tools/back-anim.py) et habillages de booster (« sachets » : remplacent le visuel des boosters
 // standard, Alliances et premium ; les boosters de faction gardent le leur ; assets/packs/<clé>.webp, tools/sachet-art.py)
-export const LIVE_BACKS = ['dos-larme-givre', 'dos-lac-gele', 'dos-vif-lanternes', 'dos-vif-hiver', 'dos-vif-coeur', 'dos-vif-passeur', 'dos-vif-nebuleuse', 'dos-vif-abysse', 'dos-vif-devoreur', 'dos-vif-lune-sang', 'dos-vif-coeur-mecanique', 'dos-vif-chandelles', 'dos-vif-orage', 'dos-vif-ame', 
+export const LIVE_BACKS = ['dos-heraut', 'dos-larme-givre', 'dos-lac-gele', 'dos-vif-lanternes', 'dos-vif-hiver', 'dos-vif-coeur', 'dos-vif-passeur', 'dos-vif-nebuleuse', 'dos-vif-abysse', 'dos-vif-devoreur', 'dos-vif-lune-sang', 'dos-vif-coeur-mecanique', 'dos-vif-chandelles', 'dos-vif-orage', 'dos-vif-ame', 
   /* v573 : tous les dos peints passent en dos vivants (même clé, fichier animé ; l'image fixe reste dans store/backs/<clé>-fixe.webp).
      dos-abysse, dos-coeur-mecanique, dos-devoreur, dos-eclipse, dos-lune-sang, dos-nebuleuse, dos-passeur montrent désormais l'animation de leur jumeau dos-vif-… (version fixe supprimée) */
   'dos-codex', 'dos-abime', 'dos-fondateur', 'dos-vif-fondateur', 'dos-infernal', 'dos-abyssal', 'dos-celeste', 'dos-sauvage', 'dos-necrotique', 'dos-primordial', 'dos-artificiel', 'dos-ames', 'dos-roses', 'dos-horloger', 'dos-miroirs', 'dos-jumeaux', 'dos-titan', 'dos-mosaique', 'dos-encre', 'dos-alchimie', 'dos-reliquaire', 'dos-tapisserie', 'dos-vivant', 'dos-vitrail', 'dos-cimetiere', 'dos-presents', 'dos-coeurs', 'dos-aurore', 'dos-carnaval', 'dos-phalene', 'dos-abysse', 'dos-coeur-mecanique', 'dos-devoreur', 'dos-lune-sang', 'dos-nebuleuse', 'dos-passeur', 'dos-vif-phenix', 'dos-vif-kraken', 'dos-vif-couronne', 'dos-vif-sablier', 'dos-vif-coeur-dragon', 'dos-vif-portail', 'dos-vif-destrier', 'dos-vif-hydre', 'dos-vif-orchidee', 'dos-vif-astrolabe', 'dos-vif-meduse', 'dos-vif-geode', 'dos-vif-corbeau', 'dos-vif-arbre', 'dos-vif-ailes', 'dos-vif-main-ombre', 'dos-vif-masque', 'dos-vif-perle', 'dos-vif-trone'];

@@ -9519,6 +9519,8 @@ export default {
   "Le parrainage ouvre très bientôt.": "El padrinazgo abre muy pronto.",
   "Parraine {0} joueur (Sanctuaire › Amis › Parraine tes proches).": "Apadrina a {0} jugador (Santuario › Amigos › Invita a tus allegados).",
   "Parraine {0} joueurs (Sanctuaire › Amis › Parraine tes proches).": "Apadrina a {0} jugadores (Santuario › Amigos › Invita a tus allegados).",
+  "Cadre vivant du Lien": "Marco vivo del Vínculo",
+  "Dos vivant du Héraut": "Dorso vivo del Heraldo",
 };
 
 export const names = {

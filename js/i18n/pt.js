@@ -9518,6 +9518,8 @@ export default {
   "Le parrainage ouvre très bientôt.": "A indicação abre muito em breve.",
   "Parraine {0} joueur (Sanctuaire › Amis › Parraine tes proches).": "Indique {0} jogador (Santuário › Amigos › Convide seus amigos).",
   "Parraine {0} joueurs (Sanctuaire › Amis › Parraine tes proches).": "Indique {0} jogadores (Santuário › Amigos › Convide seus amigos).",
+  "Cadre vivant du Lien": "Moldura viva do Elo",
+  "Dos vivant du Héraut": "Verso vivo do Arauto",
 };
 
 export const names = {

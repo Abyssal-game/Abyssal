@@ -9518,6 +9518,8 @@ export default {
   "Le parrainage ouvre très bientôt.": "Il padrinato apre molto presto.",
   "Parraine {0} joueur (Sanctuaire › Amis › Parraine tes proches).": "Fai da padrino a {0} giocatore (Santuario › Amici › Invita i tuoi cari).",
   "Parraine {0} joueurs (Sanctuaire › Amis › Parraine tes proches).": "Fai da padrino a {0} giocatori (Santuario › Amici › Invita i tuoi cari).",
+  "Cadre vivant du Lien": "Cornice vivente del Legame",
+  "Dos vivant du Héraut": "Dorso vivente dell’Araldo",
 };
 
 export const names = {

@@ -5,7 +5,7 @@ import * as cloud from '../cloud/cloud.js';
 import { sync } from '../cloud/sync.js';
 import { serverMode } from '../cloud/partie.js';
 import { REFERRAL } from '../config.js';
-import { icon } from '../ui/icons.js';
+import { icon, EMBLEM } from '../ui/icons.js';
 import { esc, fmt, toast, paint } from '../ui/dom.js';
 import { t, tw } from '../i18n.js';
 import { isNative } from '../native.js';
@@ -27,7 +27,9 @@ export function rewardLines(r) {
   if (r.ash) out.push(`${fmt(r.ash)} cendres`);
   return out;
 }
-const gainHTML = (r) => `<div class="prn-gain">${rewardLines(r).map((x) => `<p>${x}</p>`).join('')}</div>`;
+/* v882 : aperçu du cadre (5e) et du dos vivant (10e) */
+const peekHTML = (r) => (r.frame ? `<span class="prn-peek avatar-mini pf pf-${r.frame}">${EMBLEM}</span>` : r.back ? `<img class="prn-peek prn-back" alt="" loading="lazy" src="assets/backs/${r.back}.webp">` : '');
+const gainHTML = (r) => `<div class="prn-gain">${rewardLines(r).map((x) => `<p>${x}</p>`).join('')}</div>${peekHTML(r)}`;
 
 function stateLine(k) {
   if (k.state === 'ok') return k.rank && k.rank <= REFERRAL.max ? t('Validé · palier {n}', { n: k.rank }) : 'Validé';

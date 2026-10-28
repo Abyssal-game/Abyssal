@@ -9519,6 +9519,8 @@ export default {
   "Le parrainage ouvre très bientôt.": "Empfehlungen starten sehr bald.",
   "Parraine {0} joueur (Sanctuaire › Amis › Parraine tes proches).": "Wirb {0} Spieler (Heiligtum › Freunde › Lade deine Freunde ein).",
   "Parraine {0} joueurs (Sanctuaire › Amis › Parraine tes proches).": "Wirb {0} Spieler (Heiligtum › Freunde › Lade deine Freunde ein).",
+  "Cadre vivant du Lien": "Lebendiger Rahmen des Bandes",
+  "Dos vivant du Héraut": "Lebendige Rückseite des Herolds",
 };
 
 export const names = {
