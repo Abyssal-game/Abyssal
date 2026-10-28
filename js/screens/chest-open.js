@@ -89,7 +89,7 @@ export function openChestScene(app, type, { onDone } = {}) {
       const p = document.createElement('div');
       p.className = 'chx-pack chx-shards'; p.style.setProperty('--i', packs.length + j); p.style.setProperty('--n', packs.length + extras.length);
       p.innerHTML = `<span class="chx-sh-ic">${icon(ic)}</span><b>+${v}</b><span class="chx-pname">${l}</span>`;
-      row.appendChild(p); fromChest(p); app.sfx.coin(); app.chrome?.();
+      row.appendChild(p); fromChest(p); ic === 'ash' ? app.sfx.burn() : app.sfx.coin(); app.chrome?.(); /* v879 : les cendres ont leur son (flammes de la Fournaise) : le tintement était couvert par le son de révélation */
       await wait(520);
     }
     const gains = [def.shards && `${def.shards} éclats`, def.ash && `${def.ash} cendres`].filter(Boolean);
