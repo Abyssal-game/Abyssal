@@ -9526,6 +9526,9 @@ export default {
   "Parrainage · {n}e filleul": "Padrinato · {n}º figlioccio",
   "Deux anneaux d’or noirci liés par des chaînes et des mains jointes : la marque de ceux qui ont mené cinq âmes dans l’Abîme.": "Due anelli d’oro annerito legati da catene e mani giunte: il segno di chi ha condotto cinque anime nel Baratro.",
   "Le Héraut sonne le cor, et la lumière de l’Abîme s’enroule autour de lui : le dos de ceux qui ont mené dix âmes dans l’Abîme.": "L’Araldo suona il corno e la luce del Baratro gli si avvolge intorno: il dorso di chi ha condotto dieci anime nel Baratro.",
+  "1er": "1º",
+  "2e": "2º",
+  "3e": "3º",
 };
 
 export const names = {

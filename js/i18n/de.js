@@ -9527,6 +9527,9 @@ export default {
   "Parrainage · {n}e filleul": "Empfehlung · {n}. Geworbener",
   "Deux anneaux d’or noirci liés par des chaînes et des mains jointes : la marque de ceux qui ont mené cinq âmes dans l’Abîme.": "Zwei Ringe aus geschwärztem Gold, verbunden durch Ketten und verschränkte Hände: das Zeichen derer, die fünf Seelen in die Tiefe geführt haben.",
   "Le Héraut sonne le cor, et la lumière de l’Abîme s’enroule autour de lui : le dos de ceux qui ont mené dix âmes dans l’Abîme.": "Der Herold bläst das Horn, und das Licht der Tiefe windet sich um ihn: die Rückseite derer, die zehn Seelen in die Tiefe geführt haben.",
+  "1er": "1.",
+  "2e": "2.",
+  "3e": "3.",
 };
 
 export const names = {

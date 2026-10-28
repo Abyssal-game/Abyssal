@@ -9016,3 +9016,14 @@ html.reduce-motion :is(.chx-leak, .chx-beam, .chx-ring, .chx-fx) { display: none
 .prn-step.big { cursor: pointer; }
 .prn-step.big:active { transform: scale(.985); }
 .prn-step .prn-gain p.prn-tap { font-size: .74rem; letter-spacing: .04em; color: var(--gold-hi); opacity: .75; font-weight: 400; margin-top: 2px; }
+
+/* v888 : « Mon équipe / Renforcer » (Descente, Épreuves) : sur iPhone SE, le 2e bouton débordait à droite (colonnes qui ne rétrécissaient pas) */
+.dc-teambtns { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+@media (max-width: 380px) { .dc-teambtns .dc-plq { padding: 0 12px !important; font-size: .7rem !important; letter-spacing: 0; } }
+/* v888 : Fournaise : un nom long sans espace (allemand « Phantomgottesanbeterin ») sortait de sa case sur iPhone SE */
+.fg-cell { min-width: 0; }
+.fg-cell b { max-width: 100%; overflow-wrap: anywhere; hyphens: auto; }
+/* v888 : Sanctuaire : en portugais, un mot long des petites tuiles élargissait la grille au-delà de l'écran sur iPhone SE */
+.mn-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.mn-tile { min-width: 0; }
+.mn-tile b, .mn-tile > span:last-child { max-width: 100%; overflow-wrap: anywhere; hyphens: auto; }

@@ -9526,6 +9526,9 @@ export default {
   "Parrainage · {n}e filleul": "Indicação · {n}º indicado",
   "Deux anneaux d’or noirci liés par des chaînes et des mains jointes : la marque de ceux qui ont mené cinq âmes dans l’Abîme.": "Dois anéis de ouro enegrecido unidos por correntes e mãos dadas: a marca de quem levou cinco almas ao Precipício.",
   "Le Héraut sonne le cor, et la lumière de l’Abîme s’enroule autour de lui : le dos de ceux qui ont mené dix âmes dans l’Abîme.": "O Arauto toca a trombeta, e a luz do Precipício se enrola ao seu redor: o verso de quem levou dez almas ao Precipício.",
+  "1er": "1º",
+  "2e": "2º",
+  "3e": "3º",
 };
 
 export const names = {

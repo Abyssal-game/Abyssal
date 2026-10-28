@@ -6,6 +6,7 @@ import { CHESTS } from '../core/descent.js';
 import { artUrl } from '../art/assets.js';
 import { icon, sigil, EMBLEM } from '../ui/icons.js';
 import { esc, fmt, toast, bindActions } from '../ui/dom.js';
+import { t } from '../i18n.js';
 import { chestSVG } from '../ui/chest.js';
 import { rowAttrs, shownName, bindReport } from '../ui/report.js';
 import { isBlocked } from '../core/moderation.js';
@@ -62,7 +63,7 @@ export default function shadowScreen(app, root) {
     const logged = cloud.isLoggedIn();
     root.innerHTML = `<header class="screen-head ui-hero bn-shadow"><h1>Le Tirage des Ombres</h1><p class="muted">Un booster gratuit par jour. Tu ne gardes pas les cartes : seule leur valeur compte pour le classement de la semaine.</p></header>
       <section class="panel sh-prizes"><h2 class="section-title">Prix de la semaine</h2>
-        <div class="sh-pz">${SHADOW.prizes.map((k, i) => `<span class="sh-p" style="--mc:${MEDAL[i]}">${chestSVG(k)}<b>${i + 1}<sup>${i ? 'e' : 'er'}</sup></b><small>${esc(CHESTS[k].name)}</small></span>`).join('')}</div>
+        <div class="sh-pz">${SHADOW.prizes.map((k, i) => `<span class="sh-p" style="--mc:${MEDAL[i]}">${chestSVG(k)}<b>${t(['1er', '2e', '3e'][i] || `${i + 1}e`)}</b><small>${esc(CHESTS[k].name)}</small></span>`).join('')}</div>
         <p class="small muted">Classement du lundi au dimanche : tes tirages s’additionnent. Les coffres sont donnés s’il y a au moins ${SHADOW.minPlayers} participants, et arrivent le lundi suivant quand tu ouvres le jeu. Chaque tirage rapporte aussi <b>${SHADOW.participation} éclats</b>.</p>
       </section>
       ${!logged ? `<section class="panel center"><p>Le Tirage se joue en ligne : connecte-toi pour participer.</p><a class="btn primary block" href="#/compte">${icon('user')}Se connecter</a></section>`

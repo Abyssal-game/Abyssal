@@ -9527,6 +9527,9 @@ export default {
   "Parrainage · {n}e filleul": "Padrinazgo · ahijado n.º {n}",
   "Deux anneaux d’or noirci liés par des chaînes et des mains jointes : la marque de ceux qui ont mené cinq âmes dans l’Abîme.": "Dos anillos de oro ennegrecido unidos por cadenas y manos entrelazadas: la marca de quienes guiaron cinco almas a la Sima.",
   "Le Héraut sonne le cor, et la lumière de l’Abîme s’enroule autour de lui : le dos de ceux qui ont mené dix âmes dans l’Abîme.": "El Heraldo hace sonar el cuerno y la luz de la Sima se enrosca a su alrededor: el dorso de quienes guiaron diez almas a la Sima.",
+  "1er": "1.º",
+  "2e": "2.º",
+  "3e": "3.º",
 };
 
 export const names = {
