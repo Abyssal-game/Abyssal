@@ -9521,6 +9521,12 @@ export default {
   "Parraine {0} joueurs (Sanctuaire › Amis › Parraine tes proches).": "Apadrina a {0} jugadores (Santuario › Amigos › Invita a tus allegados).",
   "Cadre vivant du Lien": "Marco vivo del Vínculo",
   "Dos vivant du Héraut": "Dorso vivo del Heraldo",
+  "Amis et parrainage": "Amigos y padrinazgo",
+  "Collections de tes amis, parrainage": "Colecciones de tus amigos, padrinazgo",
+  "Toucher pour voir en grand": "Toca para verlo en grande",
+  "Parrainage · {n}e filleul": "Padrinazgo · ahijado n.º {n}",
+  "Deux anneaux d’or noirci liés par des chaînes et des mains jointes : la marque de ceux qui ont mené cinq âmes dans l’Abîme.": "Dos anillos de oro ennegrecido unidos por cadenas y manos entrelazadas: la marca de quienes guiaron cinco almas a la Sima.",
+  "Le Héraut sonne le cor, et la lumière de l’Abîme s’enroule autour de lui : le dos de ceux qui ont mené dix âmes dans l’Abîme.": "El Heraldo hace sonar el cuerno y la luz de la Sima se enrosca a su alrededor: el dorso de quienes guiaron diez almas a la Sima.",
 };
 
 export const names = {

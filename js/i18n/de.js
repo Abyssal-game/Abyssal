@@ -9521,6 +9521,12 @@ export default {
   "Parraine {0} joueurs (Sanctuaire › Amis › Parraine tes proches).": "Wirb {0} Spieler (Heiligtum › Freunde › Lade deine Freunde ein).",
   "Cadre vivant du Lien": "Lebendiger Rahmen des Bandes",
   "Dos vivant du Héraut": "Lebendige Rückseite des Herolds",
+  "Amis et parrainage": "Freunde & Empfehlungen",
+  "Collections de tes amis, parrainage": "Sammlungen deiner Freunde, Empfehlungen",
+  "Toucher pour voir en grand": "Tippen für die große Ansicht",
+  "Parrainage · {n}e filleul": "Empfehlung · {n}. Geworbener",
+  "Deux anneaux d’or noirci liés par des chaînes et des mains jointes : la marque de ceux qui ont mené cinq âmes dans l’Abîme.": "Zwei Ringe aus geschwärztem Gold, verbunden durch Ketten und verschränkte Hände: das Zeichen derer, die fünf Seelen in die Tiefe geführt haben.",
+  "Le Héraut sonne le cor, et la lumière de l’Abîme s’enroule autour de lui : le dos de ceux qui ont mené dix âmes dans l’Abîme.": "Der Herold bläst das Horn, und das Licht der Tiefe windet sich um ihn: die Rückseite derer, die zehn Seelen in die Tiefe geführt haben.",
 };
 
 export const names = {

@@ -9520,6 +9520,12 @@ export default {
   "Parraine {0} joueurs (Sanctuaire › Amis › Parraine tes proches).": "Fai da padrino a {0} giocatori (Santuario › Amici › Invita i tuoi cari).",
   "Cadre vivant du Lien": "Cornice vivente del Legame",
   "Dos vivant du Héraut": "Dorso vivente dell’Araldo",
+  "Amis et parrainage": "Amici e padrinato",
+  "Collections de tes amis, parrainage": "Collezioni dei tuoi amici, padrinato",
+  "Toucher pour voir en grand": "Tocca per vederlo in grande",
+  "Parrainage · {n}e filleul": "Padrinato · {n}º figlioccio",
+  "Deux anneaux d’or noirci liés par des chaînes et des mains jointes : la marque de ceux qui ont mené cinq âmes dans l’Abîme.": "Due anelli d’oro annerito legati da catene e mani giunte: il segno di chi ha condotto cinque anime nel Baratro.",
+  "Le Héraut sonne le cor, et la lumière de l’Abîme s’enroule autour de lui : le dos de ceux qui ont mené dix âmes dans l’Abîme.": "L’Araldo suona il corno e la luce del Baratro gli si avvolge intorno: il dorso di chi ha condotto dieci anime nel Baratro.",
 };
 
 export const names = {

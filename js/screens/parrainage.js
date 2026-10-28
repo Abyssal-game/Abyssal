@@ -6,7 +6,10 @@ import { sync } from '../cloud/sync.js';
 import { serverMode } from '../cloud/partie.js';
 import { REFERRAL } from '../config.js';
 import { icon, EMBLEM } from '../ui/icons.js';
-import { esc, fmt, toast, paint } from '../ui/dom.js';
+import { esc, fmt, toast, paint, openSheet } from '../ui/dom.js';
+import { artUrl } from '../art/assets.js';
+import { withPlate, fondStyle } from '../ui/vitrine.js';
+import { CODEX_FRAMES, CODEX_BACKS } from '../core/codex.js';
 import { t, tw } from '../i18n.js';
 import { isNative } from '../native.js';
 import { linkParrain } from '../ui/parrain.js';
@@ -29,7 +32,7 @@ export function rewardLines(r) {
 }
 /* v882 : aperçu du cadre (5e) et du dos vivant (10e) */
 const peekHTML = (r) => (r.frame ? `<span class="prn-peek avatar-mini pf pf-${r.frame}">${EMBLEM}</span>` : r.back ? `<img class="prn-peek prn-back" alt="" loading="lazy" src="assets/backs/${r.back}.webp">` : '');
-const gainHTML = (r) => `<div class="prn-gain">${rewardLines(r).map((x) => `<p>${x}</p>`).join('')}</div>${peekHTML(r)}`;
+const gainHTML = (r) => `<div class="prn-gain">${rewardLines(r).map((x) => `<p>${x}</p>`).join('')}${r.frame || r.back ? '<p class="prn-tap">Toucher pour voir en grand</p>' : ''}</div>${peekHTML(r)}`;
 
 function stateLine(k) {
   if (k.state === 'ok') return k.rank && k.rank <= REFERRAL.max ? t('Validé · palier {n}', { n: k.rank }) : 'Validé';
@@ -70,7 +73,7 @@ export default function parrainage(app, root) {
         <p class="small"><b>3.</b> Il reçoit son cadeau de bienvenue, et toi le palier suivant. Plus tu parraines, plus c’est beau, jusqu’au dixième.</p>
         <p class="small muted">Un ami qui joue sur ton téléphone ne compte pas.</p></section>
       <h2 class="section-title">Tes récompenses</h2>
-      <ol class="prn-ladder">${REFERRAL.ladder.map((r, i) => { const k = i + 1, got = paid.has(k); return `<li class="panel prn-step${got ? ' got' : ''}${k === nextRank ? ' next' : ''}${r.frame || r.back ? ' big' : ''}"><span class="prn-n">${k}</span>${gainHTML(r)}<span class="prn-st">${got ? icon('check') : k === nextRank ? '<small>Prochain</small>' : icon('lock')}</span></li>`; }).join('')}</ol>
+      <ol class="prn-ladder">${REFERRAL.ladder.map((r, i) => { const k = i + 1, got = paid.has(k); return `<li class="panel prn-step${got ? ' got' : ''}${k === nextRank ? ' next' : ''}${r.frame || r.back ? ' big' : ''}"${r.frame || r.back ? ` data-prn="look" data-k="${k}" role="button" tabindex="0"` : ''}><span class="prn-n">${k}</span>${gainHTML(r)}<span class="prn-st">${got ? icon('check') : k === nextRank ? '<small>Prochain</small>' : icon('lock')}</span></li>`; }).join('')}</ol>
       <h2 class="section-title">Tes filleuls${kids.length ? ` <span class="pill-n">${kids.length}</span>` : ''}</h2>
       ${err ? `<p class="panel small center">${icon('info')} ${esc(err)}</p>` : !data ? '<p class="small muted center">Chargement…</p>'
         : kids.length ? kids.map((k) => `<div class="panel prn-kid ${esc(k.state)}"><b class="notranslate">${esc(k.pseudo || t('Compte supprimé'))}</b><small>${stateLine(k)}</small></div>`).join('')
@@ -82,6 +85,33 @@ export default function parrainage(app, root) {
     try { data = await cloud.parrainList(); err = null; }
     catch (e) { err = /parrain_list|Could not find|404/i.test(e.message || '') ? 'Le parrainage ouvre très bientôt.' : e.message; }
     if (alive) draw();
+  }
+
+  /* v884 : le cadre (5e) et le dos vivant (10e) en grand, comme l'aperçu de l'Échoppe (classes pv2 de js/screens/codex.js) */
+  function look(k) {
+    const r = REFERRAL.ladder[k - 1], frame = !!r.frame, id = r.frame || r.back, s = g.s;
+    const own = frame ? s.frames.includes(id) : (s.backs || []).includes(id), on = frame ? s.frame === id : s.back === id;
+    const av = app.catalog.get(g.shownAvatar()), avImg = av ? `<img alt="" src="${artUrl(av, { lite: true })}">` : EMBLEM;
+    const name = me() || s.name || 'Toi', lv = g.levelInfo().level;
+    const hero = frame ? `<span class="avatar-big pf pf-${id} pv2-big-av">${avImg}</span>` : `<img class="pv2-big-back" alt="" src="assets/backs/${id}.webp">`;
+    const scene = frame
+      ? `<p class="pv2-cap">Ton profil</p><div class="pv2-prof ${s.fond ? 'has-fond' : ''}"${fondStyle(s.fond)}><span class="avatar-big pf pf-${id}">${avImg}</span><div class="pv2-prof-t"><b>${withPlate(s.plate, esc(name))}</b><span class="pv2-ttl">${esc(s.title || '')}</span><small>Niveau ${lv}</small></div></div>
+         <p class="pv2-cap">Au classement</p><div class="lb-row pv2-lb"><span class="lb-rank">1</span><span class="lb-av pf pf-${id}">${avImg}</span><span class="lb-name"><b>${withPlate(s.plate, esc(name))}</b><span class="small muted">${esc(s.title || '')}</span></span><span class="lb-floor">412 pts</span></div>`
+      : `<p class="pv2-cap">À l’ouverture d’un booster</p><div class="cx-pv-fan pv2-fan">${[0, 1, 2].map(() => `<img alt="" src="assets/backs/${id}.webp">`).join('')}</div>`;
+    const where = frame ? ['Profil', 'Barre du haut', 'Classements', 'Parties en ligne', 'Fiche vue par les autres'] : ['Ouverture des boosters', 'Cartes face cachée', 'Jeux de cartes'];
+    const foot = own ? (on ? `<span class="cx-badge on">${icon('check')}Équipé</span>` : `<button class="btn primary pv2-buy" data-look="wear">${icon('check')}Équiper</button>`)
+      : `<span class="pv2-src">${icon('user')}<span><b>${t('Parrainage · {n}e filleul', { n: k })}</b><small>Introuvable à l’Échoppe</small></span></span>`;
+    const sh = openSheet(`<section class="pv2-stage r-${frame ? 'leg' : 'myth'} k-${frame ? 'frame' : 'back'}"><span class="pv2-ray"></span><span class="pv2-dust"></span>
+        <p class="pv2-kick"><span>${frame ? 'Cadre de profil' : 'Dos de cartes'}</span><b class="pv2-rk">Parrainage</b></p>
+        <div class="pv2-show"><div class="pv2-obj">${hero}</div><span class="pv2-ped"></span></div>
+        <h2 class="pv2-name">${esc(frame ? CODEX_FRAMES[id] : CODEX_BACKS[id])}</h2>
+        <p class="pv2-desc">${frame ? 'Deux anneaux d’or noirci liés par des chaînes et des mains jointes : la marque de ceux qui ont mené cinq âmes dans l’Abîme.' : 'Le Héraut sonne le cor, et la lumière de l’Abîme s’enroule autour de lui : le dos de ceux qui ont mené dix âmes dans l’Abîme.'}</p></section>
+      <section class="pv2-body"><div class="pv2-scenes">${scene}</div><p class="pv2-cap">Où on le verra</p><div class="pv2-where">${where.map((w) => `<span>${w}</span>`).join('')}</div></section>
+      <div class="pv2-foot">${foot}</div>`, { label: 'Aperçu', full: true, cls: 'cx-pv pv2' });
+    sh.body.querySelector('[data-look="wear"]')?.addEventListener('click', () => {
+      if (frame) g.setFrame(id); else g.setBack(id);
+      app.sfx.tap?.(); toast(t('{name} : équipé.', { name: esc(frame ? CODEX_FRAMES[id] : CODEX_BACKS[id]) }), { kind: 'success', icon: 'check' }); sh.close(); app.chrome?.();
+    });
   }
 
   async function share() {
@@ -99,6 +129,7 @@ export default function parrainage(app, root) {
   root.addEventListener('click', async (e) => {
     const b = e.target.closest('[data-prn]'); if (!b) return;
     if (b.dataset.prn === 'share') share();
+    if (b.dataset.prn === 'look') { app.sfx.tap?.(); look(+b.dataset.k); }
     if (b.dataset.prn === 'pseudo') (await import('./account.js')).askPseudo(app);
   });
   root.addEventListener('submit', async (e) => {

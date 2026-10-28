@@ -9520,6 +9520,12 @@ export default {
   "Parraine {0} joueurs (Sanctuaire › Amis › Parraine tes proches).": "Indique {0} jogadores (Santuário › Amigos › Convide seus amigos).",
   "Cadre vivant du Lien": "Moldura viva do Elo",
   "Dos vivant du Héraut": "Verso vivo do Arauto",
+  "Amis et parrainage": "Amigos e indicações",
+  "Collections de tes amis, parrainage": "Coleções dos seus amigos, indicações",
+  "Toucher pour voir en grand": "Toque para ver em tamanho grande",
+  "Parrainage · {n}e filleul": "Indicação · {n}º indicado",
+  "Deux anneaux d’or noirci liés par des chaînes et des mains jointes : la marque de ceux qui ont mené cinq âmes dans l’Abîme.": "Dois anéis de ouro enegrecido unidos por correntes e mãos dadas: a marca de quem levou cinco almas ao Precipício.",
+  "Le Héraut sonne le cor, et la lumière de l’Abîme s’enroule autour de lui : le dos de ceux qui ont mené dix âmes dans l’Abîme.": "O Arauto toca a trombeta, e a luz do Precipício se enrola ao seu redor: o verso de quem levou dez almas ao Precipício.",
 };
 
 export const names = {

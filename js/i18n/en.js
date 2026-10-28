@@ -9533,6 +9533,12 @@ export default {
   "Parraine {0} joueurs (Sanctuaire › Amis › Parraine tes proches).": "Refer {0} players (Sanctuary › Friends › Invite your friends).",
   "Cadre vivant du Lien": "Living Frame of the Bond",
   "Dos vivant du Héraut": "Living Back of the Herald",
+  "Amis et parrainage": "Friends & referrals",
+  "Collections de tes amis, parrainage": "Your friends’ collections, referrals",
+  "Toucher pour voir en grand": "Tap to see it full size",
+  "Parrainage · {n}e filleul": "Referral · recruit no. {n}",
+  "Deux anneaux d’or noirci liés par des chaînes et des mains jointes : la marque de ceux qui ont mené cinq âmes dans l’Abîme.": "Two rings of blackened gold bound by chains and clasped hands: the mark of those who led five souls into the Deep.",
+  "Le Héraut sonne le cor, et la lumière de l’Abîme s’enroule autour de lui : le dos de ceux qui ont mené dix âmes dans l’Abîme.": "The Herald sounds the horn, and the light of the Deep coils around him: the card back of those who led ten souls into the Deep.",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {
