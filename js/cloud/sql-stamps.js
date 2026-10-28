@@ -6,7 +6,7 @@ export const SQL_STAMPS = {
   },
   "11": {
     "file": "11-anti-triche.sql",
-    "stamp": "4ee3f7f95560"
+    "stamp": "ccd0df6e5aab"
   },
   "12": {
     "file": "12-serveur-de-partie.sql",
@@ -35,6 +35,10 @@ export const SQL_STAMPS = {
   "19": {
     "file": "19-cadeaux.sql",
     "stamp": "bd1c7e99dab6"
+  },
+  "21": {
+    "file": "21-parrainage.sql",
+    "stamp": "8f93dd3632b2"
   },
   "05": {
     "file": "05-tirage.sql",

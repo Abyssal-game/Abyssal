@@ -215,6 +215,7 @@ const rpc = (fn, body = {}) => authed(`/rest/v1/rpc/${fn}`, { method: 'POST', bo
 /* v693 : adresse de notification du téléphone (supabase/17-notifications.sql) */
 export const pushRegister = (token, platform, lang) => rpc('push_register', { p_token: token, p_platform: platform, p_lang: lang });
 export const pushUnregister = (token) => rpc('push_unregister', { p_token: token });
+export const parrainList = () => rpc('parrain_list'); /* v881 : supabase/21-parrainage.sql */
 export const onlinePing = () => rpc('online_ping');
 export const onlineLeave = () => rpc('online_leave');
 export const onlineList = async () => (await rpc('online_list')) || [];

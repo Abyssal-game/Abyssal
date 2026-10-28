@@ -5,7 +5,7 @@
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 
-export const STAMPED = ['05', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '19'];
+export const STAMPED = ['05', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '19', '21'];
 const DIR = new URL('../supabase/', import.meta.url);
 const A = '-- ABYSSAL:empreinte (écrite par tools/sql-stamp.mjs, ne pas modifier)', Z = '-- ABYSSAL:fin';
 

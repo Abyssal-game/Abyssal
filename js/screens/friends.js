@@ -30,7 +30,8 @@ export default function friends(app, root, params = []) {
     const me = cloud.isLoggedIn() && sync.profile?.pseudo; /* v528 : compte obligatoire, seul le pseudo peut manquer */
     root.innerHTML = `${head('Ajoute des joueurs grâce à leur pseudo et découvre leur collection, leurs succès et leurs exploits.')}
       ${me ? `<section class="panel stack fr-me"><p class="small">Ton pseudo : <b class="notranslate">${esc(me)}</b> · donne-le à tes amis pour qu’ils t’ajoutent.</p>
-        <form class="row gap fr-add" id="fr-add"><input class="input plain" name="pseudo" maxlength="16" minlength="3" placeholder="Pseudo d’un joueur" autocomplete="off" required><button class="btn primary" type="submit">Ajouter</button></form></section>`
+        <form class="row gap fr-add" id="fr-add"><input class="input plain" name="pseudo" maxlength="16" minlength="3" placeholder="Pseudo d’un joueur" autocomplete="off" required><button class="btn primary" type="submit">Ajouter</button></form></section>
+        <a class="panel prn-cta" href="#/parrainage"><span class="prn-cta-ic">${icon('sparkle')}</span><span><b>Parraine tes proches</b><small>Jusqu’à 10 récompenses, de plus en plus belles</small></span><span class="fr-go">${icon('next')}</span></a>`
         : `<section class="panel stack center"><p>Choisis d’abord ton pseudo : c’est grâce à lui que tes amis te trouvent.</p><a class="btn primary block" href="#/compte">Choisir mon pseudo</a></section>`}
       <div id="fr-list"><p class="small muted center">Chargement…</p></div>`;
     root.querySelector('#fr-add')?.addEventListener('submit', async (e) => {

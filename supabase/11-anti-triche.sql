@@ -94,6 +94,7 @@ insert into public.game_titles (name) values
 ('Graine de l’Abysse'),
 ('Grand veneur'),
 ('Horloger de l''impossible'),
+('Héraut de l’Abîme'),
 ('Héritier de la Forge'),
 ('Héritier de la Titanomachie'),
 ('Héritier des Sceaux'),
@@ -142,6 +143,7 @@ insert into public.game_titles (name) values
 ('Pécheur accompli'),
 ('Pêcheur de perles'),
 ('Racine profonde'),
+('Recruteur'),
 ('Rire dans l’ombre'),
 ('Rouage infatigable'),
 ('Scribe de l’Abîme'),
@@ -754,7 +756,7 @@ update public.profiles set owned = least(owned, (select count(*) from public.gam
 create table if not exists public.sql_stamps (file text primary key, stamp text not null, at timestamptz not null default now());
 alter table public.sql_stamps enable row level security;
 revoke all on public.sql_stamps from public, anon, authenticated;
-insert into public.sql_stamps (file, stamp) values ('11', '4ee3f7f95560') on conflict (file) do update set stamp = excluded.stamp, at = now();
+insert into public.sql_stamps (file, stamp) values ('11', 'ccd0df6e5aab') on conflict (file) do update set stamp = excluded.stamp, at = now();
 create or replace function public.sql_stamps() returns jsonb language sql stable security definer set search_path = public as $$
   select coalesce(jsonb_object_agg(file, stamp), '{}'::jsonb) from public.sql_stamps;
 $$;

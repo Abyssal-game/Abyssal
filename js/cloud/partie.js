@@ -9,6 +9,7 @@ import { recordOps } from '../core/oprec.js';
 import { FREE, FREE_DEV, getPath, setPath, mergeFree, clone, digest } from '../core/ops.js';
 import { migrate } from '../core/save.js';
 import { toast } from '../ui/dom.js';
+import { t } from '../i18n.js';
 
 export const partie = { mode: 'unknown', error: null, last: 0 };
 const K = { queue: 'abyssal.ops', seq: 'abyssal.opseq', dev: 'abyssal.device', mode: 'abyssal.partieMode' };
@@ -72,12 +73,12 @@ export function adopt(data) {
 }
 
 // Envoie les actions en attente ; reçoit la partie du serveur si elle diffère de celle du téléphone
-export function flush({ want = false } = {}) {
+export function flush({ want = false, par = false } = {}) {
   if (!cloud.isLoggedIn() || partie.mode === 'legacy') return Promise.resolve(null);
-  if (inflight) return inflight.then(() => flush({ want }), () => flush({ want }));
+  if (inflight) return inflight.then(() => flush({ want, par }), () => flush({ want, par }));
   const ops = queue.slice(0, 1500), sent = ops.length ? ops[ops.length - 1].q : 0; // v540 : par paquets (un combat compte des centaines de coups)
   const fr = freeSnap(), frTxt = JSON.stringify(fr);
-  const body = { ops, dev: device(), tz: -new Date().getTimezoneOffset(), digest: digest(g.s), want: want || partie.mode !== 'server', ...(frTxt !== lastFree ? { free: fr } : {}) };
+  const body = { ops, dev: device(), tz: -new Date().getTimezoneOffset(), digest: digest(g.s), want: want || partie.mode !== 'server', ...(par ? { par: true } : {}), ...(frTxt !== lastFree ? { free: fr } : {}) };
   const who = uid();
   inflight = cloud.partieCall(body).then((res) => {
     inflight = null;
@@ -91,6 +92,11 @@ export function flush({ want = false } = {}) {
     lastFree = frTxt; partie.error = null; partie.last = Date.now();
     for (const [q, ev] of Object.entries(res?.prog || {})) if (firstQs.has(Number(q)) && ev?.length) g.emit('progress', ev); // annonces des actions faites par le serveur
     if (res?.data) { if (safe()) adopt(res.data); else waiting = res.data; } else waiting = null; // la partie du serveur est celle du téléphone
+    /* v881 : récompenses du parrainage données par le serveur */
+    for (const x of Array.isArray(res?.par) ? res.par : []) {
+      if (x.gift) toast(t('Parrainage validé ! Ton cadeau t’attend : 3 boosters, 1 booster premium et 500 éclats.'), { kind: 'success', icon: 'sparkle', ms: 7000, onShow: () => app?.sfx?.achievement?.() });
+      else if (x.rank) toast(t('Un de tes filleuls a validé son parrainage : palier {n} sur 10 gagné !', { n: x.rank }), { kind: 'success', icon: 'sparkle', ms: 7000, onShow: () => app?.sfx?.achievement?.() });
+    }
     emit();
     return res;
   }, (err) => {
@@ -166,6 +172,7 @@ const LEGACY = {
   chocClaim() { throw new Error('Le Choc des Boosters demande le serveur de partie : réessaie dans un instant.'); },
   async mpClaim(game, id, friendsOnly = false) { const r = await cloud.mpClaim(id); return { r, out: friendsOnly ? { shards: 0 } : g.mpReward(game, id, r) }; },
   shadowPay: (day) => g.shadowPay(day),
+  parrainLink() { throw new Error('Le parrainage demande le serveur de partie : réessaie dans un instant.'); }, /* v881 */
   async shadowClaim(week) {
     const rank = await cloud.shadowClaim(week);
     const sh = g.shadowState(); sh.asked = week; g.persist();

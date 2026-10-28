@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v880'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v881'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -136,6 +136,26 @@ export const LEVEL_TITLES = [
 /* v875 (décision du propriétaire du 28 octobre 2026 : les cadres de l'Échoppe ne sont plus vendus, ils se gagnent) :
    un cadre vivant à certains niveaux de profil (les autres sont des récompenses de succès, data/achievements.json) */
 export const LEVEL_FRAMES = [[5, 'cx-vif-ambre'], [8, 'cx-vif-rouages'], [12, 'cx-vif-venin'], [18, 'cx-vif-obsidienne'], [25, 'cx-vif-maree'], [32, 'cx-vif-ames'], [40, 'cx-vif-sang'], [50, 'cx-vif-soleil-noir']];
+/* v881 : parrainage (demande du propriétaire du 28 octobre 2026). Le filleul entre le pseudo de son parrain dans ses
+   7 premiers jours ; validé par le serveur quand il a joué 3 jours différents dans les 14 jours et vaincu le premier gardien.
+   Cadeau du filleul, puis 10 paliers du parrain, de plus en plus beaux ; au-delà, plus rien. Le cadre (5e) et le dos
+   vivant (10e) n'apparaissent qu'une fois leurs images ajoutées (clés réservées). */
+export const REFERRAL = {
+  linkDays: 7, windowDays: 14, needDays: 3, max: 10,
+  gift: { tickets: { standard: 3, premium: 1 }, shards: 500 },
+  ladder: [
+    { tickets: { standard: 2 }, shards: 300 },
+    { tickets: { premium: 1 }, shards: 300 },
+    { tickets: { premium: 1 }, title: 'Recruteur' },
+    { shards: 1000, ash: 500 },
+    { frame: 'cx-vif-lien', tickets: { premium: 1 } },
+    { tickets: { premium: 2 } },
+    { tickets: { event: 3 }, shards: 1500 },
+    { tickets: { faction: 2 } },
+    { tickets: { premium: 3 }, ash: 1000 },
+    { back: 'dos-heraut', title: 'Héraut de l’Abîme', shards: 2000 },
+  ],
+};
 
 export const FRAMES = {
   base: 'Cadre de fer', or: 'Cadre d’or', prisme: 'Cadre prismatique', titan: 'Cadre des Titans', neant: 'Cadre du Néant',

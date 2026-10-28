@@ -29,6 +29,8 @@ import settingsScreen from './screens/settings.js';
 import descentScreen from './screens/descent.js';
 import accountScreen from './screens/account.js';
 import friendsScreen from './screens/friends.js';
+import parrainScreen from './screens/parrainage.js';
+import { captureCode, tryPendingParrain } from './ui/parrain.js'; /* v881 */
 import menuScreen from './screens/menu.js';
 import sceauxScreen from './screens/sceaux.js';
 import gamesScreen from './screens/games.js';
@@ -67,7 +69,7 @@ watchPlates(); /* v644 : pseudos à leur taille dans les plaques */
 const ROUTES = {
   '': homeScreen, antre: homeScreen, collection: collectionScreen, boutique: shopScreen, bestiaire: bestiaryScreen,
   factions: factionsScreen, faction: factionsScreen, succes: achievementsScreen, profil: profileScreen,
-  parametres: settingsScreen, descente: descentScreen, compte: accountScreen, amis: friendsScreen, menu: menuScreen, equipe: teamScreen, coffres: chestsScreen, heros: descentScreen, arsenal: chestsScreen, marchand: descentScreen, sceaux: sceauxScreen, encheres: encheresScreen, versus: versusScreen, pacte: pacteScreen, cryptes: cryptesScreen, jeux: gamesScreen, codex: codexScreen, epreuves: trialsScreen, epreuve: descentScreen, tirage: shadowScreen, renfort: forgeScreen, fournaise: furnaceScreen, labo: labScreen,
+  parametres: settingsScreen, descente: descentScreen, compte: accountScreen, amis: friendsScreen, parrainage: parrainScreen, menu: menuScreen, equipe: teamScreen, coffres: chestsScreen, heros: descentScreen, arsenal: chestsScreen, marchand: descentScreen, sceaux: sceauxScreen, encheres: encheresScreen, versus: versusScreen, pacte: pacteScreen, cryptes: cryptesScreen, jeux: gamesScreen, codex: codexScreen, epreuves: trialsScreen, epreuve: descentScreen, tirage: shadowScreen, renfort: forgeScreen, fournaise: furnaceScreen, labo: labScreen,
 };
 const TABS = [
   ['antre', 'tab-home', 'Accueil'], ['collection', 'tab-collection', 'Collection'], ['boutique', 'tab-butin', 'Butin'], /* v428 : boosters, coffres et Tirage (v432 : « Butin ») */
@@ -75,11 +77,11 @@ const TABS = [
 ];
 // icônes peintes de la barre du bas (assets/icons)
 const tabIcon = (k) => `<img class="tab-pic" alt="" src="assets/icons/${k}.webp">`;
-const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', codex: 'boutique', descente: 'descente', menu: 'menu', bestiaire: 'menu', factions: 'menu', faction: 'menu', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', amis: 'menu', equipe: 'collection', renfort: 'collection', fournaise: 'collection', coffres: 'boutique', heros: 'descente', arsenal: 'boutique', marchand: 'descente', sceaux: 'descente', encheres: 'descente', versus: 'boutique', pacte: 'descente', cryptes: 'descente', jeux: 'descente', epreuves: 'descente', epreuve: 'descente', tirage: 'boutique', labo: 'menu' };
+const TAB_OF = { '': 'antre', antre: 'antre', collection: 'collection', boutique: 'boutique', codex: 'boutique', descente: 'descente', menu: 'menu', bestiaire: 'menu', factions: 'menu', faction: 'menu', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', amis: 'menu', parrainage: 'menu', equipe: 'collection', renfort: 'collection', fournaise: 'collection', coffres: 'boutique', heros: 'descente', arsenal: 'boutique', marchand: 'descente', sceaux: 'descente', encheres: 'descente', versus: 'boutique', pacte: 'descente', cryptes: 'descente', jeux: 'descente', epreuves: 'descente', epreuve: 'descente', tirage: 'boutique', labo: 'menu' };
 // Fond illustré de chaque page (l'Accueil et la Descente posent le leur)
-const ROUTE_SCENE = { boutique: 'shop', codex: 'shop', tirage: 'shadow', renfort: 'collection', fournaise: 'collection', collection: 'collection', equipe: 'team', coffres: 'chests', bestiaire: 'bestiary', succes: 'trophies', profil: 'profile', menu: 'menu', parametres: 'menu', compte: 'menu', amis: 'menu', factions: 'factions', faction: 'factions' };
+const ROUTE_SCENE = { boutique: 'shop', codex: 'shop', tirage: 'shadow', renfort: 'collection', fournaise: 'collection', collection: 'collection', equipe: 'team', coffres: 'chests', bestiaire: 'bestiary', succes: 'trophies', profil: 'profile', menu: 'menu', parametres: 'menu', compte: 'menu', amis: 'menu', parrainage: 'menu', factions: 'factions', faction: 'factions' };
 // Page parente des sous-pages (bouton retour en haut)
-const PARENT = { labo: 'parametres', amis: 'menu', bestiaire: 'menu', factions: 'bestiaire', faction: 'bestiaire', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', heros: 'descente', arsenal: 'coffres', marchand: 'descente', sceaux: 'jeux', encheres: 'jeux', pacte: 'jeux', cryptes: 'jeux' };
+const PARENT = { labo: 'parametres', amis: 'menu', parrainage: 'amis', bestiaire: 'menu', factions: 'bestiaire', faction: 'bestiaire', succes: 'menu', profil: 'menu', parametres: 'menu', compte: 'menu', heros: 'descente', arsenal: 'coffres', marchand: 'descente', sceaux: 'jeux', encheres: 'jeux', pacte: 'jeux', cryptes: 'jeux' };
 // Sous-onglets de chaque onglet principal (barre en haut de la page)
 // v425 : pages rangées sous un autre sous-onglet (allumé sur elles)
 const SUB_OF = { fournaise: 'renfort', sceaux: 'jeux', encheres: 'jeux', pacte: 'jeux', cryptes: 'jeux' };
@@ -482,6 +484,8 @@ async function boot() {
     app.partie = { first, firstMany, flush: flushPartie };
     /* v680 : dès que le serveur de partie répond : prix de l'App Store, et achat payé pas encore vérifié (app fermée trop tôt) */
     let iapDone = false;
+    captureCode();
+    onPartie((p) => { if (p.mode === 'server' && sync.profile?.pseudo) setTimeout(() => tryPendingParrain(app), 2500); }); /* v881 : code de parrainage entré à l'inscription */
     onPartie((p) => { if (p.mode !== 'server' || iapDone) return; iapDone = true;
       loadPrices().then(() => { if (/codex/.test(location.hash)) app.refresh?.(); });
       iapResume(app).then((got) => { if (got.length) { toast(got.length > 1 ? t('{n} achat(s) ajouté(s).', { n: got.length }) : t('{name} : ajouté.', { name: esc(got[0].name) }), { kind: 'success', icon: 'star' }); app.chrome?.(); if (/codex/.test(location.hash)) app.refresh?.(); } }); });

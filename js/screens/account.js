@@ -8,6 +8,7 @@ import { blockedIds, clearBlocked, isMaskedPseudo } from '../core/moderation.js'
 import { clearAll, pushOff } from '../notify.js';
 import { resetWatch } from '../cloud/mpwatch.js';
 import { serverMode } from '../cloud/partie.js';
+import { stashCode, pendingCode, tryPendingParrain } from '../ui/parrain.js'; /* v881 */
 
 // v321 : règle des mots de passe réglée dans Supabase (Authentication → Password requirements)
 const PW_RULE = '8 caractères au moins, avec une majuscule, une minuscule, un chiffre et un symbole (! ? # …)';
@@ -20,12 +21,12 @@ export function askPseudo(app) {
     <p class="small center muted">C’est le nom que les autres joueurs verront dans les classements, et grâce auquel tes amis te trouveront. <b>Choisis bien : il est définitif.</b></p>
     <form class="stack" id="ps-form" novalidate><input class="input plain" name="pseudo" maxlength="16" minlength="3" placeholder="3 à 16 lettres ou chiffres" autocomplete="nickname" value="${esc(app.game.s.name || '')}">
     <button class="btn primary block" type="submit">${icon('user')}Valider</button><button class="btn ghost small block" type="button" data-ps="later">Plus tard</button></form></div>`, { label: 'Ton nom', cls: 'sheet-small' });
-  sh.body.querySelector('[data-ps="later"]').addEventListener('click', () => sh.close());
+  sh.body.querySelector('[data-ps="later"]').addEventListener('click', () => { sh.close(); tryPendingParrain(app); });
   sh.body.querySelector('#ps-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const v = String(new FormData(e.target).get('pseudo') || '').trim();
     if (v && !(await confirmBox(`Ton pseudo sera <b>${esc(v)}</b>, pour toujours. C’est bon ?`, { ok: 'Oui, c’est mon pseudo' }))) return;
-    try { await setPseudo(v); if (!app.game.s.name) app.game.setName?.(v); toast(`Bienvenue, <b>${esc(v)}</b> !`, { kind: 'success', icon: 'user' }); sh.close(); app.refresh?.(); }
+    try { await setPseudo(v); if (!app.game.s.name) app.game.setName?.(v); toast(`Bienvenue, <b>${esc(v)}</b> !`, { kind: 'success', icon: 'user' }); sh.close(); app.refresh?.(); setTimeout(() => tryPendingParrain(app), 1500); }
     catch (err) { toast(esc(err.message), { kind: 'error', icon: 'info' }); }
   });
 }
@@ -89,7 +90,7 @@ export default function account(app, root) {
         <div class="seg wide acc-seg" role="group" aria-label="Connexion ou inscription"><button type="button" class="seg-b" data-mode="login" aria-pressed="${!signup}">Se connecter</button><button type="button" class="seg-b" data-mode="signup" aria-pressed="${signup}">Créer un compte</button></div>
         <form class="panel stack acc-form" id="login" novalidate>
           <label class="acc-l"><span class="small muted">E-mail</span><input class="input plain" type="email" name="email" autocomplete="username" inputmode="email" required value="${esc(lastEmail)}"></label>
-          ${forgot ? '' : `<label class="acc-l"><span class="small muted">Mot de passe</span><input class="input plain" type="password" name="password" autocomplete="${signup ? 'new-password' : 'current-password'}" required ${signup ? 'minlength="8" placeholder="8 caractères, Aa1 et symbole"' : ''}></label>${signup ? `<p class="small muted acc-pwrule">${PW_RULE}.</p>` : ''}`}
+          ${forgot ? '' : `<label class="acc-l"><span class="small muted">Mot de passe</span><input class="input plain" type="password" name="password" autocomplete="${signup ? 'new-password' : 'current-password'}" required ${signup ? 'minlength="8" placeholder="8 caractères, Aa1 et symbole"' : ''}></label>${signup ? `<p class="small muted acc-pwrule">${PW_RULE}.</p><label class="acc-l"><span class="small muted">Code de parrainage (facultatif)</span><input class="input plain" name="parrain" maxlength="16" autocomplete="off" autocapitalize="off" placeholder="Pseudo du joueur qui t’a invité" value="${esc(pendingCode())}"></label>` : ''}`}
           ${forgot ? '<p class="small muted">Tu recevras un e-mail avec un lien : il te ramène au jeu pour choisir un nouveau mot de passe.</p>' : ''}
           <button class="btn primary block" type="submit" ${busy ? 'disabled' : ''}>${icon(forgot ? 'key' : 'user')}${busy ? 'Un instant…' : forgot ? 'Envoyer le lien' : signup ? 'Créer mon compte' : 'Se connecter'}</button>
           ${signup ? `<p class="small muted">En créant un compte, tu acceptes la <a href="confidentialite.html" target="_blank" rel="noopener">politique de confidentialité</a>. Il faut avoir 13 ans ou plus.</p>` : forgot ? `<button type="button" class="btn ghost small" data-mode="login">Retour</button>` : `<button type="button" class="btn ghost small" data-mode="forgot">Mot de passe oublié ?</button>`}
@@ -113,6 +114,7 @@ export default function account(app, root) {
           } else if (signup) {
             if (!pwOk(String(f.get('password')))) throw new Error(`Mot de passe trop faible : ${PW_RULE}.`);
             const r = await cloud.signUp(lastEmail, String(f.get('password')));
+            stashCode(f.get('parrain')); /* v881 */
             if (r.loggedIn) {
               const k = await afterLogin();
               setTimeout(() => askPseudo(app), 900);

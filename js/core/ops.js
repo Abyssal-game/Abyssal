@@ -49,6 +49,7 @@ export const OPS = {
   versusCreate: { kind: 'first', net: true }, versusAccept: { kind: 'first', net: true }, versusClaim: { kind: 'first', net: true }, versusPick: { kind: 'first', net: true },
   chocNew: { kind: 'first', net: true }, chocJoin: { kind: 'first', net: true }, chocRefund: { kind: 'first', net: true }, chocClaim: { kind: 'first', net: true }, /* v811 */
   mpClaim: { kind: 'first', net: true }, shadowPay: { kind: 'first', net: true }, shadowClaim: { kind: 'first', net: true },
+  parrainLink: { kind: 'first', net: true }, /* v881 : code du parrain, vérifié par le serveur */
   // Mode Créateur
   shopBuy: { kind: 'dev' }, devGrant: { kind: 'dev' }, devGive: { kind: 'dev' }, devAllVariants: { kind: 'dev' }, devDuplicates: { kind: 'dev' },
   devChests: { kind: 'dev' }, devResetCampaign: { kind: 'dev' }, devFreePacks: { kind: 'dev' }, devChocTokens: { kind: 'dev' }, devAbyss: { kind: 'dev' }, devMissions: { kind: 'dev' }, devFloor: { kind: 'dev' },
@@ -105,7 +106,8 @@ export function digest(s) {
     s.codex ? `${s.codex.season}:${s.codex.premium ? 1 : 0}:${s.codex.xp || 0}:${(s.codex.free || []).length}:${(s.codex.prem || []).length}` : '-', (s.purchases || []).length, /* v728 : Codex et achats comptés (un Codex payé n'arrivait jamais sur le téléphone) */
     `${s.versus?.streak || 0}:${s.versus?.lg?.m || ''}:${s.versus?.lg?.pts || 0}`, /* v807 : Série ardente et Ligue du Choc */
     s.choc ? `${s.choc.n}:${Object.keys(s.choc.done || {}).length}` : '-', /* v811 : jetons du Choc */
-    s.seedBase ?? '-', s.seedN || 0, ...SESS.map((p) => sessPrint(getPath(s, p)))];
+    s.seedBase ?? '-', s.seedN || 0, ...SESS.map((p) => sessPrint(getPath(s, p))),
+    ...(s.parrain ? [`${s.parrain.gift ? 1 : 0}:${(s.parrain.paid || []).length}`] : [])]; /* v881 : parrainage (seulement s'il existe : empreinte inchangée pour les autres) */
   let h = 2166136261;
   for (const ch of parts.join('|')) h = Math.imul(h ^ ch.charCodeAt(0), 16777619) >>> 0;
   return h.toString(36);
@@ -133,7 +135,7 @@ export const ARGS = {
   encheresStart: [{ table: 'S', daily: 'b' }], encheresFinish: [], encheresQuit: [], gameForfeit: ['s'], tourneyPlay: [],
   sceauxPlay: ['i', 'i'], sceauxAi: [], pacteDraw: [], pacteStop: [], pacteDouble: [], pacteAi: [], cryptesFlip: ['i'], cryptesPower: ['ai'], cryptesAi: [], encheresBid: ['i'],
   chocTokens: [], chocNew: ['S', 's'], chocJoin: ['s'], chocRefund: [], chocClaim: ['s', 'I', 'I'], /* v811 */
-  codex: [], chocLeague: [], codexClaim: ['s', 'i'], codexClaimAll: [], catalogBuy: ['s'], codexBuyTier: [], shadowPay: ['s'],
+  codex: [], chocLeague: [], codexClaim: ['s', 'i'], codexClaimAll: [], catalogBuy: ['s'], codexBuyTier: [], shadowPay: ['s'], parrainLink: ['s'],
 };
 const isInt = (v) => Number.isInteger(v);
 function argOk(t, v) {

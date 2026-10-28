@@ -32,6 +32,8 @@ export function createRestDb({ url, secret, publishable }) {
     isCreator: (uid) => call('partie_creator', { p_uid: uid }),
     versusDuel: (id) => call('partie_versus', { p_id: id }),
     shadowDrew: (uid, day) => call('partie_shadow_drew', { p_uid: uid, p_day: day }),
+    parrainLink: (uid, code) => call('parrain_link', { p_uid: uid, p_code: code }), // v881 : supabase/21-parrainage.sql
+    parrainTick: (uid, day, boss) => call('parrain_tick', { p_uid: uid, p_day: day, p_boss: boss }),
     publish: (uid, profile, card, trials) => call('partie_publish', { p_uid: uid, p_profile: profile, p_card: card, p_trials: trials }),
     rpc: (name, args, token) => call(name, args, { token }),
     svc: (name, args) => call(name, args), // v811 : fonctions réservées au serveur (Choc des Boosters)

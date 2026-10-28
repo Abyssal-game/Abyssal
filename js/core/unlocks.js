@@ -2,7 +2,7 @@ import * as EN from './encheres.js';
 import * as PA from './pacte.js';
 import * as CR from './cryptes.js';
 // Titres et cadres : d'où vient chacun (pour expliquer comment débloquer ceux qui manquent).
-import { LEVEL_TITLES, LEVEL_FRAMES, FRAMES, ASH_FRAMES } from '../config.js';
+import { LEVEL_TITLES, LEVEL_FRAMES, FRAMES, ASH_FRAMES, REFERRAL } from '../config.js';
 import { CODEX_FRAMES } from './codex.js';
 import { SCEAUX_TITLES, RIVALS } from './sceaux.js';
 
@@ -38,6 +38,8 @@ export function unlockSources(cat) {
   }
   add(titles, 'Vainqueur de l’Abysse', 'Vaincs l’Abysse, le gardien de l’étage 100 de la Descente.');
   add(frames, 'oeil', 'Vaincs l’Abysse, le gardien de l’étage 100 de la Descente.');
+  /* v881 : parrainage (Sanctuaire › Amis › Parraine tes proches) */
+  REFERRAL.ladder.forEach((r, i) => { const how = `Parraine ${i + 1} joueur${i ? 's' : ''} (Sanctuaire › Amis › Parraine tes proches).`; add(titles, r.title, how); add(frames, r.frame, how); });
   return {
     titles: [...titles].map(([name, how]) => ({ name, how: how.join(' Ou : ') })),
     frames: Object.keys({ ...FRAMES, ...CODEX_FRAMES }).filter((k) => frames.has(k)).map((k) => ({ key: k, name: FRAMES[k] || CODEX_FRAMES[k], how: frames.get(k).join(' Ou : ') })),

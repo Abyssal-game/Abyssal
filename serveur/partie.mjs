@@ -9,6 +9,8 @@ import { lineupStake, leagueIdx } from '../js/core/versus.js';
 import { friendCard } from '../js/core/friends.js';
 import { OPS, FREE, FREE_DEV, setPath, getPath, mergeFree, clone, digest, argsOk } from '../js/core/ops.js';
 import { catalogue } from './catalogue.mjs';
+import { parrainApply } from '../js/core/parrain.js';
+import { today } from '../js/core/save.js';
 
 export const PARTIE_VERSION = 1;
 const MAX_OPS = 2000, TZ_LOCK_DAYS = 7; // un combat compte souvent plus de cent coups
@@ -109,6 +111,15 @@ const NET = {
     if (!c.iap) throw new Error('Les achats ne sont pas encore ouverts sur le serveur.');
     return g.iapApply(await c.iap(c.uid));
   },
+  /* v881 : le filleul entre le pseudo de son parrain (règles dans supabase/21-parrainage.sql) */
+  async parrainLink(c, g, code) {
+    const v = String(code || '').trim();
+    if (v.length < 3 || v.length > 16) throw new Error('Entre le pseudo de ton parrain.');
+    if (!c.db.parrainLink) throw new Error('Le parrainage n’est pas encore ouvert sur le serveur.');
+    const r = await c.db.parrainLink(c.uid, v);
+    c.par = true;
+    return { pseudo: r?.pseudo || v };
+  },
   async shadowClaim(c, g, week) {
     const rank = await c.db.rpc('shadow_claim', { p_week: week }, c.token);
     const sh = g.shadowState(); sh.asked = week;
@@ -185,6 +196,11 @@ export async function handle({ uid, token, body }, { db, now = () => Date.now(),
     }
     curQ = 0;
     seqs['d:' + dev] = last;
+    /* v881 : parrainage : jours joués du filleul, validation, paliers du parrain (au plus toutes les 10 minutes, ou sur demande) */
+    if (db.parrainTick && (c.par || b.par || !(now() - (Number(seqs._par) || 0) < 6e5))) {
+      seqs._par = now();
+      try { const got = parrainApply(g, await db.parrainTick(uid, today(g.clock()), !!g.s.bossesBeaten?.devoreur)); if (got.length) fx.par = got; } catch (e) { /* 21-parrainage.sql pas encore collé : rien */ }
+    }
     g.persist(); // note aussi le jour joué (coffre de la semaine)
     const out = g.s, dg = digest(out);
     // profil public et fiche d'ami : republiés seulement s'ils ont changé (ou s'il y a des Épreuves à compter)
@@ -196,7 +212,7 @@ export async function handle({ uid, token, body }, { db, now = () => Date.now(),
     if (!saved) { await db.unlock(uid).catch(() => {}); return { status: 409, body: { error: 'Ta partie a changé ailleurs : réessaie.' } }; }
     // ce que les autres voient : profil public, fiche d'ami, classement des Épreuves (tenus par le serveur)
     if (mustPub) { try { await db.publish(uid, profile, card, fx.trials); } catch (e) { /* jamais bloquant */ } }
-    const res = { ok: true, v: (row.version || 0) + 1, digest: dg, rets, errs, prog, tz };
+    const res = { ok: true, v: (row.version || 0) + 1, digest: dg, rets, errs, prog, tz, ...(fx.par ? { par: fx.par } : {}) };
     if (b.want || b.digest !== dg) res.data = out; // la partie n'est renvoyée que si celle du téléphone diffère
     return { status: 200, body: res };
   } catch (e) {
