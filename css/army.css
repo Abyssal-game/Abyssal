@@ -8898,3 +8898,29 @@ body:has(.prog-chip.docked.in) #topbar .top-meta { opacity: 0; }
 .pf-chasseur { --fr: url(../assets/frames/pf-chasseur-4.webp); }
 .pf-sceaux { --fr: url(../assets/frames/pf-sceaux-4.webp); }
 .pf-reliques { --fr: url(../assets/frames/pf-reliques-4.webp); }
+
+/* v876 : les 6 derniers cadres d'origine peints (Guerre, braise, Forge, Phénix, Œil de l'Abysse, Choc ; sources store/frames/pf-<clé>-source.jpg) */
+.pf.pf:is(.pf-guerre, .pf-braise, .pf-forge, .pf-phenix, .pf-oeil, .pf-choc) { position: relative; overflow: visible; border-color: transparent; box-shadow: none; animation: none; }
+.pf.pf:is(.pf-guerre, .pf-braise, .pf-forge, .pf-phenix, .pf-oeil, .pf-choc) > img { border-radius: 50%; }
+.pf.pf.pf.pf.pf.pf:is(.pf-guerre, .pf-braise, .pf-forge, .pf-phenix, .pf-oeil, .pf-choc)::after { content: ''; position: absolute; inset: -15.5%; border-radius: 0; background: var(--fr) center / 100% 100% no-repeat; -webkit-mask: none; mask: none; animation: none; pointer-events: none; z-index: 1; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .6)); opacity: 1; transform: none; }
+.top-avatar.pf.pf:is(.pf-guerre, .pf-braise, .pf-forge, .pf-phenix, .pf-oeil, .pf-choc) { margin: 0 3px; }
+.frame-pick .avatar-mini.pf.pf:is(.pf-guerre, .pf-braise, .pf-forge, .pf-phenix, .pf-oeil, .pf-choc) { margin: 6px 0 10px; }
+.pf-guerre { --fr: url(../assets/frames/pf-guerre-4.webp); }
+.pf-braise { --fr: url(../assets/frames/pf-braise-4.webp); }
+.pf-forge { --fr: url(../assets/frames/pf-forge-4.webp); }
+.pf-phenix { --fr: url(../assets/frames/pf-phenix-4.webp); }
+.pf-oeil { --fr: url(../assets/frames/pf-oeil-4.webp); }
+.pf-choc { --fr: url(../assets/frames/pf-choc-4.webp); }
+/* v876 : bannières des boosters de faction et des Alliances refaites (sources store/logo/bn-faction-source.jpg, bn-alliances-source.jpg) */
+.bn-faction { --bn: url(../assets/ui/bn-faction2.webp); }
+.bn-event { --bn: url(../assets/ui/bn-alliances.webp); }
+/* v876 : Pacte, sceaux de cire peints (assets/jeux/pa-cire-<faction>.webp) à la place des disques de couleur quand la faction est jouée */
+.pa-seal.on[data-f] { background: var(--cire) center / 100% 100% no-repeat; box-shadow: 0 0 12px 2px color-mix(in srgb, var(--fc) 60%, transparent); border-radius: 50%; }
+.pa-seal.on[data-f] .sigil { opacity: 0; }
+.pa-seal[data-f="infernal"] { --cire: url(../assets/jeux/pa-cire-infernal.webp); }
+.pa-seal[data-f="abyssal"] { --cire: url(../assets/jeux/pa-cire-abyssal.webp); }
+.pa-seal[data-f="celeste"] { --cire: url(../assets/jeux/pa-cire-celeste.webp); }
+.pa-seal[data-f="sauvage"] { --cire: url(../assets/jeux/pa-cire-sauvage.webp); }
+.pa-seal[data-f="necrotique"] { --cire: url(../assets/jeux/pa-cire-necrotique.webp); }
+.pa-seal[data-f="primordial"] { --cire: url(../assets/jeux/pa-cire-primordial.webp); }
+.pa-seal[data-f="artificiel"] { --cire: url(../assets/jeux/pa-cire-artificiel.webp); }
