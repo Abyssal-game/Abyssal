@@ -118,14 +118,21 @@ test('live : version signée téléchargée, essayée au lancement, puis gardée
   assert.equal(s.ready, null);
 });
 
-test('live : une version qui n’a pas tenu est écartée', async () => {
-  // l'app a été relancée sur l'ancienne version (plantage de la nouvelle) : on ne la reprend plus
+test('live : une version qui n’a pas tenu est réessayée une fois, puis écartée', async () => {
+  // v883 : l'app a été relancée sur l'ancienne version (plantage, ou app fermée trop tôt) : on la réessaie une fois
   await L.initLive();
-  const s = JSON.parse(localStorage.getItem('abyssal.live'));
+  let s = JSON.parse(localStorage.getItem('abyssal.live'));
+  assert.equal(s.trying, NEXT, 'réessayée au lancement suivant');
+  assert.ok(!(s.bad || []).includes(NEXT));
+  // deuxième échec : écartée
+  await L.initLive();
+  s = JSON.parse(localStorage.getItem('abyssal.live'));
   assert.equal(s.trying, null);
   assert.ok(s.bad.includes(NEXT));
+  // « Chercher une mise à jour » lui redonne sa chance
   const st = await L.liveCheck({ force: true });
-  assert.equal(st.state, 'uptodate');
+  assert.equal(st.state, 'ready');
+  assert.ok(!(JSON.parse(localStorage.getItem('abyssal.live')).bad || []).includes(NEXT));
 });
 
 test('live : Android, le jeu embarqué est recopié par le plugin natif LiveCopy', async () => {
