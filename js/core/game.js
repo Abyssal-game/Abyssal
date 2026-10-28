@@ -10,7 +10,7 @@ export const CHALLENGES = [
 export const WEEK_DAYS = 5; // jours joués dans la semaine pour le coffre de la semaine
 export const FIRST_WIN = 50;
 export const SHARD_FLOOR_CAP = 25; // au-delà de l'étage 25, les éclats par combat n'augmentent plus // éclats de la toute première victoire
-import { FINAL_FLOOR, BOOSTERS, FREE_PACK, BRAISE, TORCHES, ECONOMY, XP, LEVEL_TITLES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ASH_FRAMES, SHOW_ORDER, SHADOW, sublimeObs, VARIANTS, FIN_ORDER } from '../config.js';
+import { FINAL_FLOOR, BOOSTERS, FREE_PACK, BRAISE, TORCHES, ECONOMY, XP, LEVEL_TITLES, LEVEL_FRAMES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ASH_FRAMES, SHOW_ORDER, SHADOW, sublimeObs, VARIANTS, FIN_ORDER } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today, SAVE_STASH_KEY } from './save.js';
 import { CHOC } from './choc.js'; /* v811 */
@@ -2387,9 +2387,14 @@ export class Game {
       const reward = { ...XP.levelReward(this.s.level) };
       const t = LEVEL_TITLES.find(([n]) => n === this.s.level);
       if (t) reward.title = t[1];
+      const fr = LEVEL_FRAMES.find(([n]) => n === this.s.level);
+      if (fr && !this.s.frames.includes(fr[1])) reward.frame = fr[1];
       this.grant(reward);
       events.push({ kind: 'level', level: this.s.level, reward });
     }
+    /* v875 : cadres ajoutés aux niveaux et aux succès déjà atteints : donnés sans annonce */
+    for (const [n, f] of LEVEL_FRAMES) if (this.s.level >= n && !this.s.frames.includes(f)) this.s.frames.push(f);
+    for (const a of this.catalog.achievements) if (a.reward?.frame && this.s.achievements[a.key] && !this.s.frames.includes(a.reward.frame)) this.s.frames.push(a.reward.frame);
     if (events.length) this.emit('progress', events);
     return events;
   }

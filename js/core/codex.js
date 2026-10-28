@@ -234,7 +234,8 @@ export const COSM_RARITY = {
   /* v589 */ 'pl-corbeau': 'leg', 'pl-loup': 'leg', 'pl-araignee': 'epic', 'pl-ambre': 'epic', 'pl-meduse': 'rare', 'pl-serpent': 'rare', 'pl-lune': 'rare', 'pl-astrolabe': 'rare',
   /* v692 */ 'pl-titan': 'leg', 'pl-forge': 'epic', 'pl-racines': 'rare', 'pl-aile': 'leg', 'pl-tombes': 'epic', 'pl-encre': 'epic',
 };
-const SHOP_FRAMES = ['cx-vif-dragon', 'cx-vif-phenix', 'cx-vif-soleil-noir', 'cx-vif-amethyste', 'cx-vif-sablier', 'cx-vif-sang', 'cx-vif-brasier', 'cx-vif-givre', 'cx-vif-kraken', 'cx-vif-nacre', 'cx-vif-ames', 'cx-vif-abysse', 'cx-vif-maree', 'cx-vif-meduse', 'cx-vif-serpent', 'cx-vif-loup', 'cx-vif-foudre', 'cx-vif-etoiles', 'cx-vif-rouages', 'cx-vif-venin', 'cx-vif-ambre', 'cx-vif-obsidienne', 'cx-vif-araignee', 'cx-vif-orchidee'];
+/* v875 : les cadres vivants qui étaient vendus : ils se gagnent maintenant (niveaux, succès ; test tests/cadres-gagnes.test.mjs) */
+export const EARNED_FRAMES = ['cx-vif-dragon', 'cx-vif-phenix', 'cx-vif-soleil-noir', 'cx-vif-amethyste', 'cx-vif-sablier', 'cx-vif-sang', 'cx-vif-brasier', 'cx-vif-givre', 'cx-vif-kraken', 'cx-vif-nacre', 'cx-vif-ames', 'cx-vif-abysse', 'cx-vif-maree', 'cx-vif-meduse', 'cx-vif-serpent', 'cx-vif-loup', 'cx-vif-foudre', 'cx-vif-etoiles', 'cx-vif-rouages', 'cx-vif-venin', 'cx-vif-ambre', 'cx-vif-obsidienne', 'cx-vif-araignee', 'cx-vif-orchidee'];
 /* v586 (« je veux tout ») : tous les dos, sachets et plaques sont en vente, rangés par rareté ; seul le dos de l'alchimiste
    reste de côté (triangle lumineux proche de l'œil dans le triangle) */
 const OFF_SALE = ['dos-alchimie'];
@@ -248,7 +249,8 @@ const SHOP_MATS = shopOf(/^tp-/), SHOP_FONDS = shopOf(/^fp-/); /* v632 */
 export const PASS_RESERVE = [...Object.keys(COSM_RARITY).filter((k) => /^(dos|sachet|pl)-/.test(k) && ![...SHOP_BACKS, ...SHOP_SACHETS, ...SHOP_PLATES].includes(k))];
 const RZ = (mk, k, extra) => ({ ...mk(k, COSM_PRICE[COSM_RARITY[k]]), r: COSM_RARITY[k], live: true, ...extra });
 export const CATALOG = [
-  ...SHOP_FRAMES.map((k) => RZ(F, k)), ...SHOP_BACKS.map((k) => RZ(B, k)), ...SHOP_SACHETS.map((k) => RZ(SA, k)), ...SHOP_PLATES.map((k) => RZ(PL, k)), ...SHOP_MATS.map((k) => RZ(TP, k, { live: false })), ...SHOP_FONDS.map((k) => RZ(FP, k, { live: false })),
+  /* v875 : plus aucun cadre en vente (décision du propriétaire du 28 octobre 2026) : ils se gagnent aux niveaux et aux succès (LEVEL_FRAMES, data/achievements.json) */
+  ...SHOP_BACKS.map((k) => RZ(B, k)), ...SHOP_SACHETS.map((k) => RZ(SA, k)), ...SHOP_PLATES.map((k) => RZ(PL, k)), ...SHOP_MATS.map((k) => RZ(TP, k, { live: false })), ...SHOP_FONDS.map((k) => RZ(FP, k, { live: false })),
   ...PAID_EMOTES.filter((k) => !EMOTES[k].codex).map((k) => ({ ...RE(k, 100), r: 'rare' })), /* v630 : sans les réactions du Codex */
   { id: 'arbitres', kind: 'bundle', name: 'Le Cercle des arbitres', give: { emotes: ARBITRE_EMOTES }, cost: 600, desc: 'Les huit réactions des arbitres d’un coup (800 à l’unité).' },
   { id: 'gardiens', kind: 'bundle', name: 'Les vingt gardiens', give: { emotes: BOSS_EMOTES }, cost: 1500, desc: 'Les vingt réactions des gardiens d’un coup (2 000 à l’unité).' },

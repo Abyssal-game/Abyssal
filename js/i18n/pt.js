@@ -9449,6 +9449,9 @@ export default {
   "Trop tard…": "Tarde demais…",
   "Touche quand le cercle touche l’anneau d’or": "Toque quando o círculo tocar o anel dourado",
   "Touche quand le cercle touche l’anneau d’or · coup {0}/{1}": "Toque quando o círculo tocar o anel dourado · golpe {0}/{1}",
+  "Cent Épreuves": "Cem Provas",
+  "Gagne 100 Épreuves du jour.": "Vença 100 Provas do dia.",
+  "Maître des Épreuves": "Mestre das Provas",
 };
 
 export const names = {

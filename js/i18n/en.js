@@ -9462,6 +9462,9 @@ export default {
   "Trop tard…": "Too late…",
   "Touche quand le cercle touche l’anneau d’or": "Tap when the circle meets the golden ring",
   "Touche quand le cercle touche l’anneau d’or · coup {0}/{1}": "Tap when the circle meets the golden ring · strike {0}/{1}",
+  "Cent Épreuves": "A Hundred Trials",
+  "Gagne 100 Épreuves du jour.": "Win 100 Daily Trials.",
+  "Maître des Épreuves": "Master of Trials",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v874'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v875'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -132,6 +132,10 @@ export const LEVEL_TITLES = [
   [1, 'Novice de l’Abysse'], [3, 'Lecteur de grimoires'], [6, 'Chercheur de reliques'], [10, 'Occultiste'],
   [15, 'Archiviste interdit'], [20, 'Gardien du Bestiaire'], [30, 'Briseur de sceaux'], [40, 'Voix du Néant'],
 ];
+
+/* v875 (décision du propriétaire du 28 octobre 2026 : les cadres de l'Échoppe ne sont plus vendus, ils se gagnent) :
+   un cadre vivant à certains niveaux de profil (les autres sont des récompenses de succès, data/achievements.json) */
+export const LEVEL_FRAMES = [[5, 'cx-vif-ambre'], [8, 'cx-vif-rouages'], [12, 'cx-vif-venin'], [18, 'cx-vif-obsidienne'], [25, 'cx-vif-maree'], [32, 'cx-vif-ames'], [40, 'cx-vif-sang'], [50, 'cx-vif-soleil-noir']];
 
 export const FRAMES = {
   base: 'Cadre de fer', or: 'Cadre d’or', prisme: 'Cadre prismatique', titan: 'Cadre des Titans', neant: 'Cadre du Néant',

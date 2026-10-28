@@ -425,7 +425,7 @@ function openProgress(list) {
 }
 function onProgress(events) {
   const lv = events.filter((e) => e.kind === 'level');
-  if (lv.length > 1) events = [...events.filter((e) => e.kind !== 'level'), { kind: 'level', level: lv[lv.length - 1].level, reward: lv.reduce((r, e) => ({ shards: (r.shards || 0) + (e.reward?.shards || 0), tickets: { ...r.tickets, ...e.reward?.tickets }, title: e.reward?.title || r.title }), {}) }];
+  if (lv.length > 1) events = [...events.filter((e) => e.kind !== 'level'), { kind: 'level', level: lv[lv.length - 1].level, reward: lv.reduce((r, e) => ({ shards: (r.shards || 0) + (e.reward?.shards || 0), tickets: { ...r.tickets, ...e.reward?.tickets }, title: e.reward?.title || r.title, frame: e.reward?.frame || r.frame }), {}) }]; /* v875 : cadre de niveau gardé */
   if (!events.length) return;
   /* v680 : les points du Codex se cumulent en une seule ligne ; pas de son pour de simples points (le propriétaire déteste les bips) */
   const cx = [...progList, ...events].filter((e) => e.kind === 'codex');

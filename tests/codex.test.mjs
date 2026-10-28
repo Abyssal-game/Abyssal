@@ -72,9 +72,9 @@ test('échoppe : achat simulé réservé au Mode Créateur (une seule fois pour 
 test('obsidiennes : achats du catalogue, manque signalé, lot au prix réduit', () => {
   const g = mk();
   g.s.settings.dev = true; g.s.devCodex = true; g.s.obs = 340; /* v584 : prix par rareté (cadre Épique 280) */
-  g.catalogBuy('cx-vif-ames');
-  assert.ok(g.s.frames.includes('cx-vif-ames')); assert.equal(g.obs(), 60);
-  assert.throws(() => g.catalogBuy('cx-vif-ames'), /déjà/);
+  g.catalogBuy('pl-braise'); /* v875 : plus de cadre en vente : une plaque Épique (280) */
+  assert.ok(g.s.plates.includes('pl-braise')); assert.equal(g.obs(), 60);
+  assert.throws(() => g.catalogBuy('pl-braise'), /déjà/);
   assert.throws(() => g.catalogBuy('dos-infernal'), /manque 220/); /* v584 : dos Épique à 280 */
   g.s.obs = 300; g.catalogBuy('dos-infernal');
   assert.equal(g.catalogCost('royaumes'), Math.round(CATALOG.find((i) => i.id === 'royaumes').cost * 6 / 7));
@@ -213,7 +213,7 @@ test('v684 : l’Échoppe peut ouvrir avant le Codex (CODEX.shopFrom)', () => {
     const d = before(); CODEX.shopFrom = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`;
     const g = mk(before);
     assert.equal(g.shopOn(), true); assert.equal(g.codexOn(), false, 'le Codex reste fermé');
-    g.s.obs = 1000; const it = CATALOG.find((x) => x.kind === 'frame');
+    g.s.obs = 1000; const it = CATALOG.find((x) => x.kind === 'back'); /* v875 : plus de cadre en vente */
     g.catalogBuy(it.id); assert.ok(g.catalogOwned(it.id), 'achat possible à l’Échoppe avant le Codex');
     g.codexXp(20, 'floor'); assert.equal(g.codex().xp, 0, 'aucun point de Codex avant la saison');
   } finally { CODEX.shopFrom = was; }

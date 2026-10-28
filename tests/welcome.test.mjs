@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { CODEX_FRAMES } from '../js/core/codex.js';
 import assert from 'node:assert/strict';
 import { loadCatalog, MemoryStorage, rngFrom } from './helpers.mjs';
 import { Game } from '../js/core/game.js';
@@ -36,7 +37,7 @@ test('titres et cadres : chacun a une explication pour le débloquer', () => {
   for (const [, t] of LEVEL_TITLES) assert.ok(U.titles.some((x) => x.name === t), t);
   for (const a of catalog.achievements) if (a.reward.title) assert.ok(U.titles.find((x) => x.name === a.reward.title).how.includes(a.name));
   for (const s of catalog.sets) if (s.reward.frame) assert.ok(U.frames.find((x) => x.key === s.reward.frame).how.length > 10);
-  assert.ok(U.frames.every((f) => FRAMES[f.key] && f.how));
+  assert.ok(U.frames.every((f) => (FRAMES[f.key] || CODEX_FRAMES[f.key]) && f.how)); /* v875 : cadres vivants gagnés */
   assert.ok(U.frames.find((f) => f.key === 'or').how.includes(' Ou : '), 'deux façons d’obtenir le cadre d’or');
 });
 

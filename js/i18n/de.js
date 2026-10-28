@@ -9450,6 +9450,9 @@ export default {
   "Trop tard…": "Zu spät…",
   "Touche quand le cercle touche l’anneau d’or": "Tippe, wenn der Kreis den goldenen Ring berührt",
   "Touche quand le cercle touche l’anneau d’or · coup {0}/{1}": "Tippe, wenn der Kreis den goldenen Ring berührt · Schlag {0}/{1}",
+  "Cent Épreuves": "Hundert Prüfungen",
+  "Gagne 100 Épreuves du jour.": "Gewinne 100 Tagesprüfungen.",
+  "Maître des Épreuves": "Meister der Prüfungen",
 };
 
 export const names = {

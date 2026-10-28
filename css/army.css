@@ -8874,3 +8874,27 @@ body:has(.prog-chip.docked.in) #topbar .top-meta { opacity: 0; }
 .cbr.r-dodge .cbr-ring { filter: drop-shadow(0 0 10px rgba(130, 200, 255, 1)); }
 .cbr.r-none .cbr-tgt { filter: sepia(1) saturate(5) hue-rotate(-40deg) drop-shadow(0 0 10px rgba(255, 50, 70, .9)); }
 .cbr.r-none .cbr-ring { filter: drop-shadow(0 0 8px rgba(255, 50, 70, .9)); }
+
+/* v875 : 16 cadres de profil d'origine peints par Gemini (sources store/frames/pf-<clé>-source.jpg, frame-art.py pf-<clé> … --fit
+   --hole=0.78 (0.72 pour les anneaux épais) --suffix=4 --clip) : même pose que les cadres peints du Codex (règles .pf[class*="pf-cx-"]) */
+.pf.pf:is(.pf-base, .pf-or, .pf-prisme, .pf-titan, .pf-neant, .pf-infernal, .pf-abyssal, .pf-celeste, .pf-sauvage, .pf-necrotique, .pf-primordial, .pf-artificiel, .pf-abysse, .pf-chasseur, .pf-sceaux, .pf-reliques) { position: relative; overflow: visible; border-color: transparent; box-shadow: none; animation: none; }
+.pf.pf:is(.pf-base, .pf-or, .pf-prisme, .pf-titan, .pf-neant, .pf-infernal, .pf-abyssal, .pf-celeste, .pf-sauvage, .pf-necrotique, .pf-primordial, .pf-artificiel, .pf-abysse, .pf-chasseur, .pf-sceaux, .pf-reliques) > img { border-radius: 50%; }
+.pf.pf.pf.pf.pf.pf:is(.pf-base, .pf-or, .pf-prisme, .pf-titan, .pf-neant, .pf-infernal, .pf-abyssal, .pf-celeste, .pf-sauvage, .pf-necrotique, .pf-primordial, .pf-artificiel, .pf-abysse, .pf-chasseur, .pf-sceaux, .pf-reliques)::after { content: ''; position: absolute; inset: -15.5%; border-radius: 0; background: var(--fr) center / 100% 100% no-repeat; -webkit-mask: none; mask: none; animation: none; pointer-events: none; z-index: 1; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .6)); opacity: 1; transform: none; }
+.top-avatar.pf.pf:is(.pf-base, .pf-or, .pf-prisme, .pf-titan, .pf-neant, .pf-infernal, .pf-abyssal, .pf-celeste, .pf-sauvage, .pf-necrotique, .pf-primordial, .pf-artificiel, .pf-abysse, .pf-chasseur, .pf-sceaux, .pf-reliques) { margin: 0 3px; }
+.frame-pick .avatar-mini.pf.pf:is(.pf-base, .pf-or, .pf-prisme, .pf-titan, .pf-neant, .pf-infernal, .pf-abyssal, .pf-celeste, .pf-sauvage, .pf-necrotique, .pf-primordial, .pf-artificiel, .pf-abysse, .pf-chasseur, .pf-sceaux, .pf-reliques) { margin: 6px 0 10px; }
+.pf-base { --fr: url(../assets/frames/pf-base-4.webp); }
+.pf-or { --fr: url(../assets/frames/pf-or-4.webp); }
+.pf-prisme { --fr: url(../assets/frames/pf-prisme-4.webp); }
+.pf-titan { --fr: url(../assets/frames/pf-titan-4.webp); }
+.pf-neant { --fr: url(../assets/frames/pf-neant-4.webp); }
+.pf-infernal { --fr: url(../assets/frames/pf-infernal-4.webp); }
+.pf-abyssal { --fr: url(../assets/frames/pf-abyssal-4.webp); }
+.pf-celeste { --fr: url(../assets/frames/pf-celeste-4.webp); }
+.pf-sauvage { --fr: url(../assets/frames/pf-sauvage-4.webp); }
+.pf-necrotique { --fr: url(../assets/frames/pf-necrotique-4.webp); }
+.pf-primordial { --fr: url(../assets/frames/pf-primordial-4.webp); }
+.pf-artificiel { --fr: url(../assets/frames/pf-artificiel-4.webp); }
+.pf-abysse { --fr: url(../assets/frames/pf-abysse-4.webp); }
+.pf-chasseur { --fr: url(../assets/frames/pf-chasseur-4.webp); }
+.pf-sceaux { --fr: url(../assets/frames/pf-sceaux-4.webp); }
+.pf-reliques { --fr: url(../assets/frames/pf-reliques-4.webp); }

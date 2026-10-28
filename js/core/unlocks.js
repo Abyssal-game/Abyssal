@@ -2,7 +2,8 @@ import * as EN from './encheres.js';
 import * as PA from './pacte.js';
 import * as CR from './cryptes.js';
 // Titres et cadres : d'où vient chacun (pour expliquer comment débloquer ceux qui manquent).
-import { LEVEL_TITLES, FRAMES, ASH_FRAMES } from '../config.js';
+import { LEVEL_TITLES, LEVEL_FRAMES, FRAMES, ASH_FRAMES } from '../config.js';
+import { CODEX_FRAMES } from './codex.js';
 import { SCEAUX_TITLES, RIVALS } from './sceaux.js';
 
 const lc = (t) => t.charAt(0).toLowerCase() + t.slice(1);
@@ -12,6 +13,7 @@ export function unlockSources(cat) {
   const add = (m, k, how) => { if (!k) return; const l = m.get(k) || []; if (!l.includes(how)) l.push(how); m.set(k, l); };
   frames.set('base', ['Offert dès le départ.']);
   for (const [k, n] of Object.entries(ASH_FRAMES)) frames.set(k, [`À acheter ${n} cendres à la Fournaise.`]);
+  for (const [n, f] of LEVEL_FRAMES) add(frames, f, `Atteins le niveau ${n} de profil (l’expérience se gagne en jouant).`); /* v875 */
   for (const [n, t] of LEVEL_TITLES) add(titles, t, n === 1 ? 'Offert dès le départ.' : `Atteins le niveau ${n} de profil (l’expérience se gagne en jouant).`);
   for (const a of cat.achievements) {
     const how = `Succès « ${a.name} » : ${lc(a.desc)}`;
@@ -38,6 +40,6 @@ export function unlockSources(cat) {
   add(frames, 'oeil', 'Vaincs l’Abysse, le gardien de l’étage 100 de la Descente.');
   return {
     titles: [...titles].map(([name, how]) => ({ name, how: how.join(' Ou : ') })),
-    frames: Object.keys(FRAMES).filter((k) => frames.has(k)).map((k) => ({ key: k, name: FRAMES[k], how: frames.get(k).join(' Ou : ') })),
+    frames: Object.keys({ ...FRAMES, ...CODEX_FRAMES }).filter((k) => frames.has(k)).map((k) => ({ key: k, name: FRAMES[k] || CODEX_FRAMES[k], how: frames.get(k).join(' Ou : ') })),
   };
 }
