@@ -9465,6 +9465,7 @@ export default {
   "Cent Épreuves": "A Hundred Trials",
   "Gagne 100 Épreuves du jour.": "Win 100 Daily Trials.",
   "Maître des Épreuves": "Master of Trials",
+  "L’Abîme s’ouvre…": "The Abyss opens…",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

@@ -9452,6 +9452,7 @@ export default {
   "Cent Épreuves": "Cento Prove",
   "Gagne 100 Épreuves du jour.": "Vinci 100 Prove del giorno.",
   "Maître des Épreuves": "Maestro delle Prove",
+  "L’Abîme s’ouvre…": "L’Abisso si apre…",
 };
 
 export const names = {
