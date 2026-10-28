@@ -263,6 +263,8 @@ export function aiWants(st, rng = Math.random) {
   // dernier tour : s'il faut rattraper, on tire tant qu'on n'a pas dépassé
   if (who === 'a' && st.scores.p >= TARGET && me + v <= st.scores.p) return true;
   if (me + v >= TARGET && me + v > opp) return false;
+  /* v887 : protégé par un Sceau, une brisure ne coûte que le Sceau (la carte en double est jetée) : il tire toujours (avant : il pouvait s'arrêter après deux cartes, Sceau en main, demande du propriétaire du 28 octobre 2026) */
+  if (st.sceaux > 0) return true;
   if (rng() < R.noise) return rng() < 0.5;
   if (R.max && nf >= Math.floor(R.max + rng()) + (opp - me > 15 ? 1 : 0)) return false; // les prudents ne dépassent pas leur nombre de cartes
   // v463 : tous calculent (cartes déjà sorties comptées, Sceau, Offrande, sept factions) ; leur caractère change
