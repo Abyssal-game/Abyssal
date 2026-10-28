@@ -17,7 +17,7 @@ export const DEF_DEFAULTS = {
      ≈ 2 images en avance sur sa position calculée ; un toucher pile sur le trait blanc était jugé « esquive », un toucher en
      retard « parade ». Le toucher est jugé à son instant + cette avance (0 hors iPhone : Chromium affiche à l'heure). */
   /* v871 : cercle des gros coups (o, O) : durée du resserrement, part de la fenêtre d'esquive gardée pour la parade, bornes, début de la défense partielle */
-  ringNormal: 1300, ringElite: 1150, ringBoss: 1020, ringFast: 0.8, ringParry: 0.6, ringParryMin: 90, ringParryMax: 160, ringEarly: 0.4, /* v874 : vitesse constante, fenêtre élargie */
+  ringNormal: 850, ringElite: 750, ringBoss: 650, ringFast: 0.8, ringParry: 0.6, ringParryMin: 90, ringParryMax: 160, ringEarly: 0.4, /* v874 : vitesse constante, fenêtre élargie ; v880 : durées réglées par le propriétaire au Labo (essai : 65 % de parades, 20 % d’esquives, 15 % de touchés) */
   leadMs: /iPhone|iPad|iPod/.test(globalThis.navigator?.userAgent || '') ? 33 : 0,
 };
 
