@@ -8971,3 +8971,8 @@ body:has(.prog-chip.docked.in) #topbar .top-meta { opacity: 0; }
 @keyframes chxLand { 0% { filter: drop-shadow(0 0 0 transparent) brightness(1); } 25% { filter: drop-shadow(0 0 26px color-mix(in srgb, var(--cc) 90%, #fff)) brightness(1.5); } 100% { filter: drop-shadow(0 10px 18px rgba(0, 0, 0, .8)) brightness(1); } }
 @media (prefers-reduced-motion: reduce) { .chx-leak, .chx-beam, .chx-ring, .chx-fx { display: none; } .chx-chest.ch1, .chx-chest.ch2, .chx-chest.ch3, .chx.quake .chx-stage, .chx-pack.chx-fly, .chx-pack.chx-fly .pack { animation: none !important; } }
 html.reduce-motion :is(.chx-leak, .chx-beam, .chx-ring, .chx-fx) { display: none; }
+/* v878 : l'écran du coffre ne défile plus, ni sur les côtés ni de haut en bas (les rayons, la colonne de lumière et les étincelles
+   débordaient de la scène et la rendaient défilable) ; le geste ne fait plus rebondir la page dessous */
+.opening.chx { overflow: hidden; overscroll-behavior: none; touch-action: none; }
+.opening.chx .chx-stage { overflow: hidden; overscroll-behavior: none; }
+.opening.chx .chx-actions { touch-action: manipulation; }
