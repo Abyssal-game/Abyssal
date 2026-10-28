@@ -108,7 +108,9 @@ export async function liveCheck({ force = false } = {}) {
   if (!force && st.checked && Date.now() - st.checked < CHECK_MS) return liveStatus();
   busy = true; setStatus({ state: 'checking' });
   try {
-    st.checked = Date.now(); save(st);
+    st.checked = Date.now();
+    if (force && st.bad?.length) { st.bad = []; st.fails = {}; } /* v883 : « Chercher une mise à jour » redonne leur chance aux versions écartées */
+    save(st);
     const got = await fetchManifest();
     if (got.offline) { setStatus({ state: 'offline', msg: got.why }); return liveStatus(); }
     if (got.unsigned) { setStatus({ state: 'unsigned' }); return liveStatus(); }
@@ -173,8 +175,12 @@ export async function initLive({ idle = () => true } = {}) {
   const here = await basePath();
   const inSnap = here.includes(`/${DIR_()}/`);
   if (st.trying && st.trying !== RUNNING) {
-    // la version essayée n'a pas tenu (plantage, ou retour au jeu embarqué) : on ne la reprend plus
-    st.bad = [...new Set([...(st.bad || []), st.trying])].slice(-10); st.trying = null; save(st);
+    // la version essayée n'a pas tenu (plantage, ou app fermée avant d'être adoptée) : réessayée une fois, puis écartée
+    /* v883 : avant, écartée dès le premier échec ; une app fermée dans les 8 premières secondes suffisait (v881 et v882 écartées) */
+    const f = (st.fails ||= {}); f[st.trying] = (f[st.trying] || 0) + 1;
+    if (f[st.trying] >= 2) st.bad = [...new Set([...(st.bad || []), st.trying])].slice(-10);
+    else st.ready = st.trying;
+    st.trying = null; save(st);
   }
   /* v623 : l'app a été mise à jour par le store (jeu embarqué plus récent) : une version téléchargée dépassée
      n'est plus annoncée, et ses dossiers sont effacés (sur Android, une copie complète ≈ 200 Mo) */
@@ -191,8 +197,10 @@ export async function initLive({ idle = () => true } = {}) {
   }
   if (st.trying === RUNNING && inSnap) {
     // nouvelle version lancée : si elle tient 8 secondes, on la garde pour les prochains lancements
-    later(async () => {
-      if (!document.querySelector('#view')?.children.length) return;
+    /* v883 : adoptée dès que le jeu est dessiné depuis 2 s (contrôle toutes les 500 ms, 20 s au plus) */
+    let tries = 0;
+    const keep = async () => {
+      if (!document.querySelector('#view')?.children.length) { if (++tries < 40) later(keep, 500); return; }
       try {
         await plug('WebView').persistServerBasePath();
         const s = load(); s.trying = null; s.ok = RUNNING; save(s);
@@ -201,7 +209,8 @@ export async function initLive({ idle = () => true } = {}) {
         const { files } = await FS.readdir({ directory: LIB, path: DIR });
         for (const f of files || []) { const n = typeof f === 'string' ? f : f.name; if (n !== `v${RUNNING}`) { try { await FS.rmdir({ directory: LIB, path: `${DIR}/${n}`, recursive: true }); } catch (e) { /* suivant */ } } }
       } catch (e) { /* on réessaiera au prochain lancement */ }
-    }, 8000);
+    };
+    later(keep, 2000);
   } else if (st.ready && st.ready > RUNNING) {
     if (await apply()) return; // l'écran repart sur la nouvelle version
   }
