@@ -11,7 +11,7 @@ import { esc, openSheet } from '../ui/dom.js';
 import { setScene } from '../ui/scene.js';
 import { t } from '../i18n.js';
 import { createMpLobby } from './mp-lobby.js';
-import { SP, SEALS, howHTML, sayText } from './pacte.js';
+import { SP, howHTML, sayText, boardOf, sealsHTML } from './pacte.js';
 
 const RAR_OF = (v) => (v <= 2 ? 'C' : v === 3 ? 'PC' : v === 4 ? 'R' : v === 5 ? 'HR' : v === 6 ? 'M' : 'S');
 const hash = (s) => { let h = 2166136261; for (const ch of s) h = Math.imul(h ^ ch.charCodeAt(0), 16777619) >>> 0; return h; };
@@ -51,9 +51,9 @@ export function createPacteMp(app, root, { modeBar }) {
   }
   function center(v, s) {
     const e = eng(s), val = PA.rowValue(e), risk = Math.round(PA.bustChance(e) * 100), fs = PA.rowFactions(e), nf = fs.size, mine = s.turn === v.me;
-    const seals = SEALS.map(([f, x, y]) => `<i class="pa-seal ${fs.has(f) ? 'on' : ''}" data-f="${f}" style="left:${(x / 4.5).toFixed(1)}%;--sy:${y};--fc:${cat.faction[f]?.colors.secondary || '#C9A45A'}">${sigil(f)}</i>`).join('');
+    const pb = boardOf(app.game.s.pboard), seals = sealsHTML(pb, fs, cat, sigil);
     const ban = banner ? `<div class="pa-ban">${banner.bust ? '<img class="pa-burn" alt="" src="assets/jeux/pa-brisure.webp">' : ''}<div class="mq-banner ${banner.cls}">${banner.html}</div></div>` : '';
-    return `<div class="pa-parch">
+    return `<div class="pa-parch pp ${pb}">
       <div class="pa-row" style="--n:${Math.max(1, e.row.length)}">${e.row.length ? e.row.map((c) => cardHTML(v, c)).join('') : `<span class="pa-empty">${mine && v.status === 'playing' ? 'Tire ta première carte.' : '…'}</span>`}</div>
       ${seals}
       <div class="pa-info"><span>Ce tour : <b>${val}</b> point${val > 1 ? 's' : ''}</span><span class="pa-fac">${nf} / 7 sceaux</span>

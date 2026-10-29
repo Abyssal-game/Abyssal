@@ -9534,6 +9534,14 @@ export default {
   "Le Gardien": "Il Guardiano",
   "Les objets du Gardien t’attendent : Profil › Personnaliser.": "Gli oggetti del Guardiano ti aspettano: Profilo › Personalizza.",
   "Règles en vigueur": "Regole in vigore",
+  "Plateau du Pacte": "Tavola del Patto",
+  "Plateaux du Pacte": "Tavole del Patto",
+  "La table de tes parties du Pacte": "Il tavolo delle tue partite del Patto",
+  "La table de tes parties du Pacte, contre l’Abysse et en ligne.": "Il tavolo delle tue partite del Patto, contro l’Abisso e online.",
+  "Plateau de l’Autel oublié": "Tavola dell’Altare dimenticato",
+  "Ta table du Pacte": "Il tuo tavolo del Patto",
+  "Pacte": "Patto",
+  "Pacte en ligne": "Patto online",
 };
 
 export const names = {

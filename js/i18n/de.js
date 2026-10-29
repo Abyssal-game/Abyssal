@@ -9535,6 +9535,14 @@ export default {
   "Le Gardien": "Der Hüter",
   "Les objets du Gardien t’attendent : Profil › Personnaliser.": "Die Gegenstände des Hüters warten auf dich: Profil › Anpassen.",
   "Règles en vigueur": "Geltende Regeln",
+  "Plateau du Pacte": "Pakt-Spielbrett",
+  "Plateaux du Pacte": "Pakt-Spielbretter",
+  "La table de tes parties du Pacte": "Der Tisch deiner Pakt-Partien",
+  "La table de tes parties du Pacte, contre l’Abysse et en ligne.": "Der Tisch deiner Pakt-Partien, gegen den Abgrund und online.",
+  "Plateau de l’Autel oublié": "Spielbrett des vergessenen Altars",
+  "Ta table du Pacte": "Dein Pakt-Tisch",
+  "Pacte": "Pakt",
+  "Pacte en ligne": "Pakt online",
 };
 
 export const names = {

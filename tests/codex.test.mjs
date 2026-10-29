@@ -39,7 +39,7 @@ test('codex : voie gratuite récupérable, voie enluminée fermée sans achat', 
 test('codex : la voie enluminée ne donne jamais de puissance (ni éclats, cendres, coffres ou tickets)', () => {
   for (const t of CODEX_TIERS) if (t.prem) for (const k of ['shards', 'ash', 'chests', 'tickets']) assert.equal(t.prem[k], undefined, `palier ${t.tier}`);
   for (const it of [...SHOP, ...CATALOG]) if (it.give) for (const k of ['shards', 'ash', 'chests', 'tickets']) assert.equal(it.give[k], undefined, it.id);
-  for (const it of CATALOG) assert.ok(['frame', 'back', 'bundle', 'finish', 'plate', 'emote', 'sachet', 'mat', 'fond'].includes(it.kind) && !it.give.obs && !it.give.title, it.id);
+  for (const it of CATALOG) assert.ok(['frame', 'back', 'bundle', 'finish', 'plate', 'emote', 'sachet', 'mat', 'pboard', 'fond'].includes(it.kind) && !it.give.obs && !it.give.title, it.id);
   for (const k of CODEX_ONLY) assert.ok(!CATALOG.some((it) => it.id === k), `${k} reste exclusif au Codex`);
 });
 
@@ -256,4 +256,16 @@ test('acheter un palier : obsidiennes, pas au-delà du dernier', () => {
   g.codexXp(1e6, 'dev');
   assert.throws(() => g.codexBuyTier(), /dernier palier/);
   assert.throws(() => mk(before).codexBuyTier(), /pas encore commencé/);
+});
+
+test('v895 : plateaux du Pacte : en vente, achat, choix, plateau d’origine par défaut', async () => {
+  const { PBOARDS, CATALOG } = await import('../js/core/codex.js');
+  const { BOARD_SEALS, boardOf } = await import('../js/core/codex.js');
+  const g = mk(); g.s.obs = 5000; g.s.settings.dev = true; g.s.devCodex = true;
+  for (const k of Object.keys(PBOARDS)) { assert.ok(CATALOG.some((it) => it.id === k && it.kind === 'pboard'), `${k} en vente`); assert.equal(BOARD_SEALS[k]?.length, 7, `${k} : 7 alvéoles`); }
+  assert.ok(!CATALOG.some((it) => it.id === 'pp-cuir'), 'le plateau d’origine ne se vend pas');
+  assert.equal(boardOf(null), 'pp-cuir'); assert.equal(boardOf('pp-inconnu'), 'pp-cuir');
+  g.setPboard('pp-autel'); assert.equal(g.s.pboard ?? null, null, 'pas de plateau sans l’avoir acheté');
+  g.catalogBuy('pp-autel'); g.setPboard('pp-autel'); assert.equal(g.s.pboard, 'pp-autel'); assert.ok(g.catalogOwned('pp-autel'));
+  g.setPboard(null); assert.equal(g.s.pboard, null);
 });

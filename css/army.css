@@ -9047,3 +9047,24 @@ html.reduce-motion :is(.chx-leak, .chx-beam, .chx-ring, .chx-fx) { display: none
 }
 /* v894 : sceaux pas encore allumés : voile beige allégé (50 % → 20 %) ; ils gardent leur couleur, moins vive que celle d'un sceau allumé */
 .pa-seal:not(.on) { background: radial-gradient(circle, rgba(222, 204, 168, .2) 55%, rgba(222, 204, 168, 0) 72%); filter: saturate(.85); }
+/* v895 : plateaux du Pacte (assets/pacte/pp-<clé>.webp, carrés ; « Plateaux du Pacte » à l’Échoppe) : la rangée dans le cadre,
+   une alvéole par faction (positions en ligne, BOARD_SEALS de pacte.js), la ligne d’informations sur la bande claire du bas */
+.pa-parch.pp { --rl: 14.5%; --rt: 13.5%; --rw: 71.3; --rh: 31.2; --it: 84.9%; --ix: 10.5%; --sw: 8.8%; container-type: size; aspect-ratio: 1; border-radius: 4px; background: url(../assets/pacte/pp-cuir.webp) center / 100% 100% no-repeat; }
+.pa-parch.pp-autel { --rl: 19.1%; --rt: 18.6%; --rw: 61.9; --rh: 27.3; --it: 86.5%; --ix: 15.5%; --sw: 9.2%; background-image: url(../assets/pacte/pp-autel.webp); }
+.pa-game .mq-table .pa-parch.pp { aspect-ratio: 1; width: min(100%, 100cqh); background-image: url(../assets/pacte/pp-cuir.webp); }
+.pa-game .mq-table .pa-parch.pp-autel { background-image: url(../assets/pacte/pp-autel.webp); }
+.pa-game .pa-parch.pp .pa-row { left: var(--rl); top: var(--rt); width: calc(var(--rw) * 1%); height: calc(var(--rh) * 1%); padding: 0 4px; }
+.pa-game .pa-parch.pp .pa-card { width: min(calc(var(--rh) * 1cqh * .9 / 1.4), calc((var(--rw) * 1cqw - 8px - 4px * (var(--n) - 1)) / var(--n))); max-height: none; }
+.pa-game .pa-parch.pp .pa-info { top: var(--it); left: var(--ix); right: var(--ix); gap: 0 8px; font-size: min(.8rem, 3.1cqw); line-height: 1.15; }
+.pa-game .pa-parch.pp .pa-ban .pa-card.big { width: min(86px, 22cqw); }
+.pa-parch.pp .pa-seal { width: var(--sw); }
+.pa-parch.pp .pa-seal:not(.on) { background: none; filter: none; }
+.pa-parch.pp .pa-seal:not(.on) .sigil { opacity: .32; filter: grayscale(.4) brightness(1.3); }
+.pa-parch.pp .pa-seal.on[data-f] { box-shadow: 0 0 14px 3px color-mix(in srgb, var(--fc) 70%, transparent); }
+/* v895 : plateaux du Pacte à l’Échoppe et dans Personnaliser (images carrées) */
+.cxs-t .cx-mat.cx-pp, .cxs-at-pic .cx-mat.cx-pp { aspect-ratio: 1; width: auto; }
+.pv2-big-mat.pv2-big-pp { height: 230px; aspect-ratio: 1; }
+.pv2-pp { display: block; width: min(100%, 320px); aspect-ratio: 1; margin: 0 auto; border-radius: 6px; box-shadow: 0 10px 24px rgba(0, 0, 0, .6); }
+.cs-ppb img { aspect-ratio: 1; }
+.cs-row .cs-pic img.cs-mat.cs-pp { width: 52px; height: 52px; }
+.cs-shop.k-pboard .cs-shop-it img { height: 72px; width: auto; aspect-ratio: 1; border-radius: 6px; }

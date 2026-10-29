@@ -9547,6 +9547,14 @@ export default {
   "Le Gardien": "The Keeper",
   "Les objets du Gardien t’attendent : Profil › Personnaliser.": "The Keeper’s items await you: Profile › Customize.",
   "Règles en vigueur": "Rules in effect",
+  "Plateau du Pacte": "Pact board",
+  "Plateaux du Pacte": "Pact boards",
+  "La table de tes parties du Pacte": "The table for your Pact games",
+  "La table de tes parties du Pacte, contre l’Abysse et en ligne.": "The table for your Pact games, against the Abyss and online.",
+  "Plateau de l’Autel oublié": "Forgotten Altar board",
+  "Ta table du Pacte": "Your Pact table",
+  "Pacte": "Pact",
+  "Pacte en ligne": "Online Pact",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

@@ -9,6 +9,8 @@ import { esc, fmt, toast, confirmBox, openSheet, fitEnd } from '../ui/dom.js';
 import { setScene } from '../ui/scene.js';
 import { tuto } from '../ui/tutos.js';
 import { CHESTS } from '../core/descent.js';
+import { BOARD_SEALS, boardOf } from '../core/codex.js';
+export { boardOf };
 import { MP_HOURS, MP_FAST_SECS, MP_REWARD } from '../core/mp.js';
 import { t, tw } from '../i18n.js';
 import { haptic } from '../ui/sound.js'; /* v850 */
@@ -25,6 +27,7 @@ export const SP = { sceau: { name: 'Sceau', img: 'assets/jeux/pa-sceau.webp', de
 // v464 : les sept sceaux de cire du parchemin (assets/jeux/pa-table2.webp, 450 × 330), position en % et faction de chacun
 /* v893 : sceaux placés par le CSS (--sy, en px du tapis 450 × 330 ; plus bas de 100 px sur le grand tapis 450 × 430) */
 export const SEALS = [['infernal', 47, 170], ['artificiel', 100, 207], ['celeste', 160, 233], ['necrotique', 225, 245], ['sauvage', 292, 235], ['abyssal', 353, 207], ['primordial', 405, 170]];
+export const sealsHTML = (k, fs, cat, sigil) => SEALS.map(([f], i) => { const [x, y] = BOARD_SEALS[boardOf(k)][i]; return `<i class="pa-seal ${fs.has(f) ? 'on' : ''}" data-f="${f}" style="left:${x}%;top:${y}%;--fc:${cat.faction[f]?.colors.secondary || '#C9A45A'}">${sigil(f)}</i>`; }).join('');
 const HOW = [['cards', '#7FA8D8', 'Ton tour', 'Tire des cartes une à une et pose-les devant toi. Chaque carte de faction vaut de 1 à 7 points.'],
   ['crystal', '#E8C35A', 'T’arrêter', 'Quand tu veux, arrête-toi : tu gagnes la somme des cartes posées ce tour-ci.'],
   ['danger', '#E0485E', 'Le pacte se brise', 'Si tu tires une faction que tu as déjà posée ce tour-ci, le pacte se brise : tu perds tout ce que tu avais gagné ce tour-ci.'],
@@ -115,9 +118,9 @@ export default function pacteScreen(app, root) {
     /* v464 : la table est un parchemin : la rangée dans le cadre rouge, un sceau de cire s'allume pour chaque faction posée */
     const v = PA.rowValue(st), risk = Math.round(PA.bustChance(st) * 100), fs = PA.rowFactions(st), nf = fs.size;
     /* v511 : la gravure d'origine des sceaux (dont des étoiles à six branches) est effacée dans pa-table2.webp : chaque sceau porte l'emblème de sa faction */
-    const seals = SEALS.map(([f, x, y]) => `<i class="pa-seal ${fs.has(f) ? 'on' : ''}" data-f="${f}" style="left:${(x / 4.5).toFixed(1)}%;--sy:${y};--fc:${cat.faction[f]?.colors.secondary || '#C9A45A'}">${sigil(f)}</i>`).join('');
+    const pb = boardOf(app.game.s.pboard), seals = sealsHTML(pb, fs, cat, sigil);
     const ban = banner ? `<div class="pa-ban">${banner.bust ? '<img class="pa-burn" alt="" src="assets/jeux/pa-brisure.webp">' : ''}<div class="mq-banner ${banner.cls}">${banner.html}</div></div>` : '';
-    return `<div class="pa-parch ${defy ? 'defy' : ''}">${defy && !banner ? `<img class="pa-defy-tag" alt="×2" src="assets/jeux/pa-defi.webp">` : ''}
+    return `<div class="pa-parch pp ${pb} ${defy ? 'defy' : ''}">${defy && !banner ? `<img class="pa-defy-tag" alt="×2" src="assets/jeux/pa-defi.webp">` : ''}
       <div class="pa-row" style="--n:${Math.max(1, st.row.length)}">${st.row.length ? st.row.map((c) => cardHTML(c)).join('') : `<span class="pa-empty">${st.turn === 'p' ? 'Tire ta première carte.' : '…'}</span>`}</div>
       ${seals}
       <div class="pa-info"><span>Ce tour : <b>${v}</b> point${v > 1 ? 's' : ''}</span><span class="pa-fac">${nf} / 7 sceaux</span>

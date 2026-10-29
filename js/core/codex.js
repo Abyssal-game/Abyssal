@@ -191,7 +191,13 @@ export const TAPIS = { 'tp-mammon': 'Tapis du Banquier Mammon', 'tp-abysse': 'Ta
   /* v690 */ 'tp-braise': 'Tapis de la Forge infernale', 'tp-marees': 'Tapis des Marées noires', 'tp-racines': 'Tapis du Réveil des Racines', 'tp-celeste': 'Tapis du Parvis céleste', 'tp-rouages': 'Tapis de la Forge sans Maître', 'tp-tombes': 'Tapis de la Nécropole', 'tp-dragon': 'Tapis du Dragon primordial' };
 export const FONDS = { 'fp-trone': 'Fond du Trône de braise', 'fp-cathedrale': 'Fond de la Cathédrale engloutie', 'fp-bibliotheque': 'Fond de la Bibliothèque interdite', 'fp-foret': 'Fond de la Forêt sous la lune', /* v638 */ 'fp-fondateur': 'Fond de la Salle des Premiers Scelleurs',
   /* v691 */ 'fp-abysse': 'Fond du Bord de l’Abysse', 'fp-glacier': 'Fond du Palais de la Matriarche', 'fp-forge': 'Fond de la Forge sans Maître', 'fp-titan': 'Fond du Titan endormi', 'fp-necropole': 'Fond de la Nécropole des lanternes', 'fp-ciel': 'Fond des Ruines célestes', 'fp-tresor': 'Fond de l’Antre du Trésor', 'fp-epave': 'Fond du Cimetière des navires', /* v890 : réservé au créateur (CREATOR_KIT) */ 'fp-gardien': 'Fond du Seuil de l’Abysse' };
+/* v895 : plateaux du Pacte (assets/pacte/<clé>.webp, 900 × 900 ; pp-cuir est le plateau d’origine, jamais vendu) */
+export const PBOARDS = { 'pp-autel': 'Plateau de l’Autel oublié' };
+/* centre de chaque alvéole en %, dans l'ordre de SEALS (js/screens/pacte.js) ; pp-cuir = plateau d'origine, les autres s'achètent à l'Échoppe */
+export const BOARD_SEALS = { 'pp-cuir': [[16.4, 55.7], [25.6, 65.0], [37.6, 69.7], [49.9, 72.3], [62.2, 69.7], [74.2, 65.0], [83.3, 55.7]], 'pp-autel': [[17.2, 58.6], [27.0, 66.9], [37.9, 73.4], [50.0, 75.2], [62.2, 73.4], [73.1, 66.9], [82.8, 58.6]] };
+export const boardOf = (k) => (BOARD_SEALS[k] ? k : 'pp-cuir');
 const TP = (k, cost) => ({ id: k, kind: 'mat', give: { mat: k }, cost });
+const PP = (k, cost) => ({ id: k, kind: 'pboard', give: { pboard: k }, cost });
 const FP = (k, cost) => ({ id: k, kind: 'fond', give: { fond: k }, cost });
 const RE = (k, cost) => ({ id: k, kind: 'emote', give: { emote: k }, cost });
 export const ROYAUMES = ['dos-infernal', 'dos-abyssal', 'dos-celeste', 'dos-sauvage', 'dos-necrotique', 'dos-primordial', 'dos-artificiel'];
@@ -231,7 +237,7 @@ export const COSM_RARITY = {
   'pl-empereur': 'myth', 
   'pl-sang': 'leg', 'pl-kraken': 'leg', 'pl-automate': 'leg',
   'pl-braise': 'epic', 'pl-givre': 'epic', 'pl-dragon': 'epic', 
-  /* v632 : tapis et fonds de profil */ 'tp-mammon': 'leg', 'tp-abysse': 'leg', 'tp-obsidienne': 'epic', 'tp-givre': 'epic', /* v690 */ 'tp-braise': 'epic', 'tp-marees': 'epic', 'tp-racines': 'rare', 'tp-celeste': 'epic', 'tp-rouages': 'leg', 'tp-tombes': 'epic', 'tp-dragon': 'leg', 'fp-trone': 'leg', 'fp-cathedrale': 'leg', 'fp-bibliotheque': 'epic', 'fp-foret': 'epic', /* v691 */ 'fp-abysse': 'leg', 'fp-glacier': 'epic', 'fp-forge': 'leg', 'fp-titan': 'myth', 'fp-necropole': 'epic', 'fp-ciel': 'leg', 'fp-tresor': 'epic', 'fp-epave': 'epic',
+  /* v632 : tapis et fonds de profil */ 'tp-mammon': 'leg', 'tp-abysse': 'leg', 'tp-obsidienne': 'epic', 'tp-givre': 'epic', /* v690 */ 'tp-braise': 'epic', 'tp-marees': 'epic', 'tp-racines': 'rare', 'tp-celeste': 'epic', 'tp-rouages': 'leg', 'tp-tombes': 'epic', 'tp-dragon': 'leg', /* v895 */ 'pp-autel': 'epic', 'fp-trone': 'leg', 'fp-cathedrale': 'leg', 'fp-bibliotheque': 'epic', 'fp-foret': 'epic', /* v691 */ 'fp-abysse': 'leg', 'fp-glacier': 'epic', 'fp-forge': 'leg', 'fp-titan': 'myth', 'fp-necropole': 'epic', 'fp-ciel': 'leg', 'fp-tresor': 'epic', 'fp-epave': 'epic',
   /* v589 */ 'pl-corbeau': 'leg', 'pl-loup': 'leg', 'pl-araignee': 'epic', 'pl-ambre': 'epic', 'pl-meduse': 'rare', 'pl-serpent': 'rare', 'pl-lune': 'rare', 'pl-astrolabe': 'rare',
   /* v692 */ 'pl-titan': 'leg', 'pl-forge': 'epic', 'pl-racines': 'rare', 'pl-aile': 'leg', 'pl-tombes': 'epic', 'pl-encre': 'epic',
 };
@@ -246,12 +252,13 @@ const SHOP_BACKS = shopOf(/^dos-/);
 const SHOP_SACHETS = shopOf(/^sachet-/);
 const SHOP_PLATES = shopOf(/^pl-/);
 const SHOP_MATS = shopOf(/^tp-/), SHOP_FONDS = shopOf(/^fp-/); /* v632 */
+const SHOP_PBOARDS = shopOf(/^pp-/); /* v895 */
 /* gardés pour les saisons du Codex (plus en vente ; ceux qui les ont les gardent) */
 export const PASS_RESERVE = [...Object.keys(COSM_RARITY).filter((k) => /^(dos|sachet|pl)-/.test(k) && ![...SHOP_BACKS, ...SHOP_SACHETS, ...SHOP_PLATES].includes(k))];
 const RZ = (mk, k, extra) => ({ ...mk(k, COSM_PRICE[COSM_RARITY[k]]), r: COSM_RARITY[k], live: true, ...extra });
 export const CATALOG = [
   /* v875 : plus aucun cadre en vente (décision du propriétaire du 28 octobre 2026) : ils se gagnent aux niveaux et aux succès (LEVEL_FRAMES, data/achievements.json) */
-  ...SHOP_BACKS.map((k) => RZ(B, k)), ...SHOP_SACHETS.map((k) => RZ(SA, k)), ...SHOP_PLATES.map((k) => RZ(PL, k)), ...SHOP_MATS.map((k) => RZ(TP, k, { live: false })), ...SHOP_FONDS.map((k) => RZ(FP, k, { live: false })),
+  ...SHOP_BACKS.map((k) => RZ(B, k)), ...SHOP_SACHETS.map((k) => RZ(SA, k)), ...SHOP_PLATES.map((k) => RZ(PL, k)), ...SHOP_MATS.map((k) => RZ(TP, k, { live: false })), ...SHOP_PBOARDS.map((k) => RZ(PP, k, { live: false })), ...SHOP_FONDS.map((k) => RZ(FP, k, { live: false })),
   ...PAID_EMOTES.filter((k) => !EMOTES[k].codex).map((k) => ({ ...RE(k, 100), r: 'rare' })), /* v630 : sans les réactions du Codex */
   { id: 'arbitres', kind: 'bundle', name: 'Le Cercle des arbitres', give: { emotes: ARBITRE_EMOTES }, cost: 600, desc: 'Les huit réactions des arbitres d’un coup (800 à l’unité).' },
   { id: 'gardiens', kind: 'bundle', name: 'Les vingt gardiens', give: { emotes: BOSS_EMOTES }, cost: 1500, desc: 'Les vingt réactions des gardiens d’un coup (2 000 à l’unité).' },
