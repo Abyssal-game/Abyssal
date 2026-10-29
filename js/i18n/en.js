@@ -9690,6 +9690,9 @@ export default {
   "{0} nouveau": "{0} new",
   "Seulement pour des cosmétiques": "For cosmetics only",
   "Accueil de l’Échoppe": "Emporium home",
+  "<b>+{n} obsidiennes</b> ajoutées à ta réserve.": "<b>+{n} obsidians</b> added to your stash.",
+  "<b>Codex enluminé</b> débloqué : la voie enluminée de la saison est à toi.": "<b>Illuminated Codex</b> unlocked: this season’s illuminated path is yours.",
+  "<b>{name}</b> : tes objets t’attendent dans Profil › Personnaliser.": "<b>{name}</b>: your items await you in Profile › Customize.",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

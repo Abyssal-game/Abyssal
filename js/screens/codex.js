@@ -314,7 +314,9 @@ export default function codexScreen(app, root) {
       const got = await withPending(iapBuy(app, id), t('Paiement…'));
       if (!got) return false; /* annulé */
       app.sfx.levelup?.();
-      toast(got.length ? t('{name} : acquis. Merci pour ton soutien !', { name: esc(tx(it.name)) }) : t('Paiement reçu : vérification en cours.'), { kind: 'success', icon: 'star' });
+      /* v913 (« bizarre de mettre merci pour ton soutien à un achat ») : on dit ce que le joueur vient de recevoir */
+      const done = it.kind === 'obs' ? t('<b>+{n} obsidiennes</b> ajoutées à ta réserve.', { n: fmt(it.give.obs) }) : it.id === 'codex' ? t('<b>Codex enluminé</b> débloqué : la voie enluminée de la saison est à toi.') : t('<b>{name}</b> : tes objets t’attendent dans Profil › Personnaliser.', { name: esc(tx(it.name)) });
+      toast(got.length ? done : t('Paiement reçu : vérification en cours.'), { kind: 'success', icon: 'star' });
       return true;
     }
     if (preview0() || (g.s.settings?.dev && g.s.devCodex)) {

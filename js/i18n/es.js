@@ -9678,6 +9678,9 @@ export default {
   "{0} nouveau": "{0} nuevo",
   "Seulement pour des cosmétiques": "Solo para cosméticos",
   "Accueil de l’Échoppe": "Inicio del Bazar",
+  "<b>+{n} obsidiennes</b> ajoutées à ta réserve.": "<b>+{n} obsidianas</b> añadidas a tu reserva.",
+  "<b>Codex enluminé</b> débloqué : la voie enluminée de la saison est à toi.": "<b>Códice iluminado</b> desbloqueado: la vía iluminada de la temporada es tuya.",
+  "<b>{name}</b> : tes objets t’attendent dans Profil › Personnaliser.": "<b>{name}</b>: tus objetos te esperan en Perfil › Personalizar.",
 };
 
 export const names = {
