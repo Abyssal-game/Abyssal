@@ -9585,6 +9585,7 @@ export default {
   "Plateau des Marées noires": "Tabuleiro das Marés negras",
   "Plateau de l’Ossuaire d’argent": "Tabuleiro do Ossário de prata",
   "Plateau de la Crypte aux lanternes": "Tabuleiro da Cripta das lanternas",
+  "Plateau du Tombeau royal": "Tabuleiro do Túmulo real",
 };
 
 export const names = {

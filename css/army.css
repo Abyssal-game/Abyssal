@@ -9108,4 +9108,4 @@ html.reduce-motion :is(.chx-leak, .chx-beam, .chx-ring, .chx-fx) { display: none
 .pa-game .mq-table .pa-parch.pp-marees { background-image: url(../assets/pacte/pp-marees.webp); }
 /* v901 : plateaux des Cryptes Ossuaire d’argent (médaillons des coins gardés entiers dans la tranche) et Crypte aux lanternes (lanternes dans le fond étiré) */
 .cr-game .cr-grid.cp-ossuaire { border-image-source: url(../assets/cryptes/cp-ossuaire.webp); border-image-slice: 112 108 112 108 fill; border-image-width: 28px 27px 28px 27px; }
-.cr-game .cr-grid.cp-lanternes { border-image-source: url(../assets/cryptes/cp-lanternes.webp); border-image-slice: 54 56 54 56 fill; border-image-width: 20px 21px 20px 21px; }
+.cr-game .cr-grid.cp-tombeau { border-image-source: url(../assets/cryptes/cp-tombeau.webp); border-image-slice: 76 81 80 81 fill; border-image-width: 20px 21px 21px 21px; } /* v902 : remplace cp-lanternes */

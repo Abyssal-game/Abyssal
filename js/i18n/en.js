@@ -9598,6 +9598,7 @@ export default {
   "Plateau des Marées noires": "Black Tides board",
   "Plateau de l’Ossuaire d’argent": "Silver Ossuary board",
   "Plateau de la Crypte aux lanternes": "Lantern Crypt board",
+  "Plateau du Tombeau royal": "Royal Tomb board",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

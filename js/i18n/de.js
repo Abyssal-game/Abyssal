@@ -9586,6 +9586,7 @@ export default {
   "Plateau des Marées noires": "Spielbrett der Schwarzen Gezeiten",
   "Plateau de l’Ossuaire d’argent": "Spielbrett des Silbernen Beinhauses",
   "Plateau de la Crypte aux lanternes": "Spielbrett der Laternenkrypta",
+  "Plateau du Tombeau royal": "Spielbrett des Königsgrabs",
 };
 
 export const names = {
