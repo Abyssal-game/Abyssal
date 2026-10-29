@@ -30,6 +30,7 @@ if (mode === 'sceaux') { // partie de Sceaux commencée : quelques cartes déjà
   g.sceauxStart({ rival: 'initie' });
   const r = rngFrom('pose');
   for (let k = 0; k < 4 && !g.s.sceaux.cur.over; k++) { if (g.s.sceaux.cur.turn === 'o') g.sceauxAi(); else { const m = SC.aiMove(catalog, g.s.sceaux.cur, 4, r); g.sceauxPlay(m[0], m[1]); } }
+  if (g.s.sceaux.cur.turn === 'o' && !g.s.sceaux.cur.over) g.sceauxAi(); /* v889 : la capture montre le tour du joueur (main allumée) */
 }
 const begin = () => { g.startRun(); const r = g.s.descent.run; if (r?.phase === 'omen') g.chooseOmen(r.omenOffer[0]); }; // v354 : passe le Présage (ouvert après le premier gardien)
 if (mode === 'portes') begin(); // expédition commencée, sur l'écran des portes

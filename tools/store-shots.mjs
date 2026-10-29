@@ -58,7 +58,7 @@ const steps = {
     for (let i = 0; i < 6 && await p.locator('.cb2').count() === 0; i++) { await p.mouse.click(220, 300); await wait(1500); }
     await wait(Number(process.env.FIGHT_MS || 2500)); await shot('combat');
   },
-  async sceaux() { await open('sceaux'); await go('#/sceaux', 2500); await shot('sceaux'); },
+  async sceaux() { await open('sceaux'); await go('#/sceaux', 6000); await shot('sceaux'); }, /* v889 : on attend la fin des animations de capture */
   async bestiaire() { await open(); await go('#/bestiaire'); await shot('bestiaire'); },
 };
 for (const [k, f] of Object.entries(steps)) if (!only.length || only.includes(k)) { try { await f(); } catch (e) { console.log('ÉCHEC', k, e.message.split('\n')[0]); } }
