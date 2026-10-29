@@ -61,6 +61,7 @@ export function sayText(ev, { mine, nm, fn, seven }) {
 export const howHTML = () => `<ol class="how-steps">${HOW.map(howLi).join('')}</ol>`; /* v491 : tutoriel entier, sans « Pour aller plus loin » */
 
 export default function pacteScreen(app, root) {
+  { const im = new Image(); im.src = 'assets/jeux/pa-fissure.webp'; } /* v916 : prête avant la première brisure */
   const g = app.game, cat = app.catalog;
   let busy = false, timer = 0, gone = false, banner = null, defy = null, hold = null; /* v851 : scores d'avant le tour de l'adversaire, montrés jusqu'à la fin de son tour */
   /* v745 : effets du Pacte (carte qui vole de la pioche, sceau qui s'embrase) : ce que l'écran montrait au dessin précédent */
@@ -230,8 +231,8 @@ export default function pacteScreen(app, root) {
     const parch = root.querySelector('.pa-parch');
     if (!parch || app.reduced()) return;
     parch.classList.add('pa-cracking');
-    parch.insertAdjacentHTML('beforeend', '<i class="pa-flare" aria-hidden="true"></i>'); /* v915 : éclat de braise ; la fissure est lumineuse et s'éteint (avant : traits noirs qui restaient) */
-    parch.insertAdjacentHTML('beforeend', `<svg class="pa-crack" viewBox="0 0 450 330" preserveAspectRatio="none" aria-hidden="true"><path d="M225 8 L212 52 L236 88 L205 130 L232 170 L214 214 L240 262 L220 322"/><path d="M212 52 L170 70 L140 64"/><path d="M236 88 L286 104 L318 96"/><path d="M205 130 L160 150"/><path d="M232 170 L280 190 L300 214"/><path d="M214 214 L176 236"/></svg>`);
+    /* v916 : la fissure de feu peinte (Gemini, assets/jeux/pa-fissure.webp) s'ouvre de haut en bas, rougeoie puis s'éteint */
+    parch.insertAdjacentHTML('beforeend', '<i class="pa-flare" aria-hidden="true"></i><img class="pa-fissure" alt="" aria-hidden="true" src="assets/jeux/pa-fissure.webp">');
     parch.querySelectorAll('.pa-row .pa-card').forEach((c, i) => { c.style.setProperty('--bd', `${i * 70}ms`); c.classList.add('pa-burning'); });
     const row = parch.querySelector('.pa-row');
     if (row) for (let i = 0; i < 14; i++) {
