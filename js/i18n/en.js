@@ -9555,6 +9555,11 @@ export default {
   "Ta table du Pacte": "Your Pact table",
   "Pacte": "Pact",
   "Pacte en ligne": "Online Pact",
+  "Plateaux": "Boards",
+  "Plateau de jeu": "Game board",
+  "Les tables de tes mini-jeux, rangées par jeu": "The tables for your mini-games, sorted by game",
+  "Tapis des Duels des Sceaux": "Seal Duels mat",
+  "Tous les jeux": "All games",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

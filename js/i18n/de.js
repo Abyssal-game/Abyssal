@@ -9543,6 +9543,11 @@ export default {
   "Ta table du Pacte": "Dein Pakt-Tisch",
   "Pacte": "Pakt",
   "Pacte en ligne": "Pakt online",
+  "Plateaux": "Spielbretter",
+  "Plateau de jeu": "Spielbrett",
+  "Les tables de tes mini-jeux, rangées par jeu": "Die Tische deiner Minispiele, nach Spiel geordnet",
+  "Tapis des Duels des Sceaux": "Matte der Siegelduelle",
+  "Tous les jeux": "Alle Spiele",
 };
 
 export const names = {

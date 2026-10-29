@@ -158,12 +158,17 @@ export default function codexScreen(app, root) {
     sachet: ['Sachets', 'Sachet de booster', 'L’habillage de tes boosters standard et premium'],
     plate: ['Plaques', 'Plaque de pseudo', 'La bannière derrière ton pseudo'],
     fond: ['Fonds de profil', 'Fond de profil', 'La scène derrière ton portrait, vue par tous'],
-    mat: ['Tapis', 'Tapis de jeu', 'Le plateau de tes Duels des Sceaux'],
+    board: ['Plateaux', 'Plateau de jeu', 'Les tables de tes mini-jeux, rangées par jeu'], /* v896 : un seul rayon pour les plateaux des mini-jeux */
+    mat: ['Tapis', 'Tapis des Duels des Sceaux', 'Le plateau de tes Duels des Sceaux'],
     pboard: ['Plateaux du Pacte', 'Plateau du Pacte', 'La table de tes parties du Pacte'], /* v895 */
     emote: ['Réactions', 'Réaction', 'Des bulles à envoyer en partie en ligne'],
     bundle: ['Lots', 'Lot', 'Plusieurs objets, moins chers qu’à l’unité'],
   };
   const kindOf = (it) => (it.kind === 'back' ? 'live' : it.kind);
+  /* v896 (demande du propriétaire) : les plateaux des mini-jeux dans le rayon « Plateaux », avec un filtre par jeu */
+  const BOARD_GAMES = [['mat', 'Duels des Sceaux'], ['pboard', 'Pacte']];
+  const aisleOf = (k) => (BOARD_GAMES.some(([x]) => x === k) ? 'board' : k);
+  const AISLES = Object.keys(KINDS).filter((k) => aisleOf(k) === k);
   const nameOf = (it) => (it.kind === 'title' ? `Titre « ${it.id} »` : null) || it.name || (it.kind === 'frame' ? ALL_FRAMES[it.id] : it.kind === 'finish' ? `Finition ${FINISHES[it.id].name}` : it.kind === 'plate' ? PLATES[it.id] : it.kind === 'sachet' ? SACHETS[it.id] : it.kind === 'mat' ? TAPIS[it.id] : it.kind === 'pboard' ? PBOARDS[it.id] : it.kind === 'fond' ? FONDS[it.id] : it.kind === 'emote' ? EMOTES[it.id].name : CODEX_BACKS[it.id]) || it.id;
   const picOf = (it, big = false) => it.kind === 'frame' ? `<span class="${big ? 'avatar-big' : 'avatar-mini'} pf pf-${it.id}">${myAv()}</span>`
     : it.kind === 'back' ? `<img class="cx-bk" alt="" src="assets/backs/${it.id}.webp">`
@@ -194,20 +199,23 @@ export default function codexScreen(app, root) {
         ${on ? `<span class="cxs-own on">${icon('check')}Équipé</span>` : own ? `<span class="cxs-own">${icon('check')}Possédé</span>` : `<span class="cxs-pr ${cost <= have ? '' : 'short'}">${obsTxt(cost)}</span>`}</button>`; };
     const wallet = `<section class="cxs-wallet"><span class="cxs-w-n">${obsTxt(have)}</span><span class="small">${esc(OBS.name)} · seulement pour des cosmétiques</span>
         <button class="btn small primary" data-cx="cat" data-v="obs">Obtenir</button></section>`;
-    const inKind = (k) => CATALOG.filter((x) => kindOf(x) === k);
+    const inKind = (k) => CATALOG.filter((x) => aisleOf(kindOf(x)) === k);
+    if (aisleOf(ui.cat) === 'board' && ui.cat !== 'board') { ui.sub = ui.cat; ui.cat = 'board'; } /* lien direct vers un jeu (Personnaliser) */
     /* — un rayon — */
     if (ui.cat && ui.cat !== 'obs' && KINDS[ui.cat]) {
       const k = ui.cat, [label, , desc] = KINDS[k], all = inKind(k), owned = all.filter((x) => g.catalogOwned(x.id)).length;
-      const rar = RANKS.includes(ui.rar) ? ui.rar : null;
-      const list = all.filter((x) => (!rar || rank(x) === rar) && (!ui.hideOwned || !g.catalogOwned(x.id)));
+      const rar = RANKS.includes(ui.rar) ? ui.rar : null, games = k === 'board' ? BOARD_GAMES.filter(([x]) => all.some((it) => kindOf(it) === x)) : [], sub = games.some(([x]) => x === ui.sub) ? ui.sub : null;
+      const list = all.filter((x) => (!rar || rank(x) === rar) && (!sub || kindOf(x) === sub) && (!ui.hideOwned || !g.catalogOwned(x.id)));
       const groups = RANKS.map((r) => [r, list.filter((x) => rank(x) === r).sort((a, b) => (g.catalogOwned(a.id) - g.catalogOwned(b.id)) || (b.cost - a.cost))]).filter(([, l]) => l.length);
-      const tabs = Object.keys(KINDS).filter((x) => inKind(x).length);
+      const tabs = AISLES.filter((x) => inKind(x).length);
       return `${wallet}
         <nav class="cxs-nav" aria-label="Rayons"><button class="cxs-home" data-cx="cat" data-v="">${icon('prev')}Accueil</button>${tabs.map((x) => `<button class="cxs-cat ${x === k ? 'on' : ''}" data-cx="cat" data-v="${x}">${KINDS[x][0]}</button>`).join('')}</nav>
         <section class="cxs-aisle"><h2>${label}</h2><p class="small muted">${desc}</p><p class="small cxs-cnt"><b>${owned} / ${all.length}</b> possédés</p>
+          ${games.length > 1 ? `<div class="cxs-filt cxs-games" role="group" aria-label="Jeu">${[[null, 'Tous les jeux'], ...games].map(([x, l]) => `<button class="chip" data-cx="sub" data-v="${x || ''}" aria-pressed="${sub === x}">${l}</button>`).join('')}</div>` : ''}
           <div class="cxs-filt">${[[null, 'Toutes'], ...RANKS.map((r) => [r, RANK[r]])].filter(([r]) => !r || all.some((x) => rank(x) === r)).map(([r, l]) => `<button class="chip ${r ? `r-${r}` : ''}" data-cx="rar" data-v="${r || ''}" aria-pressed="${(rar || null) === r}">${l}</button>`).join('')}
             <button class="chip" data-cx="hide" aria-pressed="${!!ui.hideOwned}">${icon('eye')}Masquer ce que j’ai</button></div></section>
-        ${groups.length ? groups.map(([r, l]) => `<h3 class="cxs-gh r-${r}"><span>${RANK[r]}</span><small>${l.length}</small></h3><div class="cxs-grid ${k === 'live' ? 'back' : k}">${l.map((x) => tile(x)).join('')}</div>`).join('')
+        ${k === 'board' && list.length ? games.filter(([x]) => !sub || x === sub).map(([x, n]) => [n, list.filter((it) => kindOf(it) === x).sort((a, b) => RANKS.indexOf(rank(a)) - RANKS.indexOf(rank(b)) || (g.catalogOwned(a.id) - g.catalogOwned(b.id)) || (b.cost - a.cost))]).filter(([, gl]) => gl.length).map(([n, gl]) => `<h3 class="cxs-gh cxs-game"><span>${n}</span><small>${gl.length}</small></h3><div class="cxs-grid board">${gl.map((x) => tile(x)).join('')}</div>`).join('') /* v896 : un groupe par jeu */
+          : groups.length ? groups.map(([r, l]) => `<h3 class="cxs-gh r-${r}"><span>${RANK[r]}</span><small>${l.length}</small></h3><div class="cxs-grid ${k === 'live' ? 'back' : k}">${l.map((x) => tile(x)).join('')}</div>`).join('')
           : `<p class="muted center cxs-none">${ui.hideOwned ? 'Tu as déjà tout ce rayon. Bravo !' : 'Rien ici pour l’instant.'}</p>`}`;
     }
     /* — les obsidiennes — */
@@ -226,7 +234,7 @@ export default function codexScreen(app, root) {
         <p class="small muted center">Le paiement passe par ton compte de l’App Store. Les obsidiennes ne servent qu’aux cosmétiques.</p>`;
     }
     /* — l'accueil (v637 : sans vitrine ni nouveautés ; obsidiennes et Pack du Fondateur en tête, bien visibles) — */
-    const aisles = Object.keys(KINDS).filter((k) => inKind(k).length).map((k) => { const l = inKind(k), own = l.filter((x) => g.catalogOwned(x.id)).length;
+    const aisles = AISLES.filter((k) => inKind(k).length).map((k) => { const l = inKind(k), own = l.filter((x) => g.catalogOwned(x.id)).length;
       const show = l.slice().sort((a, b) => RANKS.indexOf(rank(a)) - RANKS.indexOf(rank(b)))[0];
       return `<button class="cxs-aisle-t k-${k}" data-cx="cat" data-v="${k}"><span class="cxs-at-pic">${picOf(show)}</span><b>${KINDS[k][0]}</b><small>${KINDS[k][2]}</small><span class="cxs-at-n">${own} / ${l.length}</span></button>`; }).join('');
     const fd = SHOP.find((x) => x.id === 'fondateur'), fdOwn = fd && g.shopOwned(fd.id);
@@ -438,7 +446,8 @@ export default function codexScreen(app, root) {
       if (k === 'buy') { if (!(await pay(b.dataset.id))) return; }
       if (k === 'jump') { ui.cat = 'obs'; draw(); return; }
       if (k === 'founder') { app.sfx.tap?.(); founder(); return; } /* v637 */
-      if (k === 'cat') { ui.cat = b.dataset.v || null; ui.rar = null; app.sfx.tap?.(); draw(); root.querySelector('.cxs-wallet')?.scrollIntoView({ block: 'start' }); return; }
+      if (k === 'sub') { ui.sub = b.dataset.v || null; app.sfx.tap?.(); return draw(); } /* v896 */
+      if (k === 'cat') { ui.cat = b.dataset.v || null; ui.rar = null; ui.sub = null; app.sfx.tap?.(); draw(); root.querySelector('.cxs-wallet')?.scrollIntoView({ block: 'start' }); return; }
       if (k === 'rar') { ui.rar = b.dataset.v || null; app.sfx.tap?.(); return draw(); } /* v636 */
       if (k === 'hide') { ui.hideOwned = !ui.hideOwned; app.sfx.tap?.(); return draw(); }
       if (k === 'see') { /* v484, v636 : on passe d'un objet à l'autre dans le rayon ouvert */

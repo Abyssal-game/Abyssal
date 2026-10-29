@@ -9542,6 +9542,11 @@ export default {
   "Ta table du Pacte": "Il tuo tavolo del Patto",
   "Pacte": "Patto",
   "Pacte en ligne": "Patto online",
+  "Plateaux": "Tavole",
+  "Plateau de jeu": "Tavola da gioco",
+  "Les tables de tes mini-jeux, rangées par jeu": "I tavoli dei tuoi minigiochi, ordinati per gioco",
+  "Tapis des Duels des Sceaux": "Tappeto dei Duelli dei Sigilli",
+  "Tous les jeux": "Tutti i giochi",
 };
 
 export const names = {
