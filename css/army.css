@@ -9101,3 +9101,8 @@ html.reduce-motion :is(.chx-leak, .chx-beam, .chx-ring, .chx-fx) { display: none
 .cx-pv-cr { display: flex; justify-content: center; }
 .cx-pv-cr .cr-grid { width: min(100%, 300px); grid-template-rows: none; flex: none; }
 .cx-pv-cr .cr-c { aspect-ratio: 5 / 7; height: auto; max-height: none; }
+/* v900 : plateaux du Pacte de la Forge infernale et des Marées noires (même disposition) */
+.pa-parch.pp-braise { --rl: 16.4%; --rt: 9.8%; --rw: 67.4; --rh: 25.4; --it: 88.6%; --ix: 23.1%; --sw: 8.9%; background-image: url(../assets/pacte/pp-braise.webp); }
+.pa-game .mq-table .pa-parch.pp-braise { background-image: url(../assets/pacte/pp-braise.webp); }
+.pa-parch.pp-marees { --rl: 21.0%; --rt: 10.7%; --rw: 58.6; --rh: 23.4; --it: 88.6%; --ix: 23.1%; --sw: 8.9%; background-image: url(../assets/pacte/pp-marees.webp); }
+.pa-game .mq-table .pa-parch.pp-marees { background-image: url(../assets/pacte/pp-marees.webp); }

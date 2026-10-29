@@ -9581,6 +9581,8 @@ export default {
   "Dos de la Crypte de braise": "Dorso della Cripta di brace",
   "Dos du Reliquaire d’or": "Dorso del Reliquiario d’oro",
   "Dos du Tombeau des Racines": "Dorso della Tomba delle Radici",
+  "Plateau de la Forge infernale": "Tavola della Forgia infernale",
+  "Plateau des Marées noires": "Tavola delle Maree nere",
 };
 
 export const names = {

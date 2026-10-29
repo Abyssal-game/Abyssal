@@ -9582,6 +9582,8 @@ export default {
   "Dos de la Crypte de braise": "Rückseite der Glutkrypta",
   "Dos du Reliquaire d’or": "Rückseite des Goldenen Reliquiars",
   "Dos du Tombeau des Racines": "Rückseite des Wurzelgrabs",
+  "Plateau de la Forge infernale": "Spielbrett der Höllenschmiede",
+  "Plateau des Marées noires": "Spielbrett der Schwarzen Gezeiten",
 };
 
 export const names = {

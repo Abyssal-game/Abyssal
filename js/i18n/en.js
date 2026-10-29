@@ -9594,6 +9594,8 @@ export default {
   "Dos de la Crypte de braise": "Ember Crypt back",
   "Dos du Reliquaire d’or": "Golden Reliquary back",
   "Dos du Tombeau des Racines": "Tomb of Roots back",
+  "Plateau de la Forge infernale": "Infernal Forge board",
+  "Plateau des Marées noires": "Black Tides board",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {
