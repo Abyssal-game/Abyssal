@@ -230,6 +230,7 @@ export default function pacteScreen(app, root) {
     const parch = root.querySelector('.pa-parch');
     if (!parch || app.reduced()) return;
     parch.classList.add('pa-cracking');
+    parch.insertAdjacentHTML('beforeend', '<i class="pa-flare" aria-hidden="true"></i>'); /* v915 : éclat de braise ; la fissure est lumineuse et s'éteint (avant : traits noirs qui restaient) */
     parch.insertAdjacentHTML('beforeend', `<svg class="pa-crack" viewBox="0 0 450 330" preserveAspectRatio="none" aria-hidden="true"><path d="M225 8 L212 52 L236 88 L205 130 L232 170 L214 214 L240 262 L220 322"/><path d="M212 52 L170 70 L140 64"/><path d="M236 88 L286 104 L318 96"/><path d="M205 130 L160 150"/><path d="M232 170 L280 190 L300 214"/><path d="M214 214 L176 236"/></svg>`);
     parch.querySelectorAll('.pa-row .pa-card').forEach((c, i) => { c.style.setProperty('--bd', `${i * 70}ms`); c.classList.add('pa-burning'); });
     const row = parch.querySelector('.pa-row');

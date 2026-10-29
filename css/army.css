@@ -9204,3 +9204,11 @@ html.reduce-motion :is(.chx-leak, .chx-beam, .chx-ring, .chx-fx) { display: none
 .ech-head .ech-flt { margin: 8px -16px 0; padding: 0 16px 8px; }
 .ech-kick span + span::before { content: " · "; }
 .ech-anchor { display: block; height: 0; scroll-margin-top: calc(var(--safe-t, 0px) + 54px); }
+/* v915 (« la fissure noire au milieu est très moche ») : quand le pacte se brise, une fissure de braise lumineuse s'ouvre, rougeoie puis s'éteint, avec un éclat orangé sur le plateau */
+.pa-crack { filter: drop-shadow(0 0 3px #FF7A2A) drop-shadow(0 0 9px rgba(224, 48, 26, .85)); animation: paCrackOut .55s ease-in 1.05s forwards; }
+.pa-crack path { stroke: #FFD9A0; stroke-width: 2.4; }
+.pa-crack path + path { stroke: #FFB66A; stroke-width: 1.4; }
+@keyframes paCrackOut { to { opacity: 0; } }
+.pa-flare { position: absolute; inset: 0; z-index: 2; pointer-events: none; border-radius: inherit; background: radial-gradient(60% 55% at 50% 50%, rgba(255, 140, 50, .55), rgba(200, 40, 20, .25) 45%, transparent 75%); mix-blend-mode: screen; opacity: 0; animation: paFlare 1.4s ease-out forwards; }
+@keyframes paFlare { 0% { opacity: 0; } 18% { opacity: 1; } 100% { opacity: 0; } }
+html.fx-light .pa-crack { filter: none; }
