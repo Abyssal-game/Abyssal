@@ -2135,6 +2135,7 @@ export class Game {
   setSachet(k, slot = 'standard') { if (!k || (this.s.sachets || []).includes(k)) { this.s[slot === 'premium' ? 'sachetPrem' : 'sachet'] = k || null; this.persist(); } } /* v565 : habillage des boosters, null = d'origine ; v587 : un sachet pour le standard (s.sachet), un pour le premium (s.sachetPrem) */
   setCboard(k) { if (!k || (this.s.cboards || []).includes(k)) { this.s.cboard = k || null; this.persist(); } } /* v898 : plateau des Cryptes, null = plateau d'origine */
   setCback(k) { if (!k || (this.s.cbacks || []).includes(k)) { this.s.cback = k || null; this.persist(); } } /* v898 : dos des cartes des Cryptes */
+  setEboard(k) { if (!k || (this.s.eboards || []).includes(k)) { this.s.eboard = k || null; this.persist(); } } /* v907 : salle des Enchères, null = salle d'origine */
   setPboard(k) { if (!k || (this.s.pboards || []).includes(k)) { this.s.pboard = k || null; this.persist(); } } /* v895 : plateau du Pacte, null = plateau d'origine */
   setMat(k) { if (!k || (this.s.mats || []).includes(k)) { this.s.mat = k || null; this.persist(); } } /* v632 : tapis de jeu, null = plateau d'origine */
   setFond(k) { if (!k || (this.s.fonds || []).includes(k)) { this.s.fond = k || null; this.persist(); } } /* v632 : fond de profil, null = fond d'origine */
@@ -2173,6 +2174,7 @@ export class Game {
     if (reward.mat && !(this.s.mats ||= []).includes(reward.mat)) this.s.mats.push(reward.mat); /* v632 */
     if (reward.pboard && !(this.s.pboards ||= []).includes(reward.pboard)) this.s.pboards.push(reward.pboard); /* v895 */
     if (reward.cboard && !(this.s.cboards ||= []).includes(reward.cboard)) this.s.cboards.push(reward.cboard); /* v898 */
+    if (reward.eboard && !(this.s.eboards ||= []).includes(reward.eboard)) this.s.eboards.push(reward.eboard); /* v907 */
     if (reward.cback && !(this.s.cbacks ||= []).includes(reward.cback)) this.s.cbacks.push(reward.cback);
     if (reward.fond && !(this.s.fonds ||= []).includes(reward.fond)) this.s.fonds.push(reward.fond); /* v632 */
     if (reward.sachet && !(this.s.sachets ||= []).includes(reward.sachet)) this.s.sachets.push(reward.sachet); /* v565 */
@@ -2308,7 +2310,7 @@ export class Game {
   catalogOwned(id) {
     const it = CATALOG.find((x) => x.id === id); if (!it) return false;
     const g = it.give;
-    return (!g.frame || this.s.frames.includes(g.frame)) && (!g.plate || (this.s.plates || []).includes(g.plate)) && (!g.mat || (this.s.mats || []).includes(g.mat)) && (!g.pboard || (this.s.pboards || []).includes(g.pboard)) && (!g.cboard || (this.s.cboards || []).includes(g.cboard)) && (!g.cback || (this.s.cbacks || []).includes(g.cback)) && (!g.fond || (this.s.fonds || []).includes(g.fond)) && (!g.emote || (this.s.emotes || []).includes(g.emote))
+    return (!g.frame || this.s.frames.includes(g.frame)) && (!g.plate || (this.s.plates || []).includes(g.plate)) && (!g.mat || (this.s.mats || []).includes(g.mat)) && (!g.pboard || (this.s.pboards || []).includes(g.pboard)) && (!g.cboard || (this.s.cboards || []).includes(g.cboard)) && (!g.eboard || (this.s.eboards || []).includes(g.eboard)) && (!g.cback || (this.s.cbacks || []).includes(g.cback)) && (!g.fond || (this.s.fonds || []).includes(g.fond)) && (!g.emote || (this.s.emotes || []).includes(g.emote))
       && (g.emotes || []).every((e) => (this.s.emotes || []).includes(e)) && (!g.finish || (this.s.finishes || []).includes(g.finish)) && (!g.back || (this.s.backs || []).includes(g.back)) && (!g.sachet || (this.s.sachets || []).includes(g.sachet)) && (g.backs || []).every((b) => (this.s.backs || []).includes(b));
   }
   catalogCost(id) { /* un lot ne fait pas payer ce qu'on a déjà : on retire le prix des dos déjà possédés, jamais sous 0 */

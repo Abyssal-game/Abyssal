@@ -27,7 +27,7 @@ function profilePayload() {
   const p = { avatar: g.shownAvatar(), title: s.title, level: g.levelInfo().level, owned: g.uniqueCount() };
   /* v564 : cadre et plaque vus par les autres, seulement quand le serveur les connaît (supabase/15-vitrine.sql collé) */
   if (sync.profile && 'plate' in sync.profile) Object.assign(p, { frame: s.frame || null, plate: s.plate || null, ...('sachet' in sync.profile ? { sachet: s.sachet || null } : {}) });
-  if (sync.profile && 'boards' in sync.profile) p.boards = { mat: s.mat || null, pb: s.pboard || null, cb: s.cboard || null, cd: s.cback || null }; /* v904 : plateaux et dos des mini-jeux */
+  if (sync.profile && 'boards' in sync.profile) p.boards = { mat: s.mat || null, pb: s.pboard || null, cb: s.cboard || null, cd: s.cback || null, eb: s.eboard || null }; /* v904 : plateaux et dos des mini-jeux */
   return p;
 }
 

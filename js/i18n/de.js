@@ -9594,6 +9594,17 @@ export default {
   "{n} tickets standard": "{n} Standard-Tickets",
   "coffre": "Truhe",
   "Débloqué le {date}": "Freigeschaltet am {date}",
+  "Salle du Parvis céleste": "Saal des Himmlischen Vorhofs",
+  "Salle engloutie": "Versunkener Saal",
+  "Salle de la Glace noire": "Saal des Schwarzen Eises",
+  "Salle de la Forge infernale": "Saal der Höllenschmiede",
+  "Salles des Enchères": "Säle der Auktionen",
+  "Salle des Enchères": "Auktionssaal",
+  "La salle de tes parties des Enchères": "Der Saal deiner Auktionspartien",
+  "Salle d’origine": "Ursprünglicher Saal",
+  "La salle de tes Enchères, contre l’Abysse et en ligne.": "Der Saal deiner Auktionen, gegen den Abgrund und online.",
+  "Ta salle des Enchères": "Dein Auktionssaal",
+  "Enchères en ligne": "Online-Auktionen",
 };
 
 export const names = {

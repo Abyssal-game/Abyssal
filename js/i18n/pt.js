@@ -9593,6 +9593,17 @@ export default {
   "{n} tickets standard": "{n} tickets padrão",
   "coffre": "baú",
   "Débloqué le {date}": "Desbloqueado em {date}",
+  "Salle du Parvis céleste": "Sala do Átrio celeste",
+  "Salle engloutie": "Sala submersa",
+  "Salle de la Glace noire": "Sala do Gelo negro",
+  "Salle de la Forge infernale": "Sala da Forja infernal",
+  "Salles des Enchères": "Salas dos Leilões",
+  "Salle des Enchères": "Sala dos Leilões",
+  "La salle de tes parties des Enchères": "A sala das tuas partidas de Leilões",
+  "Salle d’origine": "Sala original",
+  "La salle de tes Enchères, contre l’Abysse et en ligne.": "A sala dos teus Leilões, contra o Abismo e online.",
+  "Ta salle des Enchères": "A tua sala dos Leilões",
+  "Enchères en ligne": "Leilões online",
 };
 
 export const names = {

@@ -195,6 +195,8 @@ export const FONDS = { 'fp-trone': 'Fond du Trône de braise', 'fp-cathedrale': 
 export const PBOARDS = { 'pp-autel': 'Plateau de l’Autel oublié', /* v898 */ 'pp-parvis': 'Plateau du Parvis céleste', 'pp-rouages': 'Plateau de la Forge sans Maître', 'pp-givre': 'Plateau de la Glace noire', 'pp-racines': 'Plateau du Réveil des Racines', /* v900 */ 'pp-braise': 'Plateau de la Forge infernale', 'pp-marees': 'Plateau des Marées noires' };
 /* v898 : plateaux des Cryptes (cadre étiré autour des 20 cartes, assets/cryptes/<clé>.webp, 512 de large) et dos des cartes des Cryptes (assets/cryptes/<clé>.webp, 300 × 420) */
 export const CBOARDS = { /* v901 */ 'cp-ossuaire': 'Plateau de l’Ossuaire d’argent', /* v902 */ 'cp-tombeau': 'Plateau du Tombeau royal', 'cp-engloutie': 'Plateau de la Crypte engloutie', 'cp-forge': 'Plateau de la Crypte de braise', 'cp-reliquaire': 'Plateau du Reliquaire d’or', 'cp-racines': 'Plateau du Tombeau des Racines' };
+/* v907 : salles des Enchères (assets/encheres/<clé>.webp, 700 × 600 ; null = salle d'origine en-salle.webp) */
+export const EBOARDS = { 'ep-parvis': 'Salle du Parvis céleste', 'ep-engloutie': 'Salle engloutie', 'ep-givre': 'Salle de la Glace noire', 'ep-braise': 'Salle de la Forge infernale' };
 export const CBACKS = { /* v903 */ 'cd-tombeau': 'Dos du Tombeau royal', 'cd-ossuaire': 'Dos de l’Ossuaire d’argent', 'cd-engloutie': 'Dos de la Crypte engloutie', 'cd-forge': 'Dos de la Crypte de braise', 'cd-reliquaire': 'Dos du Reliquaire d’or', 'cd-racines': 'Dos du Tombeau des Racines' };
 /* centre de chaque alvéole en %, dans l'ordre de SEALS (js/screens/pacte.js) ; pp-cuir = plateau d'origine, les autres s'achètent à l'Échoppe */
 export const BOARD_SEALS = {
@@ -206,6 +208,7 @@ export const boardOf = (k) => (BOARD_SEALS[k] ? k : 'pp-cuir');
 const TP = (k, cost) => ({ id: k, kind: 'mat', give: { mat: k }, cost });
 const PP = (k, cost) => ({ id: k, kind: 'pboard', give: { pboard: k }, cost });
 const CP = (k, cost) => ({ id: k, kind: 'cboard', give: { cboard: k }, cost }), CD = (k, cost) => ({ id: k, kind: 'cback', give: { cback: k }, cost }); /* v898 */
+const EP = (k, cost) => ({ id: k, kind: 'eboard', give: { eboard: k }, cost }); /* v907 */
 const FP = (k, cost) => ({ id: k, kind: 'fond', give: { fond: k }, cost });
 const RE = (k, cost) => ({ id: k, kind: 'emote', give: { emote: k }, cost });
 export const ROYAUMES = ['dos-infernal', 'dos-abyssal', 'dos-celeste', 'dos-sauvage', 'dos-necrotique', 'dos-primordial', 'dos-artificiel'];
@@ -246,6 +249,7 @@ export const COSM_RARITY = {
   'pl-sang': 'leg', 'pl-kraken': 'leg', 'pl-automate': 'leg',
   'pl-braise': 'epic', 'pl-givre': 'epic', 'pl-dragon': 'epic', 
   /* v632 : tapis et fonds de profil */ 'tp-mammon': 'leg', 'tp-abysse': 'leg', 'tp-obsidienne': 'epic', 'tp-givre': 'epic', /* v690 */ 'tp-braise': 'epic', 'tp-marees': 'epic', 'tp-racines': 'rare', 'tp-celeste': 'epic', 'tp-rouages': 'leg', 'tp-tombes': 'epic', 'tp-dragon': 'leg', /* v895 */ 'pp-autel': 'epic', /* v898 */ 'pp-parvis': 'leg', 'pp-rouages': 'epic', 'pp-givre': 'epic', 'pp-racines': 'rare', /* v900 */ 'pp-braise': 'epic', 'pp-marees': 'epic', 'cp-reliquaire': 'leg', /* v901 */ 'cp-ossuaire': 'leg', 'cp-tombeau': 'epic', 'cp-engloutie': 'epic', 'cp-forge': 'epic', 'cp-racines': 'epic', 'cd-reliquaire': 'epic', /* v903 */ 'cd-tombeau': 'rare', 'cd-ossuaire': 'rare', 'cd-engloutie': 'rare', 'cd-forge': 'rare', 'cd-racines': 'rare', 'fp-trone': 'leg', 'fp-cathedrale': 'leg', 'fp-bibliotheque': 'epic', 'fp-foret': 'epic', /* v691 */ 'fp-abysse': 'leg', 'fp-glacier': 'epic', 'fp-forge': 'leg', 'fp-titan': 'myth', 'fp-necropole': 'epic', 'fp-ciel': 'leg', 'fp-tresor': 'epic', 'fp-epave': 'epic',
+  /* v907 */ 'ep-parvis': 'leg', 'ep-engloutie': 'epic', 'ep-givre': 'epic', 'ep-braise': 'rare',
   /* v589 */ 'pl-corbeau': 'leg', 'pl-loup': 'leg', 'pl-araignee': 'epic', 'pl-ambre': 'epic', 'pl-meduse': 'rare', 'pl-serpent': 'rare', 'pl-lune': 'rare', 'pl-astrolabe': 'rare',
   /* v692 */ 'pl-titan': 'leg', 'pl-forge': 'epic', 'pl-racines': 'rare', 'pl-aile': 'leg', 'pl-tombes': 'epic', 'pl-encre': 'epic',
 };
@@ -262,12 +266,13 @@ const SHOP_PLATES = shopOf(/^pl-/);
 const SHOP_MATS = shopOf(/^tp-/), SHOP_FONDS = shopOf(/^fp-/); /* v632 */
 const SHOP_PBOARDS = shopOf(/^pp-/); /* v895 */
 const SHOP_CBOARDS = shopOf(/^cp-/), SHOP_CBACKS = shopOf(/^cd-/); /* v898 */
+const SHOP_EBOARDS = shopOf(/^ep-/); /* v907 */
 /* gardés pour les saisons du Codex (plus en vente ; ceux qui les ont les gardent) */
 export const PASS_RESERVE = [...Object.keys(COSM_RARITY).filter((k) => /^(dos|sachet|pl)-/.test(k) && ![...SHOP_BACKS, ...SHOP_SACHETS, ...SHOP_PLATES].includes(k))];
 const RZ = (mk, k, extra) => ({ ...mk(k, COSM_PRICE[COSM_RARITY[k]]), r: COSM_RARITY[k], live: true, ...extra });
 export const CATALOG = [
   /* v875 : plus aucun cadre en vente (décision du propriétaire du 28 octobre 2026) : ils se gagnent aux niveaux et aux succès (LEVEL_FRAMES, data/achievements.json) */
-  ...SHOP_BACKS.map((k) => RZ(B, k)), ...SHOP_SACHETS.map((k) => RZ(SA, k)), ...SHOP_PLATES.map((k) => RZ(PL, k)), ...SHOP_MATS.map((k) => RZ(TP, k, { live: false })), ...SHOP_PBOARDS.map((k) => RZ(PP, k, { live: false })), ...SHOP_CBOARDS.map((k) => RZ(CP, k, { live: false })), ...SHOP_CBACKS.map((k) => RZ(CD, k, { live: false })), ...SHOP_FONDS.map((k) => RZ(FP, k, { live: false })),
+  ...SHOP_BACKS.map((k) => RZ(B, k)), ...SHOP_SACHETS.map((k) => RZ(SA, k)), ...SHOP_PLATES.map((k) => RZ(PL, k)), ...SHOP_MATS.map((k) => RZ(TP, k, { live: false })), ...SHOP_PBOARDS.map((k) => RZ(PP, k, { live: false })), ...SHOP_CBOARDS.map((k) => RZ(CP, k, { live: false })), ...SHOP_CBACKS.map((k) => RZ(CD, k, { live: false })), ...SHOP_EBOARDS.map((k) => RZ(EP, k, { live: false })), ...SHOP_FONDS.map((k) => RZ(FP, k, { live: false })),
   ...PAID_EMOTES.filter((k) => !EMOTES[k].codex).map((k) => ({ ...RE(k, 100), r: 'rare' })), /* v630 : sans les réactions du Codex */
   { id: 'arbitres', kind: 'bundle', name: 'Le Cercle des arbitres', give: { emotes: ARBITRE_EMOTES }, cost: 600, desc: 'Les huit réactions des arbitres d’un coup (800 à l’unité).' },
   { id: 'gardiens', kind: 'bundle', name: 'Les vingt gardiens', give: { emotes: BOSS_EMOTES }, cost: 1500, desc: 'Les vingt réactions des gardiens d’un coup (2 000 à l’unité).' },

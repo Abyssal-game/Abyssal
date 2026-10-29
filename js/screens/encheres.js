@@ -11,6 +11,7 @@ import { tuto } from '../ui/tutos.js';
 import { CHESTS } from '../core/descent.js';
 import { MP_HOURS, MP_FAST_SECS, MP_REWARD } from '../core/mp.js';
 import { createEncheresMp } from './encheres-mp.js';
+import { EBOARDS } from '../core/codex.js';
 
 const CHEST_NAME = Object.fromEntries(Object.entries(CHESTS).map(([k, c]) => [k, c.name]));
 const stars = (n) => `${'★'.repeat(n)}${'☆'.repeat(Math.max(0, 5 - n))}`;
@@ -112,7 +113,8 @@ export default function encheresScreen(app, root) {
     const lot = banner?.lot || st.lots[st.i], v = EN.potValue(st); /* pendant l'annonce : le lot qui vient d'être vendu */
     const k = banner ? st.i - 1 : st.i, fresh = ui.shown !== k; ui.shown = k; /* le lot n'arrive en glissant qu'une fois */
     const ban = banner ? `<div class="en-ban">${banner.gavel ? '<img class="en-gavel" alt="" src="assets/jeux/en-marteau.webp">' : ''}<div class="mq-banner ${banner.cls}">${banner.html}</div></div>` : '';
-    return `<div class="en-stage">${chair(st, 'a')}${chair(st, 'b')}
+    const eb = EBOARDS[app.game.s.eboard] ? ` eb ${app.game.s.eboard}` : ''; /* v907 : salle achetée à l'Échoppe */
+    return `<div class="en-stage${eb}">${chair(st, 'a')}${chair(st, 'b')}
       ${lot ? `<div class="en-onlot ${fresh ? 'fresh' : ''}">${lotCard(lot)}</div>
       ${banner ? '' : `<div class="en-plaque"><small>Lot ${st.i + 1} / ${st.lots.length}</small><b>${lot.v > 0 ? `${esc(fname(lot.f))} · ${lot.v} pt${lot.v > 1 ? 's' : ''}` : `Malédiction · ${String(lot.v).replace("-", "−")}`}</b>
         ${st.pot.length ? `<span class="en-pot">${t(st.pot.length > 1 ? '+ {n} lots restés : en jeu {v}' : '+ {n} lot resté : en jeu {v}', { n: st.pot.length, v: `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v)}` })}</span>` : ''}

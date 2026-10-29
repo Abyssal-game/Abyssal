@@ -9594,6 +9594,17 @@ export default {
   "{n} tickets standard": "{n} tickets estándar",
   "coffre": "cofre",
   "Débloqué le {date}": "Desbloqueado el {date}",
+  "Salle du Parvis céleste": "Sala del Atrio celestial",
+  "Salle engloutie": "Sala sumergida",
+  "Salle de la Glace noire": "Sala del Hielo negro",
+  "Salle de la Forge infernale": "Sala de la Forja infernal",
+  "Salles des Enchères": "Salas de las Subastas",
+  "Salle des Enchères": "Sala de las Subastas",
+  "La salle de tes parties des Enchères": "La sala de tus partidas de Subastas",
+  "Salle d’origine": "Sala original",
+  "La salle de tes Enchères, contre l’Abysse et en ligne.": "La sala de tus Subastas, contra el Abismo y en línea.",
+  "Ta salle des Enchères": "Tu sala de las Subastas",
+  "Enchères en ligne": "Subastas en línea",
 };
 
 export const names = {

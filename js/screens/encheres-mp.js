@@ -55,7 +55,8 @@ export function createEncheresMp(app, root, { modeBar }) {
     const pv = [...(s.pot || []), lot].filter(Boolean).reduce((a, l) => a + l.v, 0);
     const key = banner ? `b${s.i - 1}` : `l${s.i}`, fresh = shownLot !== key; shownLot = key;
     const ban = banner ? `<div class="en-ban">${banner.gavel ? '<img class="en-gavel" alt="" src="assets/jeux/en-marteau.webp">' : ''}<div class="mq-banner ${banner.cls}">${banner.html}</div></div>` : '';
-    return `<div class="en-stage">${chair(v, s, foe, ctx)}${chair(v, s, v.me, ctx)}
+    const eb = ctx.hall(v); /* v907 */
+    return `<div class="en-stage${eb ? ` eb ${eb}` : ''}">${chair(v, s, foe, ctx)}${chair(v, s, v.me, ctx)}
       ${lot ? `<div class="en-onlot ${fresh ? 'fresh' : ''}">${lotCard(v, lot)}</div>
       ${banner ? '' : `<div class="en-plaque"><small>Lot ${s.i + 1} / ${s.total || 15}</small><b>${lot.v > 0 ? `${esc(fname(lot.f))} · ${lot.v} pt${lot.v > 1 ? 's' : ''}` : `Malédiction · ${lot.v}`}</b>
         ${s.pot?.length ? `<span class="en-pot">+ ${s.pot.length} lot${s.pot.length > 1 ? 's' : ''} resté${s.pot.length > 1 ? 's' : ''} : en jeu ${pv > 0 ? '+' : ''}${pv}</span>` : ''}

@@ -19,7 +19,7 @@ import { checkTurns } from '../cloud/mpwatch.js';
 import { profileAttrs } from '../ui/report.js';
 import { t } from '../i18n.js';
 import { withPlate, frameCls, emoteHTML, showEmote } from '../ui/vitrine.js'; /* v564 */
-import { TAPIS, PBOARDS, CBOARDS, CBACKS } from '../core/codex.js'; /* v904 */
+import { TAPIS, PBOARDS, CBOARDS, CBACKS, EBOARDS } from '../core/codex.js'; /* v904 */
 const BUBBLE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H10l-4 3.5V16H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="8.5" cy="10.5" r="1.2" fill="currentColor"/><circle cx="12" cy="10.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="10.5" r="1.2" fill="currentColor"/></svg>';
 
 export const MP_OFF = 'Les parties contre d’autres joueurs ne sont pas encore ouvertes sur le serveur.';
@@ -326,6 +326,9 @@ export function createMpLobby(app, root, spec) {
     board: (v, k) => { const L = { mat: TAPIS, pb: PBOARDS, cb: CBOARDS, cd: CBACKS }[k], mine = { mat: g.s.mat, pb: g.s.pboard, cb: g.s.cboard, cd: g.s.cback }[k];
       const foe = v.foe?.boards?.[k], theirs = v.status === 'playing' && !myTurn(v) && L?.[foe];
       return theirs ? foe : (L?.[mine] ? mine : null); },
+    /* v907 : salle des Enchères (offrandes en même temps, pas de tour) : la même pour les deux, celle de qui a lancé la partie (joueur a) s'il en a une */
+    hall: (v) => { const mine = EBOARDS[g.s.eboard] ? g.s.eboard : null, foe = EBOARDS[v.foe?.boards?.eb] ? v.foe.boards.eb : null;
+      return v.me === 'a' ? mine || foe : foe || mine; },
     draw, watch, refresh, act, lobby,
     // barre de compte à rebours d'une partie rapide
     clockHTML: (v) => (v.status === 'playing' && v.pace === 'fast' ? `<div class="mp-clock ${myTurn(v) ? 'mine' : ''}"><span class="mp-clock-bar"></span><span class="mp-clock-t">${myTurn(v) ? 'À toi' : `<span translate="no">${esc(foeName(v))}</span>`} · <b>${left(v)}</b></span></div>` : ''),

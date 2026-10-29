@@ -9593,6 +9593,17 @@ export default {
   "{n} tickets standard": "{n} ticket standard",
   "coffre": "forziere",
   "Débloqué le {date}": "Sbloccato il {date}",
+  "Salle du Parvis céleste": "Sala del Sagrato celeste",
+  "Salle engloutie": "Sala sommersa",
+  "Salle de la Glace noire": "Sala del Ghiaccio nero",
+  "Salle de la Forge infernale": "Sala della Forgia infernale",
+  "Salles des Enchères": "Sale delle Aste",
+  "Salle des Enchères": "Sala delle Aste",
+  "La salle de tes parties des Enchères": "La sala delle tue partite alle Aste",
+  "Salle d’origine": "Sala originale",
+  "La salle de tes Enchères, contre l’Abysse et en ligne.": "La sala delle tue Aste, contro l’Abisso e online.",
+  "Ta salle des Enchères": "La tua sala delle Aste",
+  "Enchères en ligne": "Aste online",
 };
 
 export const names = {

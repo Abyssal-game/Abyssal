@@ -9606,6 +9606,17 @@ export default {
   "{n} tickets standard": "{n} standard tickets",
   "coffre": "chest",
   "Débloqué le {date}": "Unlocked on {date}",
+  "Salle du Parvis céleste": "Celestial Forecourt Hall",
+  "Salle engloutie": "Sunken Hall",
+  "Salle de la Glace noire": "Black Ice Hall",
+  "Salle de la Forge infernale": "Infernal Forge Hall",
+  "Salles des Enchères": "Auction halls",
+  "Salle des Enchères": "Auction hall",
+  "La salle de tes parties des Enchères": "The hall of your Auction games",
+  "Salle d’origine": "Original hall",
+  "La salle de tes Enchères, contre l’Abysse et en ligne.": "The hall of your Auctions, against the Abyss and online.",
+  "Ta salle des Enchères": "Your auction hall",
+  "Enchères en ligne": "Online Auctions",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

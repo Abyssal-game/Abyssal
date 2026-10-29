@@ -22,14 +22,15 @@ begin
     else new.choc := jsonb_build_object('s', coalesce((new.choc ->> 's')::int, 0), 'l', coalesce((new.choc ->> 'l')::int, 0), 'm', coalesce(new.choc ->> 'm', ''));
     end if;
   end if;
-  -- v904 : plateaux et dos des mini-jeux : seulement ces quatre clés, chacune une clé simple de sa famille
+  -- v904 : plateaux et dos des mini-jeux : seulement ces cinq clés (v907 : eb), chacune une clé simple de sa famille
   if new.boards is not null then
     if jsonb_typeof(new.boards) <> 'object' then new.boards := null;
     else new.boards := jsonb_strip_nulls(jsonb_build_object(
       'mat', case when new.boards ->> 'mat' ~ '^tp-[a-z0-9-]{1,40}$' then new.boards ->> 'mat' end,
       'pb', case when new.boards ->> 'pb' ~ '^pp-[a-z0-9-]{1,40}$' then new.boards ->> 'pb' end,
       'cb', case when new.boards ->> 'cb' ~ '^cp-[a-z0-9-]{1,40}$' then new.boards ->> 'cb' end,
-      'cd', case when new.boards ->> 'cd' ~ '^cd-[a-z0-9-]{1,40}$' then new.boards ->> 'cd' end));
+      'cd', case when new.boards ->> 'cd' ~ '^cd-[a-z0-9-]{1,40}$' then new.boards ->> 'cd' end,
+      'eb', case when new.boards ->> 'eb' ~ '^ep-[a-z0-9-]{1,40}$' then new.boards ->> 'eb' end)); -- v907 : salle des Enchères
     end if;
   end if;
   return new;
@@ -83,7 +84,7 @@ grant execute on function public.partie_publish(uuid, jsonb, jsonb, jsonb) to se
 create table if not exists public.sql_stamps (file text primary key, stamp text not null, at timestamptz not null default now());
 alter table public.sql_stamps enable row level security;
 revoke all on public.sql_stamps from public, anon, authenticated;
-insert into public.sql_stamps (file, stamp) values ('15', 'd472e4d89182') on conflict (file) do update set stamp = excluded.stamp, at = now();
+insert into public.sql_stamps (file, stamp) values ('15', '057431de049c') on conflict (file) do update set stamp = excluded.stamp, at = now();
 create or replace function public.sql_stamps() returns jsonb language sql stable security definer set search_path = public as $$
   select coalesce(jsonb_object_agg(file, stamp), '{}'::jsonb) from public.sql_stamps;
 $$;

@@ -39,7 +39,7 @@ test('codex : voie gratuite récupérable, voie enluminée fermée sans achat', 
 test('codex : la voie enluminée ne donne jamais de puissance (ni éclats, cendres, coffres ou tickets)', () => {
   for (const t of CODEX_TIERS) if (t.prem) for (const k of ['shards', 'ash', 'chests', 'tickets']) assert.equal(t.prem[k], undefined, `palier ${t.tier}`);
   for (const it of [...SHOP, ...CATALOG]) if (it.give) for (const k of ['shards', 'ash', 'chests', 'tickets']) assert.equal(it.give[k], undefined, it.id);
-  for (const it of CATALOG) assert.ok(['frame', 'back', 'bundle', 'finish', 'plate', 'emote', 'sachet', 'mat', 'pboard', 'cboard', 'cback', 'fond'].includes(it.kind) && !it.give.obs && !it.give.title, it.id);
+  for (const it of CATALOG) assert.ok(['frame', 'back', 'bundle', 'finish', 'plate', 'emote', 'sachet', 'mat', 'pboard', 'cboard', 'cback', 'eboard', 'fond'].includes(it.kind) && !it.give.obs && !it.give.title, it.id);
   for (const k of CODEX_ONLY) assert.ok(!CATALOG.some((it) => it.id === k), `${k} reste exclusif au Codex`);
 });
 
@@ -278,4 +278,14 @@ test('v898 : plateaux et dos des Cryptes : en vente, achat, choix', async () => 
   g.setCboard('cp-forge'); g.setCback('cd-forge'); assert.equal(g.s.cboard ?? null, null); assert.equal(g.s.cback ?? null, null);
   g.catalogBuy('cp-forge'); g.catalogBuy('cd-forge'); g.setCboard('cp-forge'); g.setCback('cd-forge');
   assert.equal(g.s.cboard, 'cp-forge'); assert.equal(g.s.cback, 'cd-forge'); assert.ok(g.catalogOwned('cp-forge') && g.catalogOwned('cd-forge'));
+});
+
+test('v907 : salles des Enchères : en vente, achat, choix', async () => {
+  const { EBOARDS, CATALOG } = await import('../js/core/codex.js');
+  const fs = await import('node:fs');
+  const g = mk(); g.s.obs = 9000; g.s.settings.dev = true; g.s.devCodex = true;
+  for (const k of Object.keys(EBOARDS)) { assert.ok(CATALOG.some((it) => it.id === k && it.kind === 'eboard'), `${k} en vente`); assert.ok(fs.existsSync(`assets/encheres/${k}.webp`) && fs.existsSync(`assets/encheres/${k}-mini.webp`), `${k} : images`); }
+  g.setEboard('ep-givre'); assert.equal(g.s.eboard ?? null, null);
+  g.catalogBuy('ep-givre'); g.setEboard('ep-givre'); assert.equal(g.s.eboard, 'ep-givre'); assert.ok(g.catalogOwned('ep-givre'));
+  g.setEboard(null); assert.equal(g.s.eboard, null);
 });

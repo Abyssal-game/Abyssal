@@ -22,7 +22,7 @@ export const SQL_STAMPS = {
   },
   "15": {
     "file": "15-vitrine.sql",
-    "stamp": "d472e4d89182"
+    "stamp": "057431de049c"
   },
   "16": {
     "file": "16-en-ligne.sql",
