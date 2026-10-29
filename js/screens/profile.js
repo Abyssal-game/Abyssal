@@ -6,7 +6,7 @@ import { icon, sigil, EMBLEM, picon, setIcon } from '../ui/icons.js';
 import { esc, fmt, pct, bindActions, toast, openSheet, paint } from '../ui/dom.js';
 import { unlockSources } from '../core/unlocks.js';
 import { RARITIES, FRAMES, BOOSTERS, FACTION_ORDER, VARIANTS, RARITY, RARITY_ORDER } from '../config.js';
-import { CODEX_FRAMES, CODEX_BACKS, FINISHES, PLATES, SACHETS, TAPIS, PBOARDS, FONDS, LIVE_BACKS, CATALOG, SEASONS, SHOP } from '../core/codex.js';
+import { CODEX_FRAMES, CODEX_BACKS, FINISHES, PLATES, SACHETS, TAPIS, PBOARDS, CBOARDS, CBACKS, FONDS, LIVE_BACKS, CATALOG, SEASONS, SHOP } from '../core/codex.js';
 import { withPlate, fondCls, fondStyle } from '../ui/vitrine.js'; /* v564 : plaque de pseudo */
 import { chocBoardHTML } from '../ui/choc.js'; /* v807 */
 import { chocCard } from '../core/friends.js';
@@ -63,6 +63,7 @@ export default function profile(app, root) {
       if (!miss.length) return '';
       const pic = (it) => kind === 'frame' ? `<span class="avatar-mini pf pf-${it.id}">${avImg}</span>` : kind === 'plate' ? `<span class="np np-${it.id} np-demo" translate="no">${esc(shownName)}</span>`
         : kind === 'pboard' ? `<img alt="" loading="lazy" src="assets/pacte/${it.id}-mini.webp">`
+        : kind === 'cboard' ? `<img alt="" loading="lazy" src="assets/cryptes/${it.id}-mini.webp">` : kind === 'cback' ? `<img alt="" loading="lazy" src="assets/cryptes/${it.id}.webp">`
         : `<img alt="" loading="lazy" src="assets/${{ back: 'backs', sachet: 'packs', mat: 'tapis', fond: 'fonds' }[kind]}/${it.id}.webp">`;
       return `<div class="cs-shop k-${kind}"><h3 class="pf-tf-h">${picon('obsidienne')} ${miss.length} à l’Échoppe</h3>
         <div class="cs-shop-row">${miss.slice(0, 8).map((it) => `<button class="cs-shop-it" data-cs="shop" data-v="${ray}" aria-label="${esc(it.name || '')}">${pic(it)}</button>`).join('')}</div>
@@ -82,10 +83,12 @@ export default function profile(app, root) {
       ['sachets', 'Sachets de booster', `<img alt="" src="assets/packs/${s.sachet || 'standard3'}.webp">`, esc(SACHETS[s.sachet] || 'Sachets d’origine'), `${(s.sachets || []).length}`], /* v565 */
       ['mats', 'Tapis de jeu', `<img class="cs-mat" alt="" src="assets/${s.mat ? `tapis/${s.mat}` : 'sceaux/plateau2'}.webp">`, esc(TAPIS[s.mat] || 'Plateau d’origine'), `${(s.mats || []).length}`], /* v632 */
       ['pboards', 'Plateau du Pacte', `<img class="cs-mat cs-pp" alt="" src="assets/pacte/${PBOARDS[s.pboard] ? s.pboard : 'pp-cuir'}-mini.webp">`, esc(PBOARDS[s.pboard] || 'Plateau d’origine'), `${(s.pboards || []).length}`], /* v895 */
+      ['cboards', 'Plateau des Cryptes', `<img class="cs-mat cs-cp" alt="" src="${CBOARDS[s.cboard] ? `assets/cryptes/${s.cboard}-mini` : 'assets/jeux/cr-plateau'}.webp">`, esc(CBOARDS[s.cboard] || 'Plateau d’origine'), `${(s.cboards || []).length}`], /* v898 */
+      ['cbacks', 'Dos des Cryptes', `<img class="cs-mat cs-cd" alt="" src="${CBACKS[s.cback] ? `assets/cryptes/${s.cback}` : 'assets/jeux/cr-dos'}.webp">`, esc(CBACKS[s.cback] || 'Dos d’origine'), `${(s.cbacks || []).length}`],
       ['fonds', 'Fond de profil', `<img class="cs-fond" alt="" src="assets/${s.fond ? `fonds/${s.fond}` : 'ui/bn-profile'}.webp">`, esc(FONDS[s.fond] || 'Fond d’origine'), `${(s.fonds || []).length}`], /* v632 */
       ['finishes', 'Finitions de cartes', fins.length ? `<span class="cx-fin"><img alt="" src="assets/art/lite/ABY-039.webp"><img alt="" src="assets/variants/${fins[0]}-frame.webp"></span>` : `<span class="cx-fin"><img alt="" src="assets/art/lite/ABY-039.webp"></span>`, fins.length ? `${dressed} carte${dressed > 1 ? 's' : ''} habillée${dressed > 1 ? 's' : ''}` : 'Contours peints des cartes', `${fins.length}`],
-    ].filter(([k]) => (k !== 'finishes' || false) /* v569 : finitions de cartes retirées (« ça ne rend pas bien ») */ && (k !== 'plates' || (s.plates || []).length || g.shopOn()) && (k !== 'sachets' || (s.sachets || []).length || g.shopOn()) && (k !== 'mats' || (s.mats || []).length || g.shopOn()) && (k !== 'pboards' || (s.pboards || []).length || g.shopOn()) && (k !== 'fonds' || (s.fonds || []).length || g.shopOn())); /* v499 : plus de tuiles « Bientôt » : finitions seulement si on en possède */
-    const TOT = { avatar: g.total(), titles: s.titles.length + lockedT.length, frames: new Set([...allF.map(([k]) => k), ...CATALOG.map((it) => it.give?.frame), ...SEASONS.flatMap((se) => se.tiers.map((t) => t.prem?.frame)), ...SHOP.map((it) => it.give?.frame)].filter((k) => k && (FRAMES[k] || CODEX_FRAMES[k]))).size, /* v695 : cadres de l’Échoppe et du Codex comptés comme les dos */ backs: 1 + new Set([...(s.backs || []), ...CATALOG.flatMap((it) => [it.give.back, ...(it.give.backs || [])]), ...SEASONS.flatMap((se) => se.tiers.map((t) => t.prem?.back)), ...SHOP.map((it) => it.give?.back)].filter(Boolean)).size, /* v574 : seulement les dos qui existent encore (74 avant, objets retirés compris) */ plates: Object.keys(PLATES).length, sachets: Object.keys(SACHETS).length, mats: Object.keys(TAPIS).length, pboards: 1 + Object.keys(PBOARDS).length, fonds: Object.keys(FONDS).length, finishes: Object.keys(FINISHES).length };
+    ].filter(([k]) => (k !== 'finishes' || false) /* v569 : finitions de cartes retirées (« ça ne rend pas bien ») */ && (k !== 'plates' || (s.plates || []).length || g.shopOn()) && (k !== 'sachets' || (s.sachets || []).length || g.shopOn()) && (k !== 'mats' || (s.mats || []).length || g.shopOn()) && (k !== 'pboards' || (s.pboards || []).length || g.shopOn()) && (k !== 'cboards' || (s.cboards || []).length || g.shopOn()) && (k !== 'cbacks' || (s.cbacks || []).length || g.shopOn()) && (k !== 'fonds' || (s.fonds || []).length || g.shopOn())); /* v499 : plus de tuiles « Bientôt » : finitions seulement si on en possède */
+    const TOT = { avatar: g.total(), titles: s.titles.length + lockedT.length, frames: new Set([...allF.map(([k]) => k), ...CATALOG.map((it) => it.give?.frame), ...SEASONS.flatMap((se) => se.tiers.map((t) => t.prem?.frame)), ...SHOP.map((it) => it.give?.frame)].filter((k) => k && (FRAMES[k] || CODEX_FRAMES[k]))).size, /* v695 : cadres de l’Échoppe et du Codex comptés comme les dos */ backs: 1 + new Set([...(s.backs || []), ...CATALOG.flatMap((it) => [it.give.back, ...(it.give.backs || [])]), ...SEASONS.flatMap((se) => se.tiers.map((t) => t.prem?.back)), ...SHOP.map((it) => it.give?.back)].filter(Boolean)).size, /* v574 : seulement les dos qui existent encore (74 avant, objets retirés compris) */ plates: Object.keys(PLATES).length, sachets: Object.keys(SACHETS).length, mats: Object.keys(TAPIS).length, pboards: 1 + Object.keys(PBOARDS).length, cboards: 1 + Object.keys(CBOARDS).length, cbacks: 1 + Object.keys(CBACKS).length, fonds: Object.keys(FONDS).length, finishes: Object.keys(FINISHES).length };
     if (!csTab) return `${head}<div class="cs-list">${SECTIONS.map(([k, n, pic, sub, cnt]) => { const tot = TOT[k] || 0, has = Math.min(+cnt || 0, tot || 0); return `<button class="cs-row k-${k}" data-cs="tab" data-v="${k}"><span class="cs-pic">${pic}</span><span class="cs-txt"><b>${n}</b><small>${sub}</small><span class="cs-bar"><i style="width:${tot ? (has / tot) * 100 : 0}%"></i></span></span><span class="cs-cnt"><b>${has}</b><small>/ ${tot}</small></span><span class="cs-go">${icon('next')}</span></button>`; }).join('')}</div>`;
     const back = `<button class="btn ghost small cs-back" data-cs="tab" data-v="">${icon('prev')}Personnaliser</button>`;
     const title = SECTIONS.find(([k]) => k === csTab)?.[1] || '';
@@ -113,6 +116,10 @@ export default function profile(app, root) {
     } else if (csTab === 'pboards') { /* v895 */
       const ps = [[null, 'Plateau d’origine', 'pp-cuir'], ...(s.pboards || []).map((k) => [k, PBOARDS[k] || k, k])];
       body = `<p class="small muted">La table de tes parties du Pacte, contre l’Abysse et en ligne.</p><div class="cs-mats">${ps.map(([k, n, f]) => `<button class="cs-matb cs-ppb" data-cs="pboard" data-v="${k || ''}" aria-pressed="${(s.pboard || null) === k}"><img alt="" src="assets/pacte/${f}-mini.webp"><small>${esc(n)}</small></button>`).join('')}</div>${shopRow('pboard', 'pboard')}`;
+    } else if (csTab === 'cboards' || csTab === 'cbacks') { /* v898 */
+      const bd = csTab === 'cboards', L = bd ? CBOARDS : CBACKS, cur = (bd ? s.cboard : s.cback) || null;
+      const ps = [[null, bd ? 'Plateau d’origine' : 'Dos d’origine', bd ? 'assets/jeux/cr-plateau.webp' : 'assets/jeux/cr-dos.webp'], ...(s[csTab] || []).map((k) => [k, L[k] || k, `assets/cryptes/${k}${bd ? '-mini' : ''}.webp`])];
+      body = `<p class="small muted">${bd ? 'La table de tes parties des Cryptes, contre l’Abysse et entre amis.' : 'Le dos des vingt cartes de tes parties des Cryptes.'}</p><div class="cs-mats">${ps.map(([k, n, f]) => `<button class="cs-matb ${bd ? 'cs-cpb' : 'cs-cdb'}" data-cs="${bd ? 'cboard' : 'cback'}" data-v="${k || ''}" aria-pressed="${cur === k}"><img alt="" src="${f}"><small>${esc(n)}</small></button>`).join('')}</div>${shopRow(bd ? 'cboard' : 'cback', bd ? 'cboard' : 'cback')}`;
     } else if (csTab === 'fonds') { /* v632 */
       const fs = [[null, 'Fond d’origine', 'ui/bn-profile'], ...(s.fonds || []).map((k) => [k, FONDS[k] || k, `fonds/${k}`])];
       body = `<p class="small muted">La scène derrière ton portrait : sur ton profil, et chez les autres joueurs quand ils ouvrent ta fiche.</p><div class="cs-fonds">${fs.map(([k, n, f]) => `<button class="cs-fondb" data-cs="fond" data-v="${k || ''}" aria-pressed="${(s.fond || null) === k}"><img alt="" src="assets/${f}.webp"><small>${esc(n)}</small></button>`).join('')}</div>${shopRow('fond', 'fond')}`;
@@ -141,6 +148,8 @@ export default function profile(app, root) {
       if (k === 'plate') g.setPlate(v || null);
       if (k === 'mat') { g.setMat(v || null); app.applySettings?.(); } /* v632 */
       if (k === 'pboard') g.setPboard(v || null); /* v895 */
+      if (k === 'cboard') g.setCboard(v || null); /* v898 */
+      if (k === 'cback') g.setCback(v || null);
       if (k === 'fond') g.setFond(v || null); /* v632 */
       if (k === 'slot') { csSlot = v === 'premium' ? 'premium' : 'standard'; app.sfx.tap?.(); paint(); return; }
       if (k === 'sachet') { g.setSachet(v || null, csSlot); app.applySettings?.(); }

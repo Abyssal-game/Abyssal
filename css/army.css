@@ -9078,3 +9078,26 @@ html.reduce-motion :is(.chx-leak, .chx-beam, .chx-ring, .chx-fx) { display: none
 .pa-parch.pp .pa-info.tight .pa-tl { display: none; }
 .pa-parch.pp .pa-info.tight .pa-tag[data-n]::after { content: attr(data-n); font-weight: 700; }
 .pa-parch.pp .pa-info.tight .pa-tag { padding: 1px 4px; gap: 1px; }
+/* v898 : plateaux des Cryptes à l’Échoppe (assets/cryptes/cp-<clé>.webp, 512 de large) : même cadre étiré que cr-plateau, bords ramenés à l’épaisseur habituelle (environ 21 px sur les côtés) */
+.cr-game .cr-grid.cp-engloutie { border-image-source: url(../assets/cryptes/cp-engloutie.webp); border-image-slice: 65 72 69 71 fill; border-image-width: 19px 21px 20px 21px; }
+.cr-game .cr-grid.cp-forge { border-image-source: url(../assets/cryptes/cp-forge.webp); border-image-slice: 42 45 42 46 fill; border-image-width: 19px 21px 19px 21px; }
+.cr-game .cr-grid.cp-reliquaire { border-image-source: url(../assets/cryptes/cp-reliquaire.webp); border-image-slice: 51 56 51 55 fill; border-image-width: 19px 21px 19px 21px; }
+.cr-game .cr-grid.cp-racines { border-image-source: url(../assets/cryptes/cp-racines.webp); border-image-slice: 65 69 64 69 fill; border-image-width: 20px 21px 19px 21px; }
+.cr-game .cr-grid.cb { border-image-repeat: stretch; }
+/* v898 : plateaux du Pacte à l’Échoppe (zone des cartes, bande du bas et alvéoles mesurées sur chaque image) */
+.pa-parch.pp-parvis { --rl: 24.9%; --rt: 18.1%; --rw: 50.3; --rh: 20.5; --it: 85.9%; --ix: 20.0%; --sw: 8.9%; background-image: url(../assets/pacte/pp-parvis.webp); }
+.pa-game .mq-table .pa-parch.pp-parvis { background-image: url(../assets/pacte/pp-parvis.webp); }
+.pa-parch.pp-rouages { --rl: 19.0%; --rt: 11.7%; --rw: 59.6; --rh: 25.9; --it: 85.4%; --ix: 17.1%; --sw: 9.3%; background-image: url(../assets/pacte/pp-rouages.webp); }
+.pa-game .mq-table .pa-parch.pp-rouages { background-image: url(../assets/pacte/pp-rouages.webp); }
+.pa-parch.pp-givre { --rl: 18.6%; --rt: 9.8%; --rw: 63.0; --rh: 21.5; --it: 84.7%; --ix: 22.0%; --sw: 9.3%; background-image: url(../assets/pacte/pp-givre.webp); }
+.pa-game .mq-table .pa-parch.pp-givre { background-image: url(../assets/pacte/pp-givre.webp); }
+.pa-parch.pp-racines { --rl: 24.6%; --rt: 10.7%; --rw: 50.8; --rh: 22.9; --it: 84.9%; --ix: 18.6%; --sw: 9.3%; background-image: url(../assets/pacte/pp-racines.webp); }
+.pa-game .mq-table .pa-parch.pp-racines { background-image: url(../assets/pacte/pp-racines.webp); }
+.cxs-t .cx-mat.cx-cp, .cxs-at-pic .cx-mat.cx-cp { aspect-ratio: 512 / 763; }
+.cs-cpb img { aspect-ratio: 512 / 763; object-fit: cover; }
+.cs-cdb img { aspect-ratio: 5 / 7; object-fit: cover; }
+.cs-row .cs-pic img.cs-mat.cs-cd { width: 42px; height: 59px; }
+.cs-shop.k-cboard .cs-shop-it img, .cs-shop.k-cback .cs-shop-it img { height: 84px; width: auto; border-radius: 6px; }
+.cx-pv-cr { display: flex; justify-content: center; }
+.cx-pv-cr .cr-grid { width: min(100%, 300px); grid-template-rows: none; flex: none; }
+.cx-pv-cr .cr-c { aspect-ratio: 5 / 7; height: auto; max-height: none; }

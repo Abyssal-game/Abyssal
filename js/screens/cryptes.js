@@ -12,6 +12,7 @@ import { t, tw } from '../i18n.js';
 import { CHESTS } from '../core/descent.js';
 import { MP_HOURS, MP_FAST_SECS, MP_REWARD } from '../core/mp.js';
 import { createCryptesMp } from './cryptes-mp.js';
+import { CBOARDS, CBACKS } from '../core/codex.js';
 
 const CHEST_NAME = Object.fromEntries(Object.entries(CHESTS).map(([k, c]) => [k, c.name]));
 const stars = (n) => `${'★'.repeat(n)}${'☆'.repeat(Math.max(0, 5 - n))}`;
@@ -105,12 +106,13 @@ export default function cryptesScreen(app, root) {
   const face = (c) => { const card = c.id && cat.get(c.id), cursed = (g.s.cryptes.cur?.curse || []).includes(c.k); return `<img alt="" src="${card ? artUrl(card, { lite: true }) : 'assets/sceaux/dos.webp'}"><span class="cr-f" style="--fc:${cat.faction[c.f].colors.secondary}">${sigil(c.f)}</span>${cursed ? '<span class="cr-curse" title="Paire maudite"><img alt="" src="assets/icons/maudite.webp"></span>' : ''}`; }; /* v492 : marque des paires maudites */
   function grid(st) {
     const pick = st.pending && st.turn === 'p';
-    return `<div class="cr-grid ${pick ? 'picking' : ''}">${st.cards.map((c, i) => {
+    const cb = CBOARDS[app.game.s.cboard] ? ` cb ${app.game.s.cboard}` : '', back = CBACKS[app.game.s.cback] ? `assets/cryptes/${app.game.s.cback}.webp` : 'assets/jeux/cr-dos.webp'; /* v898 : plateau et dos choisis */
+    return `<div class="cr-grid${cb} ${pick ? 'picking' : ''}">${st.cards.map((c, i) => {
       if (c.gone && !ui.up.has(i)) return `<span class="cr-c gone g-${c.gone}"></span>`;
       const up = st.open.includes(i) || ui.up.has(i);
       const cls = [up ? 'up' : '', ui.glow.has(i) ? 'glow' : '', ui.picks.includes(i) ? 'pick' : '', ui.swap.has(i) ? 'swap' : ''].join(' ');
       const peek = !up && ui.peek.has(i) ? `<span class="cr-peek" title="${esc(CR.RIVALS[st.rival].name)} connaît cette carte">${icon('eye')}</span>` : ''; /* v557 : carte regardée en secret par l'adversaire (Regard infernal) */
-      return `<button class="cr-c ${cls}" data-cr="c" data-i="${i}" aria-label="${up ? esc(fname(c.f)) : `Carte ${i + 1}, face cachée`}">${up ? face(c) : '<img alt="" src="assets/jeux/cr-dos.webp">'}${peek}</button>`;
+      return `<button class="cr-c ${cls}" data-cr="c" data-i="${i}" aria-label="${up ? esc(fname(c.f)) : `Carte ${i + 1}, face cachée`}">${up ? face(c) : `<img alt="" src="${back}">`}${peek}</button>`;
     }).join('')}</div>`;
   }
   function info(st) {

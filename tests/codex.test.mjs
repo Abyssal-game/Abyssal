@@ -39,7 +39,7 @@ test('codex : voie gratuite récupérable, voie enluminée fermée sans achat', 
 test('codex : la voie enluminée ne donne jamais de puissance (ni éclats, cendres, coffres ou tickets)', () => {
   for (const t of CODEX_TIERS) if (t.prem) for (const k of ['shards', 'ash', 'chests', 'tickets']) assert.equal(t.prem[k], undefined, `palier ${t.tier}`);
   for (const it of [...SHOP, ...CATALOG]) if (it.give) for (const k of ['shards', 'ash', 'chests', 'tickets']) assert.equal(it.give[k], undefined, it.id);
-  for (const it of CATALOG) assert.ok(['frame', 'back', 'bundle', 'finish', 'plate', 'emote', 'sachet', 'mat', 'pboard', 'fond'].includes(it.kind) && !it.give.obs && !it.give.title, it.id);
+  for (const it of CATALOG) assert.ok(['frame', 'back', 'bundle', 'finish', 'plate', 'emote', 'sachet', 'mat', 'pboard', 'cboard', 'cback', 'fond'].includes(it.kind) && !it.give.obs && !it.give.title, it.id);
   for (const k of CODEX_ONLY) assert.ok(!CATALOG.some((it) => it.id === k), `${k} reste exclusif au Codex`);
 });
 
@@ -268,4 +268,14 @@ test('v895 : plateaux du Pacte : en vente, achat, choix, plateau d’origine par
   g.setPboard('pp-autel'); assert.equal(g.s.pboard ?? null, null, 'pas de plateau sans l’avoir acheté');
   g.catalogBuy('pp-autel'); g.setPboard('pp-autel'); assert.equal(g.s.pboard, 'pp-autel'); assert.ok(g.catalogOwned('pp-autel'));
   g.setPboard(null); assert.equal(g.s.pboard, null);
+});
+
+test('v898 : plateaux et dos des Cryptes : en vente, achat, choix', async () => {
+  const { CBOARDS, CBACKS, PBOARDS, BOARD_SEALS, CATALOG } = await import('../js/core/codex.js');
+  const g = mk(); g.s.obs = 9000; g.s.settings.dev = true; g.s.devCodex = true;
+  for (const k of Object.keys(PBOARDS)) assert.equal(BOARD_SEALS[k]?.length, 7, `${k} : 7 alvéoles`);
+  for (const [L, kind] of [[CBOARDS, 'cboard'], [CBACKS, 'cback']]) for (const k of Object.keys(L)) assert.ok(CATALOG.some((it) => it.id === k && it.kind === kind), `${k} en vente`);
+  g.setCboard('cp-forge'); g.setCback('cd-forge'); assert.equal(g.s.cboard ?? null, null); assert.equal(g.s.cback ?? null, null);
+  g.catalogBuy('cp-forge'); g.catalogBuy('cd-forge'); g.setCboard('cp-forge'); g.setCback('cd-forge');
+  assert.equal(g.s.cboard, 'cp-forge'); assert.equal(g.s.cback, 'cd-forge'); assert.ok(g.catalogOwned('cp-forge') && g.catalogOwned('cd-forge'));
 });

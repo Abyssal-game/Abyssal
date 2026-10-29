@@ -20,7 +20,7 @@ export const OPS = {
   team: { kind: 'sync', lazy: (s) => Object.keys(s.collection || {}).length }, // lecture qui peut prêter les cartes de départ
   // équipe, profil, personnalisation
   setTeam: { kind: 'sync' }, saveTeamPreset: { kind: 'sync' }, deleteTeamPreset: { kind: 'sync' }, setForm: { kind: 'sync' }, toggleFav: { kind: 'sync' },
-  claimChallenge: { kind: 'sync' }, setTitle: { kind: 'sync' }, setFrame: { kind: 'sync' }, setDress: { kind: 'sync' }, setBack: { kind: 'sync' }, setPlate: { kind: 'sync' }, setMat: { kind: 'sync' }, setPboard: { kind: 'sync' }, setFond: { kind: 'sync' }, setSachet: { kind: 'sync' },
+  claimChallenge: { kind: 'sync' }, setTitle: { kind: 'sync' }, setFrame: { kind: 'sync' }, setDress: { kind: 'sync' }, setBack: { kind: 'sync' }, setPlate: { kind: 'sync' }, setMat: { kind: 'sync' }, setPboard: { kind: 'sync' }, setCboard: { kind: 'sync' }, setCback: { kind: 'sync' }, setFond: { kind: 'sync' }, setSachet: { kind: 'sync' },
   setName: { kind: 'sync' }, setAvatar: { kind: 'sync' }, toggleShowcase: { kind: 'sync' }, reset: { kind: 'sync' },
   // Descente
   chooseOmen: { kind: 'sync' }, startRun: { kind: 'sync' }, startBattle: { kind: 'sync' }, choosePact: { kind: 'sync' }, chooseTalent: { kind: 'sync' },
@@ -108,7 +108,7 @@ export function digest(s) {
     s.choc ? `${s.choc.n}:${Object.keys(s.choc.done || {}).length}` : '-', /* v811 : jetons du Choc */
     s.seedBase ?? '-', s.seedN || 0, ...SESS.map((p) => sessPrint(getPath(s, p))),
     ...(s.parrain ? [`${s.parrain.gift ? 1 : 0}:${(s.parrain.paid || []).length}`] : []),
-    ...(s.pboards?.length ? [`pp${s.pboards.length}`] : [])]; /* v895 : plateaux du Pacte (seulement si on en a) */ /* v881 : parrainage (seulement s'il existe : empreinte inchangée pour les autres) */
+    ...(s.pboards?.length ? [`pp${s.pboards.length}`] : []), ...(s.cboards?.length || s.cbacks?.length ? [`cr${(s.cboards || []).length}:${(s.cbacks || []).length}`] : [])]; /* v898 : plateaux et dos des Cryptes */ /* v895 : plateaux du Pacte (seulement si on en a) */ /* v881 : parrainage (seulement s'il existe : empreinte inchangée pour les autres) */
   let h = 2166136261;
   for (const ch of parts.join('|')) h = Math.imul(h ^ ch.charCodeAt(0), 16777619) >>> 0;
   return h.toString(36);
@@ -126,7 +126,7 @@ export const ARGS = {
   buyAshFrame: ['s'], openChest: ['s'], openAllChests: [], openBooster: ['s', { faction: 'S' }],
   claimDaily: [], claimMission: ['i'], claimWeekChest: [], missions: [], team: [],
   setTeam: ['as'], saveTeamPreset: ['S', 'AS'], deleteTeamPreset: ['i'], setForm: ['s', 'S'], toggleFav: ['s'], claimChallenge: ['s', 's'],
-  setTitle: ['S'], setFrame: ['S'], setDress: ['s', 'S'], setBack: ['S'], setPlate: ['S'], setMat: ['S'], setPboard: ['S'], setFond: ['S'], setSachet: ['S', 'S'],
+  setTitle: ['S'], setFrame: ['S'], setDress: ['s', 'S'], setBack: ['S'], setPlate: ['S'], setMat: ['S'], setPboard: ['S'], setCboard: ['S'], setCback: ['S'], setFond: ['S'], setSachet: ['S', 'S'],
   setName: ['S'], setAvatar: ['S'], toggleShowcase: ['s'], reset: [],
   chooseOmen: ['s'], startRun: [{ cursed: 'b', nightmare: '*', start: 'I', veille: 'b' }], startBattle: ['s', { room: 'S', pact: 'S' }], choosePact: ['S'], chooseTalent: ['i'],
   chooseReward: ['s'], cancelAltar: [], chooseBlessing: ['s'], swapRunTeam: ['i', 'i'], nextFloor: [], cancelRun: [], abandonRun: [], reviveFallen: ['s'], buyBraise: [],
