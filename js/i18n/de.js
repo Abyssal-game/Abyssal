@@ -9530,6 +9530,10 @@ export default {
   "1er": "1.",
   "2e": "2.",
   "3e": "3.",
+  "Cadre vivant du Gardien": "Lebender Rahmen des Hüters",
+  "Fond du Seuil de l’Abysse": "Hintergrund: Schwelle des Abgrunds",
+  "Le Gardien": "Der Hüter",
+  "Les objets du Gardien t’attendent : Profil › Personnaliser.": "Die Gegenstände des Hüters warten auf dich: Profil › Anpassen.",
 };
 
 export const names = {

@@ -47,7 +47,7 @@ export const CODEX_XP_LABEL = { floor: 'Étage franchi (1re fois)', boss: 'Gardi
 
 // Cosmétiques propres au Codex et à l'Échoppe (v472 : cadres peints par Gemini, assets/frames/<clé>.webp, posés par .pf-<clé>)
 export const CODEX_FRAMES = {
-  /* v882 : parrainage, 5e filleul (REFERRAL) */ 'cx-vif-lien': 'Cadre vivant du Lien',
+  /* v882 : parrainage, 5e filleul (REFERRAL) */ 'cx-vif-lien': 'Cadre vivant du Lien', /* v890 : réservé au créateur (CREATOR_KIT) */ 'cx-vif-gardien': 'Cadre vivant du Gardien',
   /* v685 : Saison II « L’Hiver éternel » */ 'cx-vif-aurore': 'Cadre vivant de l’Aurore', 'cx-vif-blizzard': 'Cadre vivant du Blizzard',
   /* v630 : Saison I « La Nuit des Âmes », voie enluminée */ 'cx-vif-feux-follets': 'Cadre vivant des Feux follets', 'cx-vif-brume': 'Cadre vivant de la Brume des âmes',
     'cx-fondateur': 'Cadre du Fondateur', /* v638 */ 'cx-vif-fondateur': 'Cadre vivant du Fondateur',   /* v472 : réserve (saison II ou Échoppe), images prêtes dans assets/frames/ */
@@ -190,7 +190,7 @@ const PL = (k, cost) => ({ id: k, kind: 'plate', give: { plate: k }, cost });
 export const TAPIS = { 'tp-mammon': 'Tapis du Banquier Mammon', 'tp-abysse': 'Tapis de l’Autel de l’Abysse', 'tp-obsidienne': 'Tapis d’obsidienne et d’or', 'tp-givre': 'Tapis de la Glace noire',
   /* v690 */ 'tp-braise': 'Tapis de la Forge infernale', 'tp-marees': 'Tapis des Marées noires', 'tp-racines': 'Tapis du Réveil des Racines', 'tp-celeste': 'Tapis du Parvis céleste', 'tp-rouages': 'Tapis de la Forge sans Maître', 'tp-tombes': 'Tapis de la Nécropole', 'tp-dragon': 'Tapis du Dragon primordial' };
 export const FONDS = { 'fp-trone': 'Fond du Trône de braise', 'fp-cathedrale': 'Fond de la Cathédrale engloutie', 'fp-bibliotheque': 'Fond de la Bibliothèque interdite', 'fp-foret': 'Fond de la Forêt sous la lune', /* v638 */ 'fp-fondateur': 'Fond de la Salle des Premiers Scelleurs',
-  /* v691 */ 'fp-abysse': 'Fond du Bord de l’Abysse', 'fp-glacier': 'Fond du Palais de la Matriarche', 'fp-forge': 'Fond de la Forge sans Maître', 'fp-titan': 'Fond du Titan endormi', 'fp-necropole': 'Fond de la Nécropole des lanternes', 'fp-ciel': 'Fond des Ruines célestes', 'fp-tresor': 'Fond de l’Antre du Trésor', 'fp-epave': 'Fond du Cimetière des navires' };
+  /* v691 */ 'fp-abysse': 'Fond du Bord de l’Abysse', 'fp-glacier': 'Fond du Palais de la Matriarche', 'fp-forge': 'Fond de la Forge sans Maître', 'fp-titan': 'Fond du Titan endormi', 'fp-necropole': 'Fond de la Nécropole des lanternes', 'fp-ciel': 'Fond des Ruines célestes', 'fp-tresor': 'Fond de l’Antre du Trésor', 'fp-epave': 'Fond du Cimetière des navires', /* v890 : réservé au créateur (CREATOR_KIT) */ 'fp-gardien': 'Fond du Seuil de l’Abysse' };
 const TP = (k, cost) => ({ id: k, kind: 'mat', give: { mat: k }, cost });
 const FP = (k, cost) => ({ id: k, kind: 'fond', give: { fond: k }, cost });
 const RE = (k, cost) => ({ id: k, kind: 'emote', give: { emote: k }, cost });

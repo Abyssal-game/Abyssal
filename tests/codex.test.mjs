@@ -180,7 +180,7 @@ test('v632 : tapis de jeu et fonds de profil : achat, choix, fiche vue par les a
   const { TAPIS, FONDS, CATALOG } = await import('../js/core/codex.js');
   const { friendCard, cleanCard } = await import('../js/core/friends.js');
   const g = mk(); g.s.obs = 5000; g.s.settings.dev = true; g.s.devCodex = true; /* l'Échoppe n'est ouverte qu'en Mode Créateur */
-  for (const k of [...Object.keys(TAPIS), ...Object.keys(FONDS)].filter((k) => k !== 'fp-fondateur') /* v638 : Pack du Fondateur seulement */) assert.ok(CATALOG.some((it) => it.id === k), `${k} en vente`);
+  for (const k of [...Object.keys(TAPIS), ...Object.keys(FONDS)].filter((k) => k !== 'fp-fondateur' && k !== 'fp-gardien') /* v638 : Pack du Fondateur seulement ; v890 : réservé au créateur */) assert.ok(CATALOG.some((it) => it.id === k), `${k} en vente`);
   g.setMat('tp-mammon'); assert.equal(g.s.mat ?? null, null, 'pas de tapis sans l’avoir acheté');
   g.catalogBuy('tp-mammon'); g.setMat('tp-mammon'); assert.equal(g.s.mat, 'tp-mammon');
   g.catalogBuy('fp-trone'); g.setFond('fp-trone'); assert.equal(g.s.fond, 'fp-trone');

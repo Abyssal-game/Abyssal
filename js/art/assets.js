@@ -2,6 +2,7 @@
 // assets/art/manifest.json (assets/art/<ID>.webp, ou <ID>-alt.webp pour
 // l'illustration alternative), sinon l'illustration procédurale provisoire.
 import { renderArt, renderMystery } from './procedural.js';
+import { PORTRAITS } from '../config.js';
 
 let available = new Set();
 let heroArt = new Set();
@@ -35,7 +36,7 @@ export async function loadArtManifest(base = './') {
   }
 }
 
-export function hasRealArt(id, alt = false) { return available.has(alt ? `${id}-alt` : id); }
+export function hasRealArt(id, alt = false) { return available.has(alt ? `${id}-alt` : id) || (!alt && !!PORTRAITS[id]); } /* v890 : portraits hors collection */
 export function hasHeroArt(key) { return heroArt.has(key); }
 // Coffres illustrés : assets/chests/<clé>.webp et <clé>-open.webp
 export function hasChestArt(key) { return chestArt.has(key); }

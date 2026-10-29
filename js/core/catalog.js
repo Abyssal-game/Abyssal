@@ -1,5 +1,5 @@
 // Index du catalogue (cartes, factions, ensembles…) construit une fois au démarrage.
-import { RARITY_ORDER, FACTION_ORDER } from '../config.js';
+import { RARITY_ORDER, FACTION_ORDER, PORTRAITS } from '../config.js';
 
 export function createCatalog({ cards, factions, sets, abilities, achievements, lore }) {
   const byId = new Map(cards.map((c) => [c.id, c]));
@@ -24,7 +24,7 @@ export function createCatalog({ cards, factions, sets, abilities, achievements, 
     achievements,
     lore,
     lines,
-    get(id) { return byId.get(id); },
+    get(id) { return byId.get(id) || PORTRAITS[id]; }, /* v890 : un portrait hors collection (avatar du Gardien) se lit comme une carte */
   };
 }
 

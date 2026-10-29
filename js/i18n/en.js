@@ -9542,6 +9542,10 @@ export default {
   "1er": "1st",
   "2e": "2nd",
   "3e": "3rd",
+  "Cadre vivant du Gardien": "Living Frame of the Keeper",
+  "Fond du Seuil de l’Abysse": "Threshold of the Abyss Background",
+  "Le Gardien": "The Keeper",
+  "Les objets du Gardien t’attendent : Profil › Personnaliser.": "The Keeper’s items await you: Profile › Customize.",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

@@ -157,6 +157,26 @@ test('serveur de partie : opérations refusées (coups de jeu, Mode Créateur sa
   assert.ok(db2.rows.get('u1').data.shards >= 99999);
 });
 
+/* v890 : objets du Gardien réservés au compte du créateur */
+test('serveur de partie : les objets du Gardien seulement pour le badge du créateur', async () => {
+  const db = memDb(), p = phone(db);
+  p.adopt((await p.send({ want: true })).body.data);
+  p.g.creatorKit();
+  const out = await p.send();
+  assert.match(out.body.errs[1], /Créateur/);
+  assert.ok(!db.rows.get('u1').data.titles.includes('Le Gardien'));
+  assert.ok(!(db.rows.get('u1').data.portraits || []).includes('x-gardien'));
+  const db2 = memDb({ creators: ['u1'] }), p2 = phone(db2);
+  p2.adopt((await p2.send({ want: true })).body.data);
+  p2.g.creatorKit(); p2.g.setAvatar('x-gardien'); p2.g.setTitle('Le Gardien'); p2.g.setFrame('cx-vif-gardien'); p2.g.setFond('fp-gardien');
+  await p2.send({ pub: true });
+  const d = db2.rows.get('u1').data;
+  assert.ok(d.titles.includes('Le Gardien') && d.frames.includes('cx-vif-gardien') && d.fonds.includes('fp-gardien') && d.portraits.includes('x-gardien'));
+  assert.equal(d.avatar, 'x-gardien');
+  assert.equal(db2.published.at(-1)?.profile.avatar, 'x-gardien');
+  assert.ok(!p2.g.needsCreatorKit());
+});
+
 test('serveur de partie : une partie des Sceaux truquée ne compte pas (le serveur rejoue les vrais coups)', async () => {
   const db = memDb(), p = phone(db);
   p.adopt((await p.send({ want: true })).body.data);

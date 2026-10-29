@@ -89,7 +89,7 @@ export default function profile(app, root) {
     const title = SECTIONS.find(([k]) => k === csTab)?.[1] || '';
     let body = '';
     if (csTab === 'avatar') {
-      const ids = Object.keys(s.collection).filter((id) => cat.get(id));
+      const ids = [...(s.portraits || []), ...Object.keys(s.collection)].filter((id) => cat.get(id)); /* v890 : portraits hors collection en tête */
       body = ids.length ? `<div class="av-grid">${ids.map((id) => { const c = cat.get(id); return `<button class="av-pick ${s.avatar === id ? 'on' : ''}" data-cs="avatar" data-v="${id}" style="--rc:${RARITY[c.rarity].color}"><img alt="" loading="lazy" src="${artUrl(c, { lite: true })}"><small>${esc(c.name)}</small></button>`; }).join('')}</div>` : '<p class="muted center">Obtiens d’abord une créature dans un booster.</p>';
     } else if (csTab === 'titles') {
       body = `<div class="chips pf-titles">${s.titles.map((x) => `<button class="chip" data-cs="title" data-v="${esc(x)}" aria-pressed="${x === s.title}">${esc(x)}</button>`).join('')}</div>
@@ -201,7 +201,7 @@ export default function profile(app, root) {
     frame(el) { g.setFrame(el.dataset.v); render(); },
     cardback(el) { g.setBack(el.dataset.v || null); app.applySettings?.(); app.sfx.tap?.(); render(); }, /* v473 : dos de cartes */
     pickav() {
-      const ids = Object.keys(g.s.collection).filter((id) => cat.get(id));
+      const ids = [...(g.s.portraits || []), ...Object.keys(g.s.collection)].filter((id) => cat.get(id)); /* v890 */
       if (!ids.length) { toast('Obtiens d’abord une créature dans un booster.', { icon: 'info' }); return; }
       const sh = openSheet('<h2>Choisis ton avatar</h2>', { label: 'Avatar' });
       sh.setContent(`<h2 class="center">Choisis ton avatar</h2><div class="av-grid">${ids.map((id) => { const c = cat.get(id); return `<button class="av-pick ${g.s.avatar === id ? 'on' : ''}" data-id="${id}" style="--rc:${RARITY[c.rarity].color}"><img alt="" loading="lazy" src="${artUrl(c, { lite: true })}"><small>${esc(c.name)}</small></button>`; }).join('')}</div>`);

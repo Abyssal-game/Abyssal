@@ -27,7 +27,10 @@ create or replace function public.profiles_sane()
 returns trigger language plpgsql security definer set search_path = public as $$
 begin
   if new.title is not null and not exists (select 1 from public.game_titles where name = new.title) then new.title := null; end if;
-  if new.avatar is not null and not exists (select 1 from public.game_cards where id = new.avatar) then new.avatar := null; end if;
+  -- v890 : titre et portrait du Gardien réservés au compte du créateur (badge « createur »)
+  if new.title = 'Le Gardien' and coalesce(new.badge, '') <> 'createur' then new.title := null; end if;
+  if new.avatar is not null and not exists (select 1 from public.game_cards where id = new.avatar)
+     and not (new.avatar = 'x-gardien' and coalesce(new.badge, '') = 'createur') then new.avatar := null; end if;
   new.owned := greatest(0, least(coalesce(new.owned, 0), (select count(*) from public.game_cards)::int));
   new.level := greatest(1, least(coalesce(new.level, 1), 999));
   return new;
@@ -78,7 +81,8 @@ drop function if exists public.submit_score(date, int, boolean);
 
 -- les profils déjà enregistrés passent par les mêmes contrôles
 update public.profiles set title = null where title is not null and title not in (select name from public.game_titles);
-update public.profiles set avatar = null where avatar is not null and avatar not in (select id from public.game_cards);
+update public.profiles set title = null where title = 'Le Gardien' and coalesce(badge, '') <> 'createur';
+update public.profiles set avatar = null where avatar is not null and avatar not in (select id from public.game_cards) and not (avatar = 'x-gardien' and coalesce(badge, '') = 'createur');
 update public.profiles set owned = least(owned, (select count(*) from public.game_cards)::int), level = greatest(1, least(level, 999));
 
 -- Vérification

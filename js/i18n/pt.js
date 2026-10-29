@@ -9529,6 +9529,10 @@ export default {
   "1er": "1º",
   "2e": "2º",
   "3e": "3º",
+  "Cadre vivant du Gardien": "Moldura viva do Guardião",
+  "Fond du Seuil de l’Abysse": "Fundo do Limiar do Abismo",
+  "Le Gardien": "O Guardião",
+  "Les objets du Gardien t’attendent : Profil › Personnaliser.": "Os objetos do Guardião esperam por ti: Perfil › Personalizar.",
 };
 
 export const names = {

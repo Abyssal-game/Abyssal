@@ -10,7 +10,7 @@ export const CHALLENGES = [
 export const WEEK_DAYS = 5; // jours joués dans la semaine pour le coffre de la semaine
 export const FIRST_WIN = 50;
 export const SHARD_FLOOR_CAP = 25; // au-delà de l'étage 25, les éclats par combat n'augmentent plus // éclats de la toute première victoire
-import { FINAL_FLOOR, BOOSTERS, FREE_PACK, BRAISE, TORCHES, ECONOMY, XP, LEVEL_TITLES, LEVEL_FRAMES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ASH_FRAMES, SHOW_ORDER, SHADOW, sublimeObs, VARIANTS, FIN_ORDER } from '../config.js';
+import { FINAL_FLOOR, BOOSTERS, FREE_PACK, BRAISE, TORCHES, ECONOMY, XP, LEVEL_TITLES, LEVEL_FRAMES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ASH_FRAMES, SHOW_ORDER, SHADOW, sublimeObs, VARIANTS, FIN_ORDER, CREATOR_KIT } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today, SAVE_STASH_KEY } from './save.js';
 import { CHOC } from './choc.js'; /* v811 */
@@ -1926,7 +1926,7 @@ export class Game {
   // v528 : portrait montré aux autres joueurs : celui choisi, sinon la 1re carte de la vitrine, sinon le favori le plus rare, sinon la créature la plus rare
   shownAvatar() {
     const s = this.s, has = (id) => id && s.collection?.[id] && this.catalog.get(id);
-    if (has(s.avatar)) return s.avatar;
+    if (has(s.avatar) || (s.avatar && (s.portraits || []).includes(s.avatar))) return s.avatar; /* v890 : portrait du Gardien */
     const sc = (s.showcase || []).find(has); if (sc) return sc;
     const rank = (id) => RARITY_ORDER.indexOf(this.catalog.get(id).rarity);
     const pick = (ids) => ids.filter(has).sort((a, b) => rank(b) - rank(a) || a.localeCompare(b))[0] || null;
@@ -2139,7 +2139,14 @@ export class Game {
   emotesOwned() { return [...FREE_EMOTES, ...(this.s.emotes || [])]; } /* v564 : réactions en ligne (les 4 premières sont à tous) */
   setBack(k) { if (!k || (this.s.backs || []).includes(k)) { this.s.back = k || null; this.persist(); } } /* v473 : null = dos par défaut */
   setName(n) { this.s.name = String(n || '').replace(/[<>]/g, '').trim().slice(0, 16); this.persist(); }
-  setAvatar(id) { if (this.owns(id)) { this.s.avatar = id; this.persist(); } }
+  setAvatar(id) { if (this.owns(id) || (this.s.portraits || []).includes(id)) { this.s.avatar = id; this.persist(); } } /* v890 : ou un portrait hors collection */
+  /* v890 : objets du Gardien (CREATOR_KIT), réservés au compte du créateur : opération « dev », refusée par le serveur sans le badge */
+  needsCreatorKit() { const s = this.s, k = CREATOR_KIT; return !(s.titles || []).includes(k.title) || !(s.frames || []).includes(k.frame) || !(s.fonds || []).includes(k.fond) || !(s.portraits || []).includes(k.portrait); }
+  creatorKit() {
+    const s = this.s, k = CREATOR_KIT, add = (l, v) => { if (!l.includes(v)) l.push(v); };
+    add(s.titles ||= [], k.title); add(s.frames ||= [], k.frame); add(s.fonds ||= [], k.fond); add(s.portraits ||= [], k.portrait);
+    this.persist();
+  }
   toggleShowcase(id) {
     if (!this.owns(id)) return;
     const i = this.s.showcase.indexOf(id);

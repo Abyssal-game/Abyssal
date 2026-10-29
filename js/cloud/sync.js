@@ -5,13 +5,22 @@ import { pseudoProblem } from '../core/moderation.js';
 import { friendCard } from '../core/friends.js';
 import { migrate, today, defaultSave } from '../core/save.js';
 import { openSheet, esc, toast } from '../ui/dom.js';
+import { t } from '../i18n.js';
 import { serverMode, probe, flush, pendingOps } from './partie.js';
 
 export const sync = { status: 'off', lastPush: 0, error: null, profile: null };
 let app = null, timer = 0, busy = false, pending = false;
 const listeners = new Set();
 export const onSync = (fn) => { listeners.add(fn); return () => listeners.delete(fn); };
-const emit = () => listeners.forEach((f) => f(sync));
+/* v890 : objets du Gardien donnés au compte du créateur dès que son badge est lu (le serveur refuse l'opération sans le badge) */
+function creatorKit() {
+  try {
+    if (!app || sync.profile?.badge !== 'createur' || !app.game.needsCreatorKit()) return;
+    app.game.creatorKit();
+    toast(t('Les objets du Gardien t’attendent : Profil › Personnaliser.'), { kind: 'success', icon: 'sparkle', ms: 6000 });
+  } catch (e) { /* rien */ }
+}
+const emit = () => { creatorKit(); listeners.forEach((f) => f(sync)); };
 
 function profilePayload() {
   const g = app.game, s = g.s;

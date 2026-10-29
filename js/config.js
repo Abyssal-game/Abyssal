@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v889'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v890'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -60,6 +60,10 @@ BOOSTERS.abysse = {
 // numéro de build de l'application capable de lancer cette version (à relever quand on ajoute un module natif).
 export const LIVE_BASES = ['https://abyssal-game.github.io/Abyssal/'];
 export const LIVE_NATIVE = 618;
+/* v890 : objets du Gardien, réservés au compte du créateur (badge « createur » du profil, vérifié par le serveur de partie
+   et par supabase/11-anti-triche.sql) : jamais en vente, jamais à gagner. Portrait = avatar hors collection (assets/art/<clé>.webp, carré). */
+export const CREATOR_KIT = { title: 'Le Gardien', frame: 'cx-vif-gardien', fond: 'fp-gardien', portrait: 'x-gardien' };
+export const PORTRAITS = { 'x-gardien': { id: 'x-gardien', name: 'Le Gardien', rarity: 'S', faction: 'abyssal', variants: ['normal'], portrait: true } };
 // Clé PUBLIQUE de signature des mises à jour (ECDSA P-256, coordonnées x et y). La clé secrète n'est jamais dans le dépôt :
 // elle est gardée par le propriétaire et dans le secret GitHub LIVE_SIGN_KEY. Tant qu'elle vaut null, aucune mise à jour n'est prise.
 export const LIVE_KEY = { x: 'o0UvHUxr62DiBrjrD6a-CyZiQfbXwx0UIdnVeOuWIyY', y: '4ekFbtWuvGMmUg3_23Kyf67F-F2AAdT2-gdjpJoR0vU' }; /* v619 : clé créée par le propriétaire sur son Mac le 22 octobre 2026 */

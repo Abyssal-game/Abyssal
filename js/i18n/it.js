@@ -9529,6 +9529,10 @@ export default {
   "1er": "1º",
   "2e": "2º",
   "3e": "3º",
+  "Cadre vivant du Gardien": "Cornice vivente del Guardiano",
+  "Fond du Seuil de l’Abysse": "Sfondo della Soglia dell’Abisso",
+  "Le Gardien": "Il Guardiano",
+  "Les objets du Gardien t’attendent : Profil › Personnaliser.": "Gli oggetti del Guardiano ti aspettano: Profilo › Personalizza.",
 };
 
 export const names = {

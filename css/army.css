@@ -9027,3 +9027,5 @@ html.reduce-motion :is(.chx-leak, .chx-beam, .chx-ring, .chx-fx) { display: none
 .mn-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
 .mn-tile { min-width: 0; }
 .mn-tile b, .mn-tile > span:last-child { max-width: 100%; overflow-wrap: anywhere; hyphens: auto; }
+/* v890 : cadre vivant du Gardien (réservé au créateur, CREATOR_KIT) */
+.pf-cx-vif-gardien { --fr: url(../assets/frames/cx-vif-gardien-4.webp); }

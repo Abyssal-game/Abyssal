@@ -54,7 +54,7 @@ export const OPS = {
   shopBuy: { kind: 'dev' }, devGrant: { kind: 'dev' }, devGive: { kind: 'dev' }, devAllVariants: { kind: 'dev' }, devDuplicates: { kind: 'dev' },
   devChests: { kind: 'dev' }, devResetCampaign: { kind: 'dev' }, devFreePacks: { kind: 'dev' }, devChocTokens: { kind: 'dev' }, devAbyss: { kind: 'dev' }, devMissions: { kind: 'dev' }, devFloor: { kind: 'dev' },
   devBoss: { kind: 'dev' }, devVeille: { kind: 'dev' }, devUnlockAll: { kind: 'dev' }, devObs: { kind: 'dev' }, devCodexXp: { kind: 'dev' }, devCodexPrem: { kind: 'dev' },
-  devCodexReset: { kind: 'dev' }, devSnapshot: { kind: 'dev' }, autoResolve: { kind: 'dev' }, autoTrial: { kind: 'dev' },
+  devCodexReset: { kind: 'dev' }, creatorKit: { kind: 'dev' }, /* v890 : objets du Gardien (badge du créateur) */ devSnapshot: { kind: 'dev' }, autoResolve: { kind: 'dev' }, autoTrial: { kind: 'dev' },
 };
 
 // Parties en cours (combats, mini-jeux) : rejouées par le serveur ; leur empreinte entre dans `digest`
@@ -120,6 +120,7 @@ export function digest(s) {
    Une opération absente de la liste n'est pas vérifiée ici (la méthode s'en charge). Au-delà des arguments décrits : refusé. */
 export const ARGS = {
   devAbyss: ['b', 'I'], /* v769 */
+  creatorKit: [], /* v890 */
   markSeen: ['s'], markAllSeen: [], decipher: ['s'], setShownVariant: ['s', 'S'], sublime: ['s'], burn: ['s', 'S', 'I'], burnSpares: ['AS'], upgrade: ['s'],
   buyAshFrame: ['s'], openChest: ['s'], openAllChests: [], openBooster: ['s', { faction: 'S' }],
   claimDaily: [], claimMission: ['i'], claimWeekChest: [], missions: [], team: [],
