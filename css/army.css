@@ -9045,3 +9045,5 @@ html.reduce-motion :is(.chx-leak, .chx-beam, .chx-ring, .chx-fx) { display: none
   .pa-game .mq-table .pa-parch .pa-ban .pa-card.big { width: 86px; }
   .pa-game .mq-table .pa-seal[style*="--sy"] { top: calc((var(--sy) + 100) / 4.3 * 1%); }
 }
+/* v894 : sceaux pas encore allumés : voile beige allégé (50 % → 20 %) ; ils gardent leur couleur, moins vive que celle d'un sceau allumé */
+.pa-seal:not(.on) { background: radial-gradient(circle, rgba(222, 204, 168, .2) 55%, rgba(222, 204, 168, 0) 72%); filter: saturate(.85); }
