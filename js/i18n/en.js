@@ -9546,6 +9546,7 @@ export default {
   "Fond du Seuil de l’Abysse": "Threshold of the Abyss Background",
   "Le Gardien": "The Keeper",
   "Les objets du Gardien t’attendent : Profil › Personnaliser.": "The Keeper’s items await you: Profile › Customize.",
+  "Règles en vigueur": "Rules in effect",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

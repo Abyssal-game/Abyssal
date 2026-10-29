@@ -9029,3 +9029,8 @@ html.reduce-motion :is(.chx-leak, .chx-beam, .chx-ring, .chx-fx) { display: none
 .mn-tile b, .mn-tile > span:last-child { max-width: 100%; overflow-wrap: anywhere; hyphens: auto; }
 /* v890 : cadre vivant du Gardien (réservé au créateur, CREATOR_KIT) */
 .pf-cx-vif-gardien { --fr: url(../assets/frames/cx-vif-gardien-4.webp); }
+/* v891 : pastilles de règles repliées dans « +N » quand elles ne tiennent pas dans la barre du haut du combat */
+.dv.cb.cb2 .dv-top .cb-law[hidden] { display: none !important; }
+.dv.cb.cb2 .dv-top .cb-law.cb-more { padding: 0 8px; }
+.dv.cb.cb2 .dv-top .cb-law.cb-more > b { display: inline; font: 700 .72rem/1 var(--f-ui); color: var(--gold-hi); }
+.cb-rulesheet hr.cb-rulesep { border: 0; border-top: 1px solid rgba(201, 164, 90, .25); margin: 12px 0; }

@@ -9533,6 +9533,7 @@ export default {
   "Fond du Seuil de l’Abysse": "Sfondo della Soglia dell’Abisso",
   "Le Gardien": "Il Guardiano",
   "Les objets du Gardien t’attendent : Profil › Personnaliser.": "Gli oggetti del Guardiano ti aspettano: Profilo › Personalizza.",
+  "Règles en vigueur": "Regole in vigore",
 };
 
 export const names = {

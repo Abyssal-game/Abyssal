@@ -9534,6 +9534,7 @@ export default {
   "Fond du Seuil de l’Abysse": "Fondo del Umbral del Abismo",
   "Le Gardien": "El Guardián",
   "Les objets du Gardien t’attendent : Profil › Personnaliser.": "Los objetos del Guardián te esperan: Perfil › Personalizar.",
+  "Règles en vigueur": "Reglas en vigor",
 };
 
 export const names = {

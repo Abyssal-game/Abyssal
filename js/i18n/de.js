@@ -9534,6 +9534,7 @@ export default {
   "Fond du Seuil de l’Abysse": "Hintergrund: Schwelle des Abgrunds",
   "Le Gardien": "Der Hüter",
   "Les objets du Gardien t’attendent : Profil › Personnaliser.": "Die Gegenstände des Hüters warten auf dich: Profil › Anpassen.",
+  "Règles en vigueur": "Geltende Regeln",
 };
 
 export const names = {

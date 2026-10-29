@@ -9533,6 +9533,7 @@ export default {
   "Fond du Seuil de l’Abysse": "Fundo do Limiar do Abismo",
   "Le Gardien": "O Guardião",
   "Les objets du Gardien t’attendent : Profil › Personnaliser.": "Os objetos do Guardião esperam por ti: Perfil › Personalizar.",
+  "Règles en vigueur": "Regras em vigor",
 };
 
 export const names = {

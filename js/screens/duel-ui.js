@@ -348,7 +348,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       st.runes ? `<span class="cb-law cb-runes" data-d="rule" data-k="runes" title="Runes du gardien">${st.runes.map((r) => `<img alt="" src="assets/ui/${r.broken ? 'rune-broken' : 'rune'}.webp" class="${r.broken ? 'off' : ''}">`).join('')}<b>${runesLeft(st) ? `−${runesLeft(st) * 10} %` : 'Rompues'}</b></span>` : '',
       st.omen && OMENS[st.omen] ? `<span class="cb-law" data-d="rule" data-k="omen">${icon(OMENS[st.omen].icon)}<b>Présage</b></span>` : (st.relics || []).length ? `<span class="cb-law" data-d="rule" data-k="relics">${icon('p:crown')}<b>${st.relics.length} relique${st.relics.length > 1 ? 's' : ''}</b></span>` : '',
       run?.day && g.rule(run.day) && !g.rule(run.day).off ? `<span class="cb-law cb-day" data-d="rule" data-k="day">${icon('p:rule')}<b>${esc(g.rule(run.day).name)}</b></span>` : ''].join(''); /* v400 : règle du jour en dernier */
-    const rulesEl = $('.cb-rules'); if (rulesEl) { setHTML(rulesEl, rules); rulesEl.hidden = !rules; }
+    const rulesEl = $('.cb-rules'); if (rulesEl) { setHTML(rulesEl, rules); rulesEl.hidden = !rules; fitRules(rulesEl); }
     const night = st.bossKey === 'abysse' && Object.values(st.units).some((u) => u.boss && u.night && u.hp > 0), dvEl = $('.dv'); /* v392 : la Nuit sans fin assombrit et fissure la salle */
     if (dvEl && dvEl.classList.contains('abyss-night') !== night) dvEl.classList.toggle('abyss-night', night);
     patchRow(alEl, shownFront('ally').map((u) => ({ uid: u.uid, html: cardEl(u) })));
@@ -1354,8 +1354,30 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     sh.body.addEventListener('click', (ev) => { const p = ev.target.closest('[data-in]'); if (p) { sh.close(); const u = sel; mode = null; exec(() => E.duelAct(where, u, 'swap', p.dataset.in)); } });
   }
 
+  /* v891 : les pastilles de règles qui ne tiennent pas dans la barre du haut (petit écran, gardien avec runes, présage, règle
+     du jour…) passaient sous les boutons ×1, ? : les dernières sont repliées dans une pastille « +N » qui les montre toutes */
+  function fitRules(el) {
+    const kids = [...el.children].filter((c) => !c.classList.contains('cb-more'));
+    kids.forEach((c) => { c.hidden = false; });
+    el.querySelector('.cb-more')?.remove();
+    if (el.scrollWidth <= el.clientWidth + 1) return;
+    const more = document.createElement('span');
+    more.className = 'cb-law cb-more'; more.dataset.d = 'rule'; more.dataset.k = 'all';
+    el.append(more);
+    for (let i = kids.length - 1, n = 1; i > 0; i--, n++) { kids[i].hidden = true; more.innerHTML = `<b>+${n}</b>`; if (el.scrollWidth <= el.clientWidth + 1) break; }
+  }
   // Règles en vigueur : pacte, loi de l'Architecte, aspect de l'Éclipse, reliques
   function ruleSheet(k) {
+    if (k === 'all') { /* v891 : toutes les règles du combat dans une seule fenêtre */
+      const ks = [...(root.querySelector('.cb-rules')?.querySelectorAll('[data-k]') || [])].map((x) => x.dataset.k).filter((x) => x !== 'all');
+      const h = ks.map((x) => ruleHTML(x)).filter(Boolean).join('<hr class="cb-rulesep">');
+      if (h) openSheet(`<div class="cb-rulesheet">${h}</div>`, { label: 'Règles en vigueur' });
+      return;
+    }
+    const h = ruleHTML(k);
+    if (h) openSheet(`<div class="cb-rulesheet">${h}</div>`, { label: 'Règle en vigueur' });
+  }
+  function ruleHTML(k) {
     let h = '';
     if (k === 'gap') { const gp = gapOf(st), d = Math.round((1 - 1 / gp ** 2) * 100); h = `<h2>Ennemis trop forts</h2><p>Ces ennemis sont bien plus forts que ton équipe (environ ×${gp.toFixed(1).replace(".", ",")}).</p><p>Tes créatures leur font <b>${d} % de dégâts en moins</b>, et leurs coups ne sont plus retenus : ils peuvent abattre une créature d’un seul coup.</p><p class="small muted">Renforce ton équipe (Collection › Forge) ou choisis des créatures plus rares avant de descendre aussi bas.</p>`; }
     else if (k === 'goal') { const gl = goalState(st); if (gl) h = `<h2>Objectif : ${esc(gl.name)}</h2><p>${esc(gl.desc)}</p><p class="small muted">Facultatif. Réussi et combat gagné : des éclats en plus et 1 Ferveur pour la suite du chapitre.</p><p><b>${gl.state === 'done' ? 'Réussi !' : gl.state === 'fail' ? 'Manqué pour ce combat.' : `En cours${gl.p ? ` (${gl.p})` : ''}.`}</b></p>`; }
@@ -1366,7 +1388,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     else if (k === 'omen' && OMENS[st.omen]) h = `<h2>${esc(OMENS[st.omen].name)}</h2><p class="small"><b class="dc-good">Gain</b> ${esc(OMENS[st.omen].gain)}</p><p class="small"><b class="dc-bad">Prix</b> ${esc(OMENS[st.omen].cost)}</p>`;
     else if (k === 'day' && run) { const R = g.rule(run.day); h = `<h2>Règle du jour : ${esc(R.name)}</h2><p>${esc(R.desc)}</p><p class="small muted">Elle vaut pour la Descente et les Épreuves d’aujourd’hui.</p>`; }
     else if (k === 'relics') h = `<h2>Tes reliques</h2>${(st.relics || []).map((r) => `<p class="small"><b>${esc(RELICS[r].name)}</b> : ${esc(RELICS[r].gain)} <span class="dc-bad">${esc(RELICS[r].cost)}</span></p>`).join('')}`;
-    if (h) openSheet(`<div class="cb-rulesheet">${h}</div>`, { label: 'Règle en vigueur' });
+    return h;
   }
   // ——— Touchers ———
   root.addEventListener('pointerdown', (e) => { if (defTap && !e.target.closest('[data-d="quit"],[data-d="help"],[data-d="speed"]')) { e.preventDefault(); defTap(e.timeStamp); } }, { signal: ctl.signal });
