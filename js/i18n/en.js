@@ -9560,6 +9560,15 @@ export default {
   "Les tables de tes mini-jeux, rangées par jeu": "The tables for your mini-games, sorted by game",
   "Tapis des Duels des Sceaux": "Seal Duels mat",
   "Tous les jeux": "All games",
+  "Offrande ×{0}": "Offering ×{0}",
+  "{e0}Offrande ×{0}": "{e0}Offering ×{0}",
+  "Encore {0} carte": "{0} more card",
+  "Encore {0} cartes": "{0} more cards",
+  "{e0}Encore {0} carte": "{e0}{0} more card",
+  "{e0}Encore {0} cartes": "{e0}{0} more cards",
+  "→ {name}": "→ {name}",
+  "→ toi": "→ you",
+  "Offrande : la suivante ×2": "Offering: the next one ×2",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

@@ -11,7 +11,7 @@ import { esc, openSheet } from '../ui/dom.js';
 import { setScene } from '../ui/scene.js';
 import { t } from '../i18n.js';
 import { createMpLobby } from './mp-lobby.js';
-import { SP, howHTML, sayText, boardOf, sealsHTML } from './pacte.js';
+import { SP, howHTML, sayText, boardOf, sealsHTML, fitInfo } from './pacte.js';
 
 const RAR_OF = (v) => (v <= 2 ? 'C' : v === 3 ? 'PC' : v === 4 ? 'R' : v === 5 ? 'HR' : v === 6 ? 'M' : 'S');
 const hash = (s) => { let h = 2166136261; for (const ch of s) h = Math.imul(h ^ ch.charCodeAt(0), 16777619) >>> 0; return h; };
@@ -57,7 +57,7 @@ export function createPacteMp(app, root, { modeBar }) {
       <div class="pa-row" style="--n:${Math.max(1, e.row.length)}">${e.row.length ? e.row.map((c) => cardHTML(v, c)).join('') : `<span class="pa-empty">${mine && v.status === 'playing' ? 'Tire ta première carte.' : '…'}</span>`}</div>
       ${seals}
       <div class="pa-info"><span>Ce tour : <b>${val}</b> point${val > 1 ? 's' : ''}</span><span class="pa-fac">${nf} / 7 sceaux</span>
-        ${e.sceaux ? `<span class="pa-tag ok">${icon('shield')}Protégé ×${e.sceaux}</span>` : ''}${e.offer ? '<span class="pa-tag gold">Offrande : la suivante ×2</span>' : ''}
+        ${e.sceaux ? `<span class="pa-tag ok" data-n="×${e.sceaux}">${icon('shield')}<span class="pa-tl">Protégé ×${e.sceaux}</span></span>` : ''}${e.offer ? '<span class="pa-tag gold" data-n="×2" title="Offrande : la suivante ×2"><img alt="" src="assets/jeux/pa-offrande.webp"><span class="pa-tl">Offrande ×2</span></span>' : ''}
         <span class="pa-risk ${risk >= 40 ? 'hi' : risk >= 20 ? 'mid' : ''}">Risque : <b>${risk} %</b></span></div>${ban}</div>`;
   }
   function drawGame(v, ctx, _last, shown = null) {
@@ -85,6 +85,7 @@ export function createPacteMp(app, root, { modeBar }) {
           <button class="btn dc-plq dc-plq-dark" data-mp="stop" ${canStop ? '' : 'disabled'}>${canStop ? `S’arrêter (+${val})` : 'S’arrêter'}</button></div>` : ''}
         <button class="btn small ghost mp-resign" data-mp="resign">${icon('p:danger')}Abandonner</button>`}
     </div>`;
+    fitInfo(root);
   }
 
   // Annonce d'un événement (brisure, protection, arrêt…), comme contre l'Abysse

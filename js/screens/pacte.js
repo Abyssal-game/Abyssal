@@ -27,6 +27,16 @@ export const SP = { sceau: { name: 'Sceau', img: 'assets/jeux/pa-sceau.webp', de
 // v464 : les sept sceaux de cire du parchemin (assets/jeux/pa-table2.webp, 450 × 330), position en % et faction de chacun
 /* v893 : sceaux placés par le CSS (--sy, en px du tapis 450 × 330 ; plus bas de 100 px sur le grand tapis 450 × 430) */
 export const SEALS = [['infernal', 47, 170], ['artificiel', 100, 207], ['celeste', 160, 233], ['necrotique', 225, 245], ['sauvage', 292, 235], ['abyssal', 353, 207], ['primordial', 405, 170]];
+/* v897 : la ligne du bas tient sur la bande du plateau : si elle déborde, les étiquettes passent en image + nombre, puis le texte rapetisse */
+export const fitInfo = (root) => requestAnimationFrame(() => requestAnimationFrame(() => {
+  const el = root.querySelector('.pa-parch.pp .pa-info');
+  if (!el?.isConnected) return;
+  el.classList.remove('tight'); el.style.fontSize = '';
+  if (el.scrollWidth <= el.clientWidth + 1) return;
+  el.classList.add('tight');
+  let f = parseFloat(getComputedStyle(el).fontSize);
+  while (el.scrollWidth > el.clientWidth + 1 && f > 7) { f -= 0.5; el.style.fontSize = `${f}px`; }
+}));
 export const sealsHTML = (k, fs, cat, sigil) => SEALS.map(([f], i) => { const [x, y] = BOARD_SEALS[boardOf(k)][i]; return `<i class="pa-seal ${fs.has(f) ? 'on' : ''}" data-f="${f}" style="left:${x}%;top:${y}%;--fc:${cat.faction[f]?.colors.secondary || '#C9A45A'}">${sigil(f)}</i>`; }).join('');
 const HOW = [['cards', '#7FA8D8', 'Ton tour', 'Tire des cartes une à une et pose-les devant toi. Chaque carte de faction vaut de 1 à 7 points.'],
   ['crystal', '#E8C35A', 'T’arrêter', 'Quand tu veux, arrête-toi : tu gagnes la somme des cartes posées ce tour-ci.'],
@@ -124,7 +134,7 @@ export default function pacteScreen(app, root) {
       <div class="pa-row" style="--n:${Math.max(1, st.row.length)}">${st.row.length ? st.row.map((c) => cardHTML(c)).join('') : `<span class="pa-empty">${st.turn === 'p' ? 'Tire ta première carte.' : '…'}</span>`}</div>
       ${seals}
       <div class="pa-info"><span>Ce tour : <b>${v}</b> point${v > 1 ? 's' : ''}</span><span class="pa-fac">${nf} / 7 sceaux</span>
-        ${st.sceaux ? `<span class="pa-tag ok">${icon('shield')}Protégé ×${st.sceaux}</span>` : ''}${st.offer ? '<span class="pa-tag gold">Offrande : la suivante ×2</span>' : ''}${st.must > 0 ? `<span class="pa-tag bad">Malédiction : encore ${st.must} carte${st.must > 1 ? 's' : ''}</span>` : ''}${st.curse?.[st.turn === 'p' ? 'a' : 'p'] ? `<span class="pa-tag bad">${st.turn === 'p' ? t('Malédiction pour {name} au prochain tour', { name: esc(tw(PA.RIVALS[st.rival].name)) }) : t('Malédiction pour toi au prochain tour')}</span>` : ''}
+        ${st.sceaux ? `<span class="pa-tag ok" data-n="×${st.sceaux}">${icon('shield')}<span class="pa-tl">Protégé ×${st.sceaux}</span></span>` : ''}${st.offer ? '<span class="pa-tag gold" data-n="×2" title="Offrande : la suivante ×2"><img alt="" src="assets/jeux/pa-offrande.webp"><span class="pa-tl">Offrande ×2</span></span>' : ''}${st.must > 0 ? `<span class="pa-tag bad" data-n="${st.must}" title="Malédiction"><img alt="" src="assets/jeux/pa-malediction.webp"><span class="pa-tl">Encore ${st.must} carte${st.must > 1 ? 's' : ''}</span></span>` : ''}${st.curse?.[st.turn === 'p' ? 'a' : 'p'] ? `<span class="pa-tag bad" title="${esc(st.turn === 'p' ? t('Malédiction pour {name} au prochain tour', { name: tw(PA.RIVALS[st.rival].name) }) : t('Malédiction pour toi au prochain tour'))}"><img alt="" src="assets/jeux/pa-malediction.webp">${st.turn === 'p' ? t('→ {name}', { name: esc(tw(PA.RIVALS[st.rival].name)) }) : t('→ toi')}</span>` : ''}
         <span class="pa-risk ${risk >= 40 ? 'hi' : risk >= 20 ? 'mid' : ''}">Risque : <b>${risk} %</b></span></div>${ban}</div>`;
   }
   /* v557 (demande du propriétaire : jouer moins à l'aveugle) : la pioche montre ce qu'il reste, faction par faction */
@@ -168,6 +178,7 @@ export default function pacteScreen(app, root) {
       <div class="mq-table pa-table">${center(st)}</div>
       ${st.peek && st.turn === 'p' && st.deck.length && !busy ? `<div class="pa-peek">${cardHTML(st.deck[st.deck.length - 1])}<span><b>Présage</b> <span class="small">La prochaine carte sera celle-ci. Tire-la ou arrête-toi.</span></span></div>` : ''}
       ${controls(st)}</div>`;
+    fitInfo(root);
     fx(st);
   }
   /* v745 : un seul tableau des scores en tête (adversaire à gauche, toi à droite) au lieu de deux grands cadres */

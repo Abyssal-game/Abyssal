@@ -9548,6 +9548,15 @@ export default {
   "Les tables de tes mini-jeux, rangées par jeu": "Las mesas de tus minijuegos, ordenadas por juego",
   "Tapis des Duels des Sceaux": "Tapete de los Duelos de Sellos",
   "Tous les jeux": "Todos los juegos",
+  "Offrande ×{0}": "Ofrenda ×{0}",
+  "{e0}Offrande ×{0}": "{e0}Ofrenda ×{0}",
+  "Encore {0} carte": "{0} carta más",
+  "Encore {0} cartes": "{0} cartas más",
+  "{e0}Encore {0} carte": "{e0}{0} carta más",
+  "{e0}Encore {0} cartes": "{e0}{0} cartas más",
+  "→ {name}": "→ {name}",
+  "→ toi": "→ ti",
+  "Offrande : la suivante ×2": "Ofrenda: la siguiente ×2",
 };
 
 export const names = {

@@ -9068,3 +9068,13 @@ html.reduce-motion :is(.chx-leak, .chx-beam, .chx-ring, .chx-fx) { display: none
 .cs-ppb img { aspect-ratio: 1; }
 .cs-row .cs-pic img.cs-mat.cs-pp { width: 52px; height: 52px; }
 .cs-shop.k-pboard .cs-shop-it img { height: 72px; width: auto; aspect-ratio: 1; border-radius: 6px; }
+/* v897 : bande du bas des plateaux du Pacte : une seule ligne (le nombre de sceaux se lit sur le plateau), étiquettes courtes
+   avec leur image, Malédiction lisible sur la bande claire (rose pâle sur fond clair avant) */
+.pa-game .pa-parch.pp .pa-info { flex-wrap: nowrap; white-space: nowrap; gap: 0 5px; font-size: min(.8rem, 2.9cqw); }
+.pa-parch.pp .pa-fac { display: none; }
+.pa-parch.pp .pa-tag, .pa-parch.pp .pa-risk { font-size: 1em; padding: 1px 6px; gap: 3px; }
+.pa-parch.pp .pa-tag img { width: 1.35em; height: 1.35em; object-fit: contain; margin: -2px 0; }
+.pa-parch .pa-tag.bad { background: rgba(160, 20, 30, .16); color: #7A1414; }
+.pa-parch.pp .pa-info.tight .pa-tl { display: none; }
+.pa-parch.pp .pa-info.tight .pa-tag[data-n]::after { content: attr(data-n); font-weight: 700; }
+.pa-parch.pp .pa-info.tight .pa-tag { padding: 1px 4px; gap: 1px; }
