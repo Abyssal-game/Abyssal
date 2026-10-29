@@ -9673,6 +9673,10 @@ export default {
   "Fait marquant : {0} critique au dé.": "Highlight: {0} critical die roll.",
   "Fait marquant : {0} critiques au dé.": "Highlight: {0} critical die rolls.",
   "Les vingt réactions des gardiens d’un coup ({0} à l’unité).": "All twenty guardian reactions at once ({0} separately).",
+  "Gagne une partie du Cercle de l’Abysse": "Win a game in the Abyss Circle",
+  "Joue 2 parties du Cercle de l’Abysse": "Play 2 games in the Abyss Circle",
+  "Bon retour dans l’Abysse ! <b>Un booster premium</b> t’attend dans la boutique.": "Welcome back to the Abyss! <b>A premium booster</b> awaits you in the shop.",
+  "Bon retour dans l’Abysse ! <b>Un booster</b> t’attend dans la boutique.": "Welcome back to the Abyss! <b>A booster</b> awaits you in the shop.",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

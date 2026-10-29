@@ -10,7 +10,7 @@ export const CHALLENGES = [
 export const WEEK_DAYS = 5; // jours joués dans la semaine pour le coffre de la semaine
 export const FIRST_WIN = 50;
 export const SHARD_FLOOR_CAP = 25; // au-delà de l'étage 25, les éclats par combat n'augmentent plus // éclats de la toute première victoire
-import { FINAL_FLOOR, BOOSTERS, FREE_PACK, BRAISE, TORCHES, ECONOMY, XP, LEVEL_TITLES, LEVEL_FRAMES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ASH_FRAMES, SHOW_ORDER, SHADOW, sublimeObs, VARIANTS, FIN_ORDER, CREATOR_KIT } from '../config.js';
+import { FINAL_FLOOR, BOOSTERS, FREE_PACK, COMEBACK, BRAISE, TORCHES, ECONOMY, XP, LEVEL_TITLES, LEVEL_FRAMES, RARITY_ORDER, FACTION_ORDER, RARITY, MISSIONS, LUCK_POINTS, ASH_FRAMES, SHOW_ORDER, SHADOW, sublimeObs, VARIANTS, FIN_ORDER, CREATOR_KIT } from '../config.js';
 import { drawBooster, cryptoRandom, currentEvent, boosterOdds, weekIndex } from './boosters.js';
 import { loadSave, writeSave, defaultSave, today, SAVE_STASH_KEY } from './save.js';
 import { CHOC } from './choc.js'; /* v811 */
@@ -378,6 +378,22 @@ export class Game {
   /* v644 : éclats de l'offrande pour le n-ième jour d'une série (affichage) */
   dailyGainFor(n) { return ECONOMY.daily.base + Math.min(ECONOMY.daily.maxStreakBonus, (Math.max(1, n) - 1) * ECONOMY.daily.perStreakDay); }
 
+  /* v909 : cadeau de retour. L'offrande se prend à chaque visite : son dernier jour est le dernier jour joué.
+     Après COMEBACK.days jours sans jouer, un booster standard (premium après COMEBACK.long jours), une fois. */
+  comeback() {
+    const last = this.s.daily?.last, day = today(this.clock());
+    if (!last || this.s.comebackDay === day) return null;
+    const away = dayGap(last, day);
+    return away >= COMEBACK.days ? { away, ticket: away >= COMEBACK.long ? 'premium' : 'standard' } : null;
+  }
+  claimComeback() {
+    const c = this.comeback();
+    if (!c) throw new Error('Aucun cadeau de retour en attente.');
+    this.s.comebackDay = today(this.clock());
+    this.s.tickets[c.ticket] = (this.s.tickets[c.ticket] || 0) + 1;
+    this.persist();
+    return c;
+  }
   claimDaily() {
     if (!this.canDailyClaim()) throw new Error('L’offrande du jour a déjà été récupérée.');
     const { streak, amount } = this.dailyAmount();
@@ -1224,7 +1240,7 @@ export class Game {
     const R = st.awake ? SC.awakened(SC.RIVAL[st.rival]) : SC.RIVAL[st.rival];
     sc.awake ||= {};
     const out = { result: st.over, shards: 0, first: false, title: null, daily: st.daily, capped: false };
-    if (st.over === 'won') { this.codexXp(CODEX_XP.game, 'game');
+    this.track('cercleplay'); /* v909 : missions du Cercle */ if (st.over === 'won') { this.track('cercle'); this.codexXp(CODEX_XP.game, 'game');
       sc.wins++; sc.streak++; sc.best = Math.max(sc.best, sc.streak);
       out.chests = [];
       if (st.awake) { if (!sc.awake[R.key]) { sc.awake[R.key] = Date.now(); out.first = true; out.shards += SC.SCEAUX_REWARD.firstAwake; out.chests.push(SC.sceauxChest(R.key, true)); } }
@@ -1334,7 +1350,7 @@ export class Game {
     if (en.day !== day) { en.day = day; en.paidToday = 0; }
     const T = EN.TABLE[st.table], R = EN.ENCHERES_REWARD;
     const out = { result: st.over, shards: 0, first: false, title: null, daily: st.daily, capped: false, chests: [] };
-    if (st.over === 'won') { this.codexXp(CODEX_XP.game, 'game');
+    this.track('cercleplay'); /* v909 : missions du Cercle */ if (st.over === 'won') { this.track('cercle'); this.codexXp(CODEX_XP.game, 'game');
       en.wins++; en.streak++; en.best = Math.max(en.best, en.streak);
       if (!en.beaten[T.key]) { en.beaten[T.key] = Date.now(); out.first = true; out.shards += R.firstWin; out.chests.push(T.chest); }
       if (st.daily && en.dailyDone !== (st.dailyDay || day)) { en.dailyDone = st.dailyDay || day; out.shards += R.daily; out.chests.push('bois'); }
@@ -1408,7 +1424,7 @@ export class Game {
     if (pa.day !== day) { pa.day = day; pa.paidToday = 0; }
     const T = PA.TABLE[st.table], R = PA.PACTE_REWARD;
     const out = { result: st.over, shards: 0, first: false, title: null, daily: st.daily, capped: false, chests: [] };
-    if (st.over === 'won') { this.codexXp(CODEX_XP.game, 'game');
+    this.track('cercleplay'); /* v909 : missions du Cercle */ if (st.over === 'won') { this.track('cercle'); this.codexXp(CODEX_XP.game, 'game');
       pa.wins++; pa.streak++; pa.best = Math.max(pa.best, pa.streak);
       if (!pa.beaten[T.key]) { pa.beaten[T.key] = Date.now(); out.first = true; out.shards += R.firstWin; out.chests.push(T.chest); }
       if (st.daily && pa.dailyDone !== (st.dailyDay || day)) { pa.dailyDone = st.dailyDay || day; out.shards += R.daily; out.chests.push('bois'); }
@@ -1486,7 +1502,7 @@ export class Game {
     if (cr.day !== day) { cr.day = day; cr.paidToday = 0; }
     const T = CR.TABLE[st.table], R = CR.CRYPTES_REWARD;
     const out = { result: st.over, shards: 0, first: false, title: null, daily: st.daily, capped: false, chests: [] };
-    if (st.over === 'won') { this.codexXp(CODEX_XP.game, 'game');
+    this.track('cercleplay'); /* v909 : missions du Cercle */ if (st.over === 'won') { this.track('cercle'); this.codexXp(CODEX_XP.game, 'game');
       cr.wins++; cr.streak++; cr.best = Math.max(cr.best, cr.streak);
       if (!cr.beaten[T.key]) { cr.beaten[T.key] = Date.now(); out.first = true; out.shards += R.firstWin; out.chests.push(T.chest); }
       if (st.daily && cr.dailyDone !== (st.dailyDay || day)) { cr.dailyDone = st.dailyDay || day; out.shards += R.daily; out.chests.push('bois'); }

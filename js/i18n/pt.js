@@ -9660,6 +9660,10 @@ export default {
   "Fait marquant : {0} critique au dé.": "Destaque: {0} crítico no dado.",
   "Fait marquant : {0} critiques au dé.": "Destaque: {0} críticos no dado.",
   "Les vingt réactions des gardiens d’un coup ({0} à l’unité).": "As vinte reações dos guardiões de uma vez ({0} em separado).",
+  "Gagne une partie du Cercle de l’Abysse": "Ganha uma partida do Círculo do Abismo",
+  "Joue 2 parties du Cercle de l’Abysse": "Joga 2 partidas do Círculo do Abismo",
+  "Bon retour dans l’Abysse ! <b>Un booster premium</b> t’attend dans la boutique.": "Bem-vindo de volta ao Abismo! <b>Um booster premium</b> espera-te na loja.",
+  "Bon retour dans l’Abysse ! <b>Un booster</b> t’attend dans la boutique.": "Bem-vindo de volta ao Abismo! <b>Um booster</b> espera-te na loja.",
 };
 
 export const names = {

@@ -9661,6 +9661,10 @@ export default {
   "Fait marquant : {0} critique au dé.": "Höhepunkt: {0} kritischer Würfelwurf.",
   "Fait marquant : {0} critiques au dé.": "Höhepunkt: {0} kritische Würfelwürfe.",
   "Les vingt réactions des gardiens d’un coup ({0} à l’unité).": "Alle zwanzig Wächter-Reaktionen auf einmal ({0} einzeln).",
+  "Gagne une partie du Cercle de l’Abysse": "Gewinne eine Partie im Zirkel des Abgrunds",
+  "Joue 2 parties du Cercle de l’Abysse": "Spiele 2 Partien im Zirkel des Abgrunds",
+  "Bon retour dans l’Abysse ! <b>Un booster premium</b> t’attend dans la boutique.": "Willkommen zurück im Abgrund! <b>Ein Premium-Booster</b> wartet im Laden auf dich.",
+  "Bon retour dans l’Abysse ! <b>Un booster</b> t’attend dans la boutique.": "Willkommen zurück im Abgrund! <b>Ein Booster</b> wartet im Laden auf dich.",
 };
 
 export const names = {

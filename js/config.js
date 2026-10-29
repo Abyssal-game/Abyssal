@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v908'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v909'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -177,6 +177,8 @@ export const ASH_FRAMES = { braise: 600, forge: 2000, phenix: 6000 };
 
 // Booster standard gratuit du jour : un par jour ; v348 : il se garde, 2 au plus en réserve.
 export const FREE_PACK = { perDay: 1, max: 2 }; // v348 : cumulable jusqu'à 2
+/* v909 : cadeau de retour : après `days` jours sans jouer (offrande non prise), un booster offert (premium après `long` jours) */
+export const COMEBACK = { days: 3, long: 7 };
 /* v668 : Braises de vie (ranimer une créature tombée dans la Descente) : une offerte par jour (2 au plus en réserve), achetées en cendres,
    gagnées au premier gardien vaincu de chaque chapitre (bossLate dès le chapitre lateFrom) */
 /* v735 : Torches de la Descente (décision du propriétaire du 25 octobre 2026) : chaque combat de la Descente (gagné ou perdu,
@@ -205,6 +207,9 @@ export const MISSIONS = [
   { key: 'trial2',   kind: 'trial',    n: 2, shards: 40, text: 'Gagne 2 Épreuves du jour' },
   { key: 'wins',     kind: 'win',      n: 5, shards: 35, text: 'Remporte 5 combats (Descente ou Épreuves)' },
   { key: 'chest2',   kind: 'chest',    n: 2, shards: 30, text: 'Ouvre 2 coffres' },
+  /* v909 : le Cercle de l'Abysse dans les missions (Duels des Sceaux, Pacte, Cryptes, Enchères contre l'Abysse) */
+  { key: 'cercle',   kind: 'cercle',   n: 1, shards: 35, text: 'Gagne une partie du Cercle de l’Abysse' },
+  { key: 'cercle2',  kind: 'cercleplay', n: 2, shards: 30, text: 'Joue 2 parties du Cercle de l’Abysse' },
 ];
 // (le bonus des 3 missions du jour a été retiré en v232, la mission « offrande du jour » en v234)
 

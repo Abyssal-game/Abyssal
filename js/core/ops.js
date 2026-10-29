@@ -16,7 +16,7 @@ export const OPS = {
   openChest: { kind: 'sync' }, openAllChests: { kind: 'sync' },
   openBooster: { kind: 'first' },
   // jour, missions, semaine
-  claimDaily: { kind: 'sync' }, claimMission: { kind: 'sync' }, claimWeekChest: { kind: 'sync' }, missions: { kind: 'sync', lazy: (s) => s.missions?.day },
+  claimDaily: { kind: 'sync' }, claimComeback: { kind: 'sync' }, claimMission: { kind: 'sync' }, claimWeekChest: { kind: 'sync' }, missions: { kind: 'sync', lazy: (s) => s.missions?.day },
   team: { kind: 'sync', lazy: (s) => Object.keys(s.collection || {}).length }, // lecture qui peut prêter les cartes de départ
   // équipe, profil, personnalisation
   setTeam: { kind: 'sync' }, saveTeamPreset: { kind: 'sync' }, deleteTeamPreset: { kind: 'sync' }, setForm: { kind: 'sync' }, toggleFav: { kind: 'sync' },
@@ -124,7 +124,7 @@ export const ARGS = {
   creatorKit: [], /* v890 */
   markSeen: ['s'], markAllSeen: [], decipher: ['s'], setShownVariant: ['s', 'S'], sublime: ['s'], burn: ['s', 'S', 'I'], burnSpares: ['AS'], upgrade: ['s'],
   buyAshFrame: ['s'], openChest: ['s'], openAllChests: [], openBooster: ['s', { faction: 'S' }],
-  claimDaily: [], claimMission: ['i'], claimWeekChest: [], missions: [], team: [],
+  claimDaily: [], claimComeback: [], claimMission: ['i'], claimWeekChest: [], missions: [], team: [],
   setTeam: ['as'], saveTeamPreset: ['S', 'AS'], deleteTeamPreset: ['i'], setForm: ['s', 'S'], toggleFav: ['s'], claimChallenge: ['s', 's'],
   setTitle: ['S'], setFrame: ['S'], setDress: ['s', 'S'], setBack: ['S'], setPlate: ['S'], setMat: ['S'], setPboard: ['S'], setEboard: ['S'], setCboard: ['S'], setCback: ['S'], setFond: ['S'], setSachet: ['S', 'S'],
   setName: ['S'], setAvatar: ['S'], toggleShowcase: ['s'], reset: [],

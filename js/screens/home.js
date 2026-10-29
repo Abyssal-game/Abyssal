@@ -14,7 +14,7 @@ import { setScene } from '../ui/scene.js';
 import { shadowDone } from './shadow.js';
 
 // Icône et couleur de chaque type de mission du jour
-const MISSION_LOOK = { booster: ['booster', '#E0485E'], new: ['book', '#B48CFF'], rare: ['crystal', '#6FB4FF'], variant: ['holo', '#FF8AD8'], burn: ['furnace', '#FF9A3A'], depth: ['depth', '#9C7BFF'], trial: ['crest-elite', '#E0485E'], win: ['crown', '#F2C14E'], daily: ['crystal', '#7FD3FF'], chest: ['chest', '#E8C35A'] };
+const MISSION_LOOK = { booster: ['booster', '#E0485E'], new: ['book', '#B48CFF'], rare: ['crystal', '#6FB4FF'], variant: ['holo', '#FF8AD8'], burn: ['furnace', '#FF9A3A'], depth: ['depth', '#9C7BFF'], trial: ['crest-elite', '#E0485E'], win: ['crown', '#F2C14E'], daily: ['crystal', '#7FD3FF'], chest: ['chest', '#E8C35A'], cercle: ['seal', '#C9A45A'], cercleplay: ['seal', '#9C7BFF'] }; /* v909 */
 
 export default function home(app, root) {
   const g = app.game, cat = app.catalog, s = g.s;

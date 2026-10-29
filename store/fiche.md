@@ -5,7 +5,7 @@ Tout ce qu'il faut copier-coller dans **Google Play Console** et **App Store Con
 Les images sont prêtes dans `store/google/` et `store/apple/`. Pour les refaire après un changement du jeu :
 `node tools/store-shots.mjs` (captures) puis `node tools/store-compose.mjs` (mise en forme).
 
-> Les textes décrivent le jeu **sans achat intégré**. Si des achats sont ajoutés un jour, il faudra modifier la partie « Équitable » de la description et les réponses aux questionnaires.
+> **Version 1.2 (prévue)** : premiers achats intégrés, uniquement cosmétiques (Échoppe, Codex enluminé, Pack du Fondateur). La description dit déjà « seuls des objets d'apparence s'achètent » ; ce qui change à l'envoi de la 1.2 est marqué **1.2** ci-dessous (nouveautés, notes pour Apple, questionnaires de données).
 
 ---
 
@@ -111,6 +111,24 @@ Le Bestiaire interdit t'attend. Jusqu'où oseras-tu descendre ?
 Première version d'ABYSSAL. Bonne descente dans l'Abysse !
 ```
 
+### Nouveautés de la version 1.2 (français)
+```
+• L'Échoppe ouvre ses portes : dos de cartes vivants, sachets de booster, plaques, fonds de profil et plateaux pour les Duels des Sceaux, le Pacte, les Cryptes et les Enchères. Uniquement des objets d'apparence : rien ne rend plus fort.
+• Tes plateaux sont vus par ton adversaire pendant les parties en ligne.
+• Nouvelles missions du jour dans le Cercle de l'Abysse.
+• Un cadeau t'attend quand tu reviens après quelques jours d'absence.
+• Nombreuses corrections et améliorations d'affichage, sur tous les écrans et dans toutes les langues.
+```
+
+### Nouveautés de la version 1.2 (anglais, pour la fiche en anglais)
+```
+• The Emporium opens its doors: living card backs, booster skins, nameplates, profile backgrounds and boards for Seal Duels, the Pact, the Crypts and the Auctions. Cosmetic items only: nothing makes you stronger.
+• Your opponent sees your boards during online games.
+• New daily missions in the Abyss Circle.
+• A gift awaits you when you come back after a few days away.
+• Many fixes and display improvements across every screen and language.
+```
+
 ### Copyright (App Store)
 ```
 © 2026 ABYSSAL
@@ -177,7 +195,7 @@ Pandore (ART-068), autrefois dessinée nue, a été refaite habillée en v300 : 
 | Thèmes médicaux | Aucun |
 | Contenu généré par les utilisateurs | Oui, uniquement les pseudos : filtre, signalement et masquage dans le jeu |
 | Messagerie ou discussion | Non |
-| Achats intégrés | Non en 1.0 ; **Oui à partir de la 1.1** (obsidiennes, Codex enluminé, Pack du Fondateur : cosmétiques seulement) |
+| Achats intégrés | Non jusqu'à la 1.1 ; **Oui à partir de la 1.2** (obsidiennes, Codex enluminé, Pack du Fondateur : cosmétiques seulement) |
 | Publicité | Non |
 | Accès web sans restriction | Non |
 
@@ -189,7 +207,7 @@ Si Apple calcule un âge plus bas que 13+, choisis quand même **13+** (Apple pe
 - Peur, horreur : oui, **éléments effrayants légers** (créatures démoniaques, ambiance sombre).
 - Sexualité, nudité, grossièretés, drogues, jeux d'argent : **non**.
 - Les utilisateurs peuvent-ils interagir ou échanger du contenu ? **Oui, un pseudo visible dans les classements.** Pas de discussion. Modération : filtre de mots et signalement.
-- Achats numériques : **non** en 1.0, **oui** à partir de la 1.1 (cosmétiques seulement).
+- Achats numériques : **oui** dès que les achats sont branchés sur Android (cosmétiques seulement, voir `docs/android-achats.md`).
 
 Résultat attendu : PEGI 12 en Europe (au pire PEGI 7). Public cible (Contenu de l'appli → Public cible) : **13 ans et plus**. Si on coche « moins de 13 ans », Google impose les règles « Familles ».
 
@@ -208,7 +226,8 @@ Résultat attendu : PEGI 12 en Europe (au pire PEGI 7). Public cible (Contenu de
 | Informations personnelles → Adresse e-mail | Oui | Non (compte nécessaire pour jouer) | Gestion du compte |
 | Informations personnelles → ID utilisateur | Oui | Oui | Gestion du compte, fonctionnalités de l'appli |
 | Activité dans l'appli → Autre contenu généré par l'utilisateur (pseudo, sauvegarde, scores) | Oui | Oui | Fonctionnalités de l'appli |
-| Position, contacts, photos, audio, finances, santé, navigation | Non | — | — |
+| Informations financières → Historique d'achats (**dès que les achats sont branchés sur Android**) | Oui | Oui | Fonctionnalités de l'appli (donner l'achat une seule fois) |
+| Position, contacts, photos, audio, santé, navigation | Non | — | — |
 | Plantages, diagnostics, identifiants publicitaires | Non | — | — |
 
 ### Apple → App Store Connect → Confidentialité de l'app
@@ -217,7 +236,7 @@ Résultat attendu : PEGI 12 en Europe (au pire PEGI 7). Public cible (Contenu de
   - Coordonnées → **Adresse e-mail**
   - Identifiants → **Identifiant utilisateur**
   - Contenu utilisateur → **Contenu de jeu** (sauvegarde, scores) et **Autre contenu utilisateur** (pseudo)
-  - **À ajouter avec la 1.1** : Achats → **Historique d'achats** (associé à l'identité, « Fonctionnalités de l'app », pas de pistage)
+  - **À ajouter avec la 1.2** : Achats → **Historique d'achats** (associé à l'identité, « Fonctionnalités de l'app », pas de pistage)
 - Tout le reste : **Non collecté**.
 
 ---
@@ -230,7 +249,12 @@ Pourquoi un compte est nécessaire : la partie de chaque joueur est tenue par no
 
 Modération (seul contenu créé par les joueurs : les pseudos ; en partie en ligne, seules des réactions prédéfinies, sans texte libre) : les pseudos insultants sont refusés. Touchez le pseudo ou le portrait d'un autre joueur (classements, parties en ligne) pour ouvrir son profil, puis « Signaler ou masquer ce joueur ». Un pseudo signalé par plusieurs joueurs est remplacé automatiquement. Contact : contact@abyssal-game.fr
 
-Aucun achat qui rend plus fort (seulement des objets d'apparence à partir de la version 1.1), aucune publicité, aucun pistage.
+Aucun achat qui rend plus fort, aucune publicité, aucun pistage.
+```
+
+**À partir de la 1.2**, remplacer la dernière ligne des notes ci-dessus par ce paragraphe :
+```
+Achats intégrés (nouveaux dans cette version, cosmétiques seulement) : Butin → Codex → L'Échoppe. Les obsidiennes s'achètent dans « Obtenir » (en haut de l'Échoppe) et servent uniquement à des objets d'apparence (dos de cartes, sachets de booster, plaques, fonds de profil, plateaux des mini-jeux). Le Pack du Fondateur et le Codex enluminé (voie de récompenses cosmétiques de la saison) sont aussi dans l'Échoppe. « Restaurer mes achats » se trouve en bas de la page « Obtenir ». Aucun achat ne donne de carte, de booster ni d'avantage en jeu. Aucune publicité, aucun pistage.
 ```
 **Compte de démonstration :** crée un compte réservé aux vérificateurs (par exemple `review.abyssal@gmail.com` avec un pseudo « Vérificateur »). Donne son e-mail et son mot de passe dans les champs « Sign-in information ». Google demande la même chose dans **Contenu de l'appli → Accès aux applis**.
 
@@ -244,14 +268,16 @@ Aucun achat qui rend plus fort (seulement des objets d'apparence à partir de la
 - [x] Refaire l'illustration de Pandore (ART-068), habillée (fait en v300).
 - [ ] Vérifier que le nom « ABYSSAL » n'est pas déjà pris sur les deux stores et en marque déposée (base INPI / EUIPO).
 - [x] Créer les comptes développeur : Google (25 $ une fois), Apple (99 $ par an).
-- [ ] Google : confirmer l'accès à un vrai téléphone Android (exigé par la Play Console) : **Android mis de côté le 23 octobre 2026** (le propriétaire n'a pas d'appareil Android). Version signée prête (`abyssal-play-store`).
-- [ ] Google, compte personnel récent : test fermé avec au moins 12 testeurs pendant 14 jours avant la publication.
+- [x] Google : Android repris ; version signée construite par GitHub Actions (`abyssal-play-store`).
+- [ ] Google, compte personnel récent : test fermé (accepté et publié le 29 octobre 2026, 12 testeurs inscrits) pendant 14 jours, puis demande d'accès à la production vers le 12-13 novembre 2026 (réponses préparées : `docs/google-production.md`).
+- [ ] **Version 1.2** : les 10 essais d'achat sur TestFlight (`docs/achats-verification.md`), puis me demander d'ouvrir l'Échoppe, construire la version, joindre les 6 achats intégrés, coller les nouveautés et les notes 1.2 ci-dessus.
+- [ ] Android : achats Google Play (`docs/android-achats.md`).
 - [ ] Emballer l'application (Capacitor) et la tester sur un vrai téléphone Android et sur iPhone (TestFlight).
 
 
 ---
 
-## 9. Achats intégrés (version 1.1, Saison I du Codex le 1er décembre 2026)
+## 9. Achats intégrés (version 1.2 ; Saison I du Codex le 1er décembre 2026)
 
 Paiement par **RevenueCat** (module `@revenuecat/purchases-capacitor`, `js/iap.js`) ; le serveur de partie vérifie chaque achat auprès de RevenueCat (`serveur/iap.mjs`) avant de le donner.
 
@@ -271,4 +297,5 @@ Le Codex enluminé est **consommable** : il se rachète à chaque saison ; le se
 - Apple : contrat des applications payantes signé, **Small Business Program** (15 %), DSA « commerçant » une fois la micro-entreprise créée.
 - RevenueCat : projet « ABYSSAL », app iOS (identifiant `com.abyssalgame.abyssal`, clé d'achats intégrés d'App Store Connect), **Transfer behavior : Keep with original App User ID** (un achat reste sur le compte qui l'a payé).
 - Clé publique RevenueCat (`appl_…`) → `IAP_KEY.ios` dans `js/config.js` ; clé secrète (`sk_…`) → Supabase → Edge Functions → Secrets → **`REVENUECAT_SECRET`** (jamais dans le dépôt ni dans la conversation).
-- Confidentialité de l'app : ajouter « Historique d'achats » (voir partie 6). Mettre à jour la page de confidentialité du site `abyssal-game.fr` (dépôt `site`) à la sortie de la 1.1.
+- Confidentialité de l'app : ajouter « Historique d'achats » (voir partie 6). La page de confidentialité du jeu parle déjà des achats et de RevenueCat ; vérifier celle du site `abyssal-game.fr` (dépôt `site`) avant l'envoi de la 1.2.
+- Android (Google Play) : même 6 identifiants, pas à pas dans `docs/android-achats.md`.

@@ -356,6 +356,8 @@ function autoClaim() {
   claiming = true;
   try {
     let any = false;
+    /* v909 : cadeau de retour (avant l'offrande, qui note le jour joué) */
+    if (g.comeback()) { const c = g.claimComeback(); any = true; toast(c.ticket === 'premium' ? t('Bon retour dans l’Abysse ! <b>Un booster premium</b> t’attend dans la boutique.') : t('Bon retour dans l’Abysse ! <b>Un booster</b> t’attend dans la boutique.'), { kind: 'epic', icon: 'star' }); }
     if (g.canDailyClaim()) { const r = g.claimDaily(); any = true; toast(`Offrande du jour : <b>+${fmt(r.amount)} éclats</b>${r.streak > 1 ? ` · série de ${r.streak} jours` : ''}${r.chest ? ' et <b>un coffre de fer</b>' : ''}.`, { kind: r.chest ? 'epic' : 'success', icon: 'crystal' }); }
     g.missions().list.forEach((x, i) => { if (x.p >= x.n && !x.claimed) { const r = g.claimMission(i); any = true; toast(`Mission accomplie : <span>${esc(x.text)}</span> · <b>+${fmt(r.shards)} éclats</b>`, { kind: 'success', icon: 'check' }); } });
     if (g.weekChest().ready) { g.claimWeekChest(); any = true; toast('Coffre de la semaine : <b>un coffre d’or</b> rejoint tes coffres !', { kind: 'epic', icon: 'trophy' }); }

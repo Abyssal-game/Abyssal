@@ -9660,6 +9660,10 @@ export default {
   "Fait marquant : {0} critique au dé.": "Fatto saliente: {0} critico col dado.",
   "Fait marquant : {0} critiques au dé.": "Fatto saliente: {0} critici col dado.",
   "Les vingt réactions des gardiens d’un coup ({0} à l’unité).": "Le venti reazioni dei guardiani in un colpo ({0} singolarmente).",
+  "Gagne une partie du Cercle de l’Abysse": "Vinci una partita del Circolo dell’Abisso",
+  "Joue 2 parties du Cercle de l’Abysse": "Gioca 2 partite del Circolo dell’Abisso",
+  "Bon retour dans l’Abysse ! <b>Un booster premium</b> t’attend dans la boutique.": "Bentornato nell’Abisso! <b>Un booster premium</b> ti aspetta nel negozio.",
+  "Bon retour dans l’Abysse ! <b>Un booster</b> t’attend dans la boutique.": "Bentornato nell’Abisso! <b>Un booster</b> ti aspetta nel negozio.",
 };
 
 export const names = {
