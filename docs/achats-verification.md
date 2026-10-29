@@ -1,5 +1,7 @@
 # Vérifier les achats avant d'envoyer la version 1.2 à Apple (v904)
 
+> **29 octobre 2026 : essais faits par le propriétaire sur TestFlight, tous les achats fonctionnent.** (En mode d'essai, les boutons peuvent afficher des prix en dollars alors que la fenêtre d'Apple dit 0,99 € : défaut connu du bac à sable.)
+
 Pourquoi : si un achat échoue pendant l'examen, Apple refuse la version. Tout se vérifie sur l'iPhone, dans l'app TestFlight :
 les achats y passent par le « bac à sable » d'Apple, **ils ne coûtent rien** (aucun euro débité).
 
