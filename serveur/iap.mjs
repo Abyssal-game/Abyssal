@@ -9,7 +9,8 @@ export function revenueCatTx(json) {
   for (const [product, list] of Object.entries(sub.non_subscriptions || {})) {
     for (const t of Array.isArray(list) ? list : []) {
       const id = t?.store_transaction_id || t?.id;
-      if (id) out.push({ id: String(id), product, at: t.purchase_date || null, sandbox: !!t.is_sandbox, store: t.store || null });
+      /* v908 : Google Play peut nommer un produit « identifiant:option » : seul l'identifiant compte */
+      if (id) out.push({ id: String(id), product: product.split(':')[0], at: t.purchase_date || null, sandbox: !!t.is_sandbox, store: t.store || null });
     }
   }
   return out.sort((a, b) => String(a.at).localeCompare(String(b.at)));

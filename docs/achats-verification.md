@@ -32,8 +32,5 @@ Si un essai échoue : faire une capture et me l'envoyer, avec le numéro de l'es
 2. Construire la version sur le Mac, l'envoyer, puis dans App Store Connect → version 1.2 → section « Achats intégrés » : **cocher les 6 articles** pour les joindre à la version.
 3. Notes pour l'examinateur : indiquer le compte de démonstration et « L'Échoppe se trouve dans Butin → Codex → L'Échoppe ».
 
-## D. Côté Google (Android), encore à faire
-1. Play Console → Configuration → **Profil de paiement** (profil marchand) : le créer, avec les informations de la micro-entreprise.
-2. Play Console → ABYSSAL → Monétiser → Produits → **Produits intégrés** : créer les 6 mêmes articles, **avec exactement les mêmes identifiants** que chez Apple.
-3. RevenueCat → ajouter l'app Android (identifiant `com.abyssalgame.abyssal`), y joindre la clé de compte de service Google (RevenueCat explique la marche), importer les 6 produits.
-4. M'envoyer la **clé publique Android de RevenueCat** (elle commence par `goog_`) : je la mets dans le jeu (`IAP_KEY.android`). Cette clé-là peut être publique ; ne jamais m'envoyer de clé secrète.
+## D. Côté Google (Android)
+Tout le pas à pas est dans `docs/android-achats.md` (profil de paiement, les 6 articles, RevenueCat, clé `goog_`, essai).

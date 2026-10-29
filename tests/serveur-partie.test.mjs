@@ -264,6 +264,8 @@ test('serveur : iapSync donne les achats vérifiés auprès de RevenueCat, une s
   const store = (id) => SHOP.find((x) => x.id === id).store;
   const json = { subscriber: { non_subscriptions: { [store('obs-1000')]: [{ id: 'rc1', store_transaction_id: '2000001', purchase_date: '2026-12-02T10:00:00Z', is_sandbox: true, store: 'app_store' }] } } };
   assert.deepEqual(revenueCatTx(json).map((t) => [t.id, t.product]), [['2000001', store('obs-1000')]]);
+  /* v908 : Google Play (« identifiant:option ») */
+  assert.deepEqual(revenueCatTx({ subscriber: { non_subscriptions: { [`${store('obs-100')}:base`]: [{ id: 'rc2', store_transaction_id: 'GPA.1', purchase_date: '2026-12-02T11:00:00Z', store: 'play_store' }] } } }).map((t) => [t.id, t.product]), [['GPA.1', store('obs-100')]]);
   let asked = null;
   const iap = createRevenueCat({ key: 'sk_test', fetch: async (url, o) => { asked = { url, auth: o.headers.Authorization }; return { ok: true, status: 200, json: async () => json }; } });
   const db = memDb();
