@@ -2,6 +2,7 @@
 import { cardHTML, lazyArt } from '../ui/card.js';
 import { icon, setIcon } from '../ui/icons.js';
 import { esc, bindActions, fmt, toast, confirmBox, paint } from '../ui/dom.js';
+import { t, LANG } from '../i18n.js'; /* v906 */
 
 /* v732 : un médaillon peint par famille de succès (assets/icons/ach-<famille>.webp). Tant qu'une image manque
    (famille absente de ACH_PAINTED), l'ancienne icône reste. */
@@ -26,7 +27,7 @@ export default function achievements(app, root, params) {
         ${achIc(a, done)}
         <div class="ach-body"><h3>${esc(a.name)}</h3><p class="small muted">${esc(a.desc)}</p>
           ${done ? '' : `<span class="progress"><i style="width:${(cur / tgt) * 100}%"></i></span>`}
-          <span class="small muted">${done ? `Débloqué le ${new Date(done).toLocaleDateString('fr-FR')}` : `${cur} / ${tgt}`} · ${app.rewardText(a.reward)}</span>
+          <span class="small muted">${done ? t('Débloqué le {date}', { date: new Date(done).toLocaleDateString(LANG === 'fr' ? 'fr-FR' : LANG) }) : `${cur} / ${tgt}`} · ${app.rewardText(a.reward)}</span>
         </div>
       </article>`;
     };

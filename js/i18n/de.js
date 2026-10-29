@@ -9588,6 +9588,12 @@ export default {
   "Plateau de la Crypte aux lanternes": "Spielbrett der Laternenkrypta",
   "Plateau du Tombeau royal": "Spielbrett des Königsgrabs",
   "Dos du Tombeau royal": "Rückseite des Königsgrabs",
+  "{n} éclats": "{n} Splitter",
+  "titre « {name} »": "Titel „{name}“",
+  "{n} ticket standard": "{n} Standard-Ticket",
+  "{n} tickets standard": "{n} Standard-Tickets",
+  "coffre": "Truhe",
+  "Débloqué le {date}": "Freigeschaltet am {date}",
 };
 
 export const names = {

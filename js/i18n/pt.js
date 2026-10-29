@@ -9587,6 +9587,12 @@ export default {
   "Plateau de la Crypte aux lanternes": "Tabuleiro da Cripta das lanternas",
   "Plateau du Tombeau royal": "Tabuleiro do Túmulo real",
   "Dos du Tombeau royal": "Verso do Túmulo real",
+  "{n} éclats": "{n} fragmentos",
+  "titre « {name} »": "título “{name}”",
+  "{n} ticket standard": "{n} ticket padrão",
+  "{n} tickets standard": "{n} tickets padrão",
+  "coffre": "baú",
+  "Débloqué le {date}": "Desbloqueado em {date}",
 };
 
 export const names = {

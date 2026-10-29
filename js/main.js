@@ -1,7 +1,7 @@
 // Point d'entrée : chargement des données, état du joueur, navigation.
 import { startErrLog } from './ui/errlog.js'; /* v804 : journal des erreurs (Mode Créateur) */
 startErrLog();
-import { startTranslator, t } from './i18n.js'; /* v506 : langues (en premier : le dictionnaire est chargé avant le reste) */
+import { startTranslator, t, tw } from './i18n.js'; /* v506 : langues (en premier : le dictionnaire est chargé avant le reste) */
 import { loadCatalogData, createCatalog } from './core/catalog.js';
 import { Game } from './core/game.js';
 import { loadArtManifest, artUrl, hasRealArt, setCardBack } from './art/assets.js';
@@ -366,13 +366,14 @@ function autoClaim() {
 
 // Notifications de progression (succès, ensembles, niveaux)
 function rewardText(r = {}) {
+  /* v906 : chaque morceau traduit à part (la ligne assemblée restait en français dans les autres langues) */
   const parts = [];
-  if (r.shards) parts.push(`${fmt(r.shards)} éclats`);
-  for (const [k, n] of Object.entries(r.tickets || {})) parts.push(`${n} ticket${n > 1 ? 's' : ''} ${k === 'premium' ? 'premium' : 'standard'}`);
-  if (r.title) parts.push(`titre « ${esc(r.title)} »`);
-  if (r.frame) parts.push('un cadre de profil');
+  if (r.shards) parts.push(t('{n} éclats', { n: fmt(r.shards) }));
+  for (const [k, n] of Object.entries(r.tickets || {})) parts.push(t(k === 'premium' ? (n > 1 ? '{n} tickets premium' : '{n} ticket premium') : (n > 1 ? '{n} tickets standard' : '{n} ticket standard'), { n }));
+  if (r.title) parts.push(t('titre « {name} »', { name: esc(tw(r.title)) }));
+  if (r.frame) parts.push(t('un cadre de profil'));
   const ch = { bois: 'coffre de bois', fer: 'coffre de fer', or: 'coffre d’or', abyssal: 'coffre abyssal' };
-  for (const [k, n] of Object.entries(r.chests || {})) parts.push(`${n} ${ch[k] || 'coffre'}`);
+  for (const [k, n] of Object.entries(r.chests || {})) parts.push(`${n} ${t(ch[k] || 'coffre')}`);
   return parts.join(', ');
 }
 app.rewardText = rewardText;

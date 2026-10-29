@@ -9587,6 +9587,12 @@ export default {
   "Plateau de la Crypte aux lanternes": "Tavola della Cripta delle lanterne",
   "Plateau du Tombeau royal": "Tavola della Tomba reale",
   "Dos du Tombeau royal": "Dorso della Tomba reale",
+  "{n} éclats": "{n} schegge",
+  "titre « {name} »": "titolo «{name}»",
+  "{n} ticket standard": "{n} ticket standard",
+  "{n} tickets standard": "{n} ticket standard",
+  "coffre": "forziere",
+  "Débloqué le {date}": "Sbloccato il {date}",
 };
 
 export const names = {
