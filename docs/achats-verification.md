@@ -29,6 +29,7 @@ Si un essai échoue : faire une capture et me l'envoyer, avec le numéro de l'es
 
 ## C. Le jour de l'envoi de la 1.2
 1. Me demander d'ouvrir l'Échoppe (`CODEX.shopFrom`) : je fais la livraison.
+   Je regénère aussi le site abyssal-game.fr avec l'Échoppe ouverte (`python3 build.py <dossier> --echoppe`, depuis le dépôt du jeu).
 2. Construire la version sur le Mac, l'envoyer, puis dans App Store Connect → version 1.2 → section « Achats intégrés » : **cocher les 6 articles** pour les joindre à la version.
 3. Notes pour l'examinateur : indiquer le compte de démonstration et « L'Échoppe se trouve dans Butin → Codex → L'Échoppe ».
 
