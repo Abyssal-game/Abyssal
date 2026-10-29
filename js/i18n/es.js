@@ -9584,6 +9584,8 @@ export default {
   "Dos du Tombeau des Racines": "Dorso de la Tumba de las Raíces",
   "Plateau de la Forge infernale": "Tablero de la Forja infernal",
   "Plateau des Marées noires": "Tablero de las Mareas negras",
+  "Plateau de l’Ossuaire d’argent": "Tablero del Osario de plata",
+  "Plateau de la Crypte aux lanternes": "Tablero de la Cripta de los faroles",
 };
 
 export const names = {

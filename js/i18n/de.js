@@ -9584,6 +9584,8 @@ export default {
   "Dos du Tombeau des Racines": "Rückseite des Wurzelgrabs",
   "Plateau de la Forge infernale": "Spielbrett der Höllenschmiede",
   "Plateau des Marées noires": "Spielbrett der Schwarzen Gezeiten",
+  "Plateau de l’Ossuaire d’argent": "Spielbrett des Silbernen Beinhauses",
+  "Plateau de la Crypte aux lanternes": "Spielbrett der Laternenkrypta",
 };
 
 export const names = {
