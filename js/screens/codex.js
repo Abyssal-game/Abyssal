@@ -254,6 +254,13 @@ export default function codexScreen(app, root) {
       <h3 class="cxs-sh">${icon('chest')}Les rayons</h3><div class="cxs-aisles">${aisles}</div>`;
   }
 
+  /* v911 (« la fenêtre Acheter est pénible quand on regarde un objet ») : la barre d'achat du bas se range quand on fait
+     défiler vers le bas pour regarder, et revient dès qu'on remonte, qu'on arrive en bas ou qu'on touche l'objet */
+  const footAway = (sh) => { let last = 0;
+    const set = (hid) => sh.el.querySelectorAll('.cx-pv-foot, .pv2-foot').forEach((f) => f.classList.toggle('away', hid));
+    sh.el.addEventListener('scroll', (e) => { const el = e.target; if (!(el instanceof Element)) return; const y = el.scrollTop, end = y + el.clientHeight >= el.scrollHeight - 8;
+      if (y > last + 6 && y > 40 && !end) set(true); else if (y < last - 6 || end || y <= 40) set(false); last = y; }, true);
+    sh.el.addEventListener('click', (e) => { if (!e.target.closest('.cx-pv-foot, .pv2-foot')) set(false); }); };
   /* v637 : ce que contient le Pack du Fondateur (aperçu de chaque objet) */
   function founder() {
     const it = SHOP.find((x) => x.id === 'fondateur'), gv = it.give, own = g.shopOwned(it.id), s = g.s;
@@ -266,7 +273,7 @@ export default function codexScreen(app, root) {
     if (gv.fond) rows.push(['Fond de profil', FONDS[gv.fond], `<span class="cx-fondt has-fond"${fondStyle(gv.fond)}><span class="avatar-mini pf pf-${s.frame}">${avImg}</span></span>`]);
     if (gv.title) rows.push(['Titre', '', `<span class="cx-fd-title">${picon('titles')}<b>${esc(gv.title)}</b><small>avec son badge au classement</small></span>`]);
     if (gv.obs) rows.push([esc(OBS.name), `${fmt(gv.obs)} obsidiennes`, `<span class="cx-fd-obs">${OBS_I}<b>${fmt(gv.obs)}</b></span>`]);
-    const sh = openSheet('', { label: it.name, full: true, cls: 'cx-pv cx-fd' });
+    const sh = openSheet('', { label: it.name, full: true, cls: 'cx-pv cx-fd' }); footAway(sh);
     sh.setContent(`<img class="cx-fd-hero" alt="" src="assets/ui/ech-fondateur2-large.webp" onerror="this.remove()"><header class="cx-pv-head r-myth"><small class="cx-kick">Vendu une seule fois</small><h2 class="cx-pv-title">${esc(it.name)}</h2><small class="cx-pv-pos">${rows.length} récompenses</small></header>
       <p class="small muted center">Pour celles et ceux qui soutiennent l’Abysse dès le début : des objets introuvables ailleurs, jamais de puissance.</p>
       ${rows.map(([k, n, v]) => `<section class="cx-fd-row"><p class="cx-pv-cap">${k}</p><div class="cx-fd-v">${v}</div><b class="cx-fd-n">${esc(n || '')}</b></section>`).join('')}
@@ -406,7 +413,7 @@ export default function codexScreen(app, root) {
       if (o.season) return `<div class="pv2-foot">${own ? (wearBtn || `<span class="cx-badge on">${icon('check')}${on ? 'Équipé' : 'Déjà à toi'}</span>`) : `<span class="pv2-src">${icon('star')}<span><b>Voie enluminée · palier ${o.tier}</b><small>Introuvable à l’Échoppe</small></span></span>`}</div>`;
       const cost = g.catalogCost(o.id);
       return `<div class="pv2-foot">${own ? (wearBtn || `<span class="cx-badge on">${icon('check')}${on ? 'Équipé' : 'Déjà à toi'}</span>`) : `<button class="btn primary pv2-buy" data-pv="buy">Acheter · ${obsTxt(cost)}</button><small class="muted">Tu as ${obsTxt(g.obs())}</small>`}</div>`; };
-    const sh = openSheet('', { label: 'Aperçu', full: true, cls: 'cx-pv pv2', onClose: () => stopTilt?.() });
+    const sh = openSheet('', { label: 'Aperçu', full: true, cls: 'cx-pv pv2', onClose: () => stopTilt?.() }); footAway(sh);
     const paint = () => {
       stopTilt?.();
       const o = it(), r = o.season ? 'season' : rank(o), n = items.length, nm = nameOf(o);

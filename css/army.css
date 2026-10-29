@@ -9144,3 +9144,6 @@ html.reduce-motion :is(.chx-leak, .chx-beam, .chx-ring, .chx-fx) { display: none
 .en-stage.ep-dragon { background-image: url(../assets/encheres/ep-dragon.webp); --lb: 61.5%; --pt: 50%; --px: 31%; --ct: 40%; --cx: 1%; }
 .cr-game .cr-grid.cp-givre { border-image-source: url(../assets/cryptes/cp-givre.webp); border-image-slice: 90 92 93 92 fill; border-image-width: 24px 24px 24px 24px; }
 .cr-game .cr-grid.cp-rouages { border-image-source: url(../assets/cryptes/cp-rouages.webp); border-image-slice: 60 60 61 60 fill; border-image-width: 21px 21px 21px 21px; }
+/* v911 : la barre d'achat des aperçus de l'Échoppe se range pendant qu'on fait défiler vers le bas (footAway) */
+.cx-pv-foot, .pv2-foot { transition: transform .25s ease, opacity .25s ease; }
+.cx-pv-foot.away, .pv2-foot.away { transform: translateY(110%); opacity: 0; pointer-events: none; }
