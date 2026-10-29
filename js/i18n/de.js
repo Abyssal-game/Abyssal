@@ -9681,6 +9681,7 @@ export default {
   "<b>+{n} obsidiennes</b> ajoutées à ta réserve.": "<b>+{n} Obsidiane</b> zu deinem Vorrat hinzugefügt.",
   "<b>Codex enluminé</b> débloqué : la voie enluminée de la saison est à toi.": "<b>Illuminierter Kodex</b> freigeschaltet: Der illuminierte Pfad der Saison gehört dir.",
   "<b>{name}</b> : tes objets t’attendent dans Profil › Personnaliser.": "<b>{name}</b>: Deine Gegenstände warten unter Profil › Anpassen.",
+  "dont {0} offertes": "davon {0} gratis",
 };
 
 export const names = {

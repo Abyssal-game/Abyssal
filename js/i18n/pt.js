@@ -9680,6 +9680,7 @@ export default {
   "<b>+{n} obsidiennes</b> ajoutées à ta réserve.": "<b>+{n} obsidianas</b> adicionadas à tua reserva.",
   "<b>Codex enluminé</b> débloqué : la voie enluminée de la saison est à toi.": "<b>Códice iluminado</b> desbloqueado: a via iluminada da temporada é tua.",
   "<b>{name}</b> : tes objets t’attendent dans Profil › Personnaliser.": "<b>{name}</b>: os teus objetos esperam por ti em Perfil › Personalizar.",
+  "dont {0} offertes": "incluindo {0} de oferta",
 };
 
 export const names = {

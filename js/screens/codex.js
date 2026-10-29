@@ -244,7 +244,7 @@ export default function codexScreen(app, root) {
     if (ui.cat === 'obs') {
       const euro = (it, i) => { const own = it.once && g.shopOwned(it.id); const art = it.kind === 'obs' ? `assets/ui/obs-${Math.min(4, i + 1)}.webp` : 'assets/ui/ech-fondateur2.webp';
         return `<article class="cxs-e ${it.kind === 'obs' ? 'obs' : 'founder'} ${own ? 'own' : ''}">${opt(art, 'cxs-e-art')}
-          <div class="cxs-e-in"><b>${it.kind === 'obs' ? obsTxt(it.give.obs) : esc(it.name)}</b>${it.bonus ? `<span class="cx-bonus">+${it.bonus} offertes</span>` : ''}
+          <div class="cxs-e-in"><b>${it.kind === 'obs' ? obsTxt(it.give.obs) : esc(it.name)}</b>${it.bonus ? `<span class="cx-bonus">dont ${it.bonus} offertes</span>` /* v914 : le total affiché comprend déjà le bonus */ : ''}
           ${it.desc ? `<small>${esc(it.desc)}</small>` : ''}</div>
           ${own ? `<span class="cxs-own">${icon('check')}Possédé</span>` : `<button class="btn primary small" data-cx="buy" data-id="${it.id}">${esc(priceOf(it))}</button>`}</article>`; };
       let obsI = 0;
