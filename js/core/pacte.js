@@ -278,20 +278,31 @@ export function aiWants(st, rng = Math.random) {
   return gain * (1 + R.risk + R.race * (behind + 0.5 * oppNear) - R.cool * ahead) > loss * R.caution;
 }
 // v561 : l'adversaire tente Défier le pacte quand le risque est faible et le tour assez gros
+/* v899 (le propriétaire : « les adversaires n'utilisent jamais le défi ») : il n'y pensait qu'au moment de s'arrêter, avec un
+   risque de brisure sous 12-30 % ; or il s'arrête justement quand le risque est haut : le défi ne sortait presque jamais
+   (Écho 0,4 par partie, les autres 0 à 0,02). Il compare maintenant ce que le défi rapporte en moyenne (le tour doublé avec
+   une carte de plus, si le pacte tient) à ce qu'il encaisse en s'arrêtant, selon son caractère (prudence, audace, retard). */
 function aiDoubles(st, rng) {
   if (!canDouble(st)) return false;
-  const R = RIVALS[st.rival];
-  if (R.caution > 1.2) return false; /* les prudents (Ilda, Orvel) ne tentent jamais Défier le pacte */
-  const v = rowValue(st), p = bustChance(st) * (st.sceaux ? 0.15 : 1);
-  if (st.scores[st.turn] + v >= tgt(st)) return false;
-  return v >= 8 && p < 0.12 + (R.risk || 0) * 0.6 && rng() > R.noise;
+  const R = RIVALS[st.rival], who = st.turn, T = tgt(st);
+  const v = rowValue(st), me = st.scores[who], opp = st.scores[who === 'p' ? 'a' : 'p'];
+  if (me + v >= T) return false; /* il gagne déjà en s'arrêtant */
+  if (v < (R.caution > 1.5 ? 9 : 8)) return false; /* le tour doit valoir la peine */
+  const p = bustChance(st) * (st.sceaux ? 0.15 : 1);
+  const win = (1 - p) * 2 * (v + meanSafe(st) * (st.offer ? 2 : 1));
+  const behind = Math.max(0, opp - me) / T;
+  const need = v * (1 + 0.55 * (R.caution - 1) + 0.4 - R.risk - 0.6 * R.race * behind);
+  const dare = Math.min(0.85, 0.3 + 2 * R.risk + 0.8 * Math.max(0, 1.3 - R.caution)); /* envie de tenter : Ilda, Orvel 30 %, Écho, Mammon, Souveraine 85 % */
+  return win > need && rng() < dare;
 }
 // Tour complet de l'adversaire (liste des événements, pour l'écran)
 export function aiTurn(st, rng = Math.random) {
   const evs = [];
   let guard = 0;
   while (!st.over && st.turn === 'a' && guard++ < 60) {
-    if (aiWants(st, rng)) evs.push(draw(st));
+    const go = aiWants(st, rng);
+    if (go && rowValue(st) >= 0.3 * tgt(st) && aiDoubles(st, rng)) evs.push(double(st)); /* v899 : gros tour en cours (l'Archiviste ne s'arrête presque jamais d'elle-même) */
+    else if (go) evs.push(draw(st));
     else if (aiDoubles(st, rng)) evs.push(double(st));
     else evs.push(stop(st));
   }
