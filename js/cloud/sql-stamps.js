@@ -10,7 +10,7 @@ export const SQL_STAMPS = {
   },
   "12": {
     "file": "12-serveur-de-partie.sql",
-    "stamp": "14dcf43a2fc2"
+    "stamp": "3faccdc3cc01"
   },
   "13": {
     "file": "13-verrouillage.sql",
@@ -22,7 +22,7 @@ export const SQL_STAMPS = {
   },
   "15": {
     "file": "15-vitrine.sql",
-    "stamp": "9fd3932fe844"
+    "stamp": "d472e4d89182"
   },
   "16": {
     "file": "16-en-ligne.sql",
@@ -50,6 +50,6 @@ export const SQL_STAMPS = {
   },
   "09": {
     "file": "09-multijoueur.sql",
-    "stamp": "c11b92ab25b9"
+    "stamp": "32cde03e47fd"
   }
 };

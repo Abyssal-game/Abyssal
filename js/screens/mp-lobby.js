@@ -19,6 +19,7 @@ import { checkTurns } from '../cloud/mpwatch.js';
 import { profileAttrs } from '../ui/report.js';
 import { t } from '../i18n.js';
 import { withPlate, frameCls, emoteHTML, showEmote } from '../ui/vitrine.js'; /* v564 */
+import { TAPIS, PBOARDS, CBOARDS, CBACKS } from '../core/codex.js'; /* v904 */
 const BUBBLE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H10l-4 3.5V16H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="8.5" cy="10.5" r="1.2" fill="currentColor"/><circle cx="12" cy="10.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="10.5" r="1.2" fill="currentColor"/></svg>';
 
 export const MP_OFF = 'Les parties contre d’autres joueurs ne sont pas encore ouvertes sur le serveur.';
@@ -49,7 +50,7 @@ export function createMpLobby(app, root, spec) {
   async function lobby() {
     if (spec.busyLocal?.()) return; /* v811 : entraînement du Choc en cours (rien du serveur à redessiner) */
     ui.open = null; view = null; clearInterval(clock); clock = 0; /* v574 */
-    document.body.classList.remove('battle-mode');
+    document.body.classList.remove('battle-mode'); app.applySettings?.(); /* v904 : ton tapis revient (celui de l'adversaire a pu s'afficher) */
     document.querySelector('.sc-scene')?.remove();
     setScene('menu');
     if (!cloud.isLoggedIn() || !sync.profile?.pseudo) {
@@ -321,6 +322,10 @@ export function createMpLobby(app, root, spec) {
     get busy() { return busy; },
     get alive() { return alive; },
     plate: (v, mine, html) => withPlate(mine ? g.s.plate : v.foe?.plate, html), /* v564 : nom posé sur sa plaque */
+    /* v904 : plateau ou dos du jeu (k = mat, pb, cb, cd) : celui de l'adversaire pendant son tour (s'il en a un que ce jeu connaît), le tien sinon */
+    board: (v, k) => { const L = { mat: TAPIS, pb: PBOARDS, cb: CBOARDS, cd: CBACKS }[k], mine = { mat: g.s.mat, pb: g.s.pboard, cb: g.s.cboard, cd: g.s.cback }[k];
+      const foe = v.foe?.boards?.[k], theirs = v.status === 'playing' && !myTurn(v) && L?.[foe];
+      return theirs ? foe : (L?.[mine] ? mine : null); },
     draw, watch, refresh, act, lobby,
     // barre de compte à rebours d'une partie rapide
     clockHTML: (v) => (v.status === 'playing' && v.pace === 'fast' ? `<div class="mp-clock ${myTurn(v) ? 'mine' : ''}"><span class="mp-clock-bar"></span><span class="mp-clock-t">${myTurn(v) ? 'À toi' : `<span translate="no">${esc(foeName(v))}</span>`} · <b>${left(v)}</b></span></div>` : ''),
@@ -379,7 +384,7 @@ export function createMpLobby(app, root, spec) {
       return ui.open ? open(ui.open) : lobby();
     },
     stop() {
-      alive = false; stopPoll(); document.removeEventListener('visibilitychange', onVis);
+      alive = false; stopPoll(); document.removeEventListener('visibilitychange', onVis); app.applySettings?.(); /* v904 */
       /* v527 : une recherche rapide s'annule quand on quitte l'écran (sinon la partie démarrerait sans toi et serait perdue au temps) */
       if (ui.searching) { cloud.mpCancel(ui.searching).catch(() => {}); ui.searching = null; ui.searchingV = null; }
       spec.onStop?.();

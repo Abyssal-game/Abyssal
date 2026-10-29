@@ -99,6 +99,10 @@ begin
     if exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'profiles' and column_name = 'choc') then
       execute 'update public.profiles set choc = $2 where id = $1' using p_uid, p_profile -> 'choc';
     end if;
+    -- v904 : plateaux et dos des mini-jeux (colonne ajoutée par 15-vitrine.sql)
+    if exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'profiles' and column_name = 'boards') then
+      execute 'update public.profiles set boards = $2 where id = $1' using p_uid, p_profile -> 'boards';
+    end if;
   end if;
   if p_card is not null and to_regclass('public.player_cards') is not null and octet_length(p_card::text) < 100000 then
     execute 'insert into public.player_cards (id, data, updated_at) values ($1, $2, now())
@@ -130,7 +134,7 @@ end $$;
 create table if not exists public.sql_stamps (file text primary key, stamp text not null, at timestamptz not null default now());
 alter table public.sql_stamps enable row level security;
 revoke all on public.sql_stamps from public, anon, authenticated;
-insert into public.sql_stamps (file, stamp) values ('12', '14dcf43a2fc2') on conflict (file) do update set stamp = excluded.stamp, at = now();
+insert into public.sql_stamps (file, stamp) values ('12', '3faccdc3cc01') on conflict (file) do update set stamp = excluded.stamp, at = now();
 create or replace function public.sql_stamps() returns jsonb language sql stable security definer set search_path = public as $$
   select coalesce(jsonb_object_agg(file, stamp), '{}'::jsonb) from public.sql_stamps;
 $$;

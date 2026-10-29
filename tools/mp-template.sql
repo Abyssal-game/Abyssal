@@ -1029,6 +1029,7 @@ end $$;
 alter table public.mp_matches add column if not exists emotes jsonb not null default '{}'::jsonb;
 alter table public.profiles add column if not exists frame text;
 alter table public.profiles add column if not exists plate text;
+alter table public.profiles add column if not exists boards jsonb; -- v904 : plateaux et dos des mini-jeux, vus par l'adversaire (vérifiés par 15-vitrine.sql)
 create or replace function public.mp_emote(p_id uuid, p_key text)
 returns jsonb language plpgsql volatile security definer set search_path = public as $$
 declare m public.mp_matches; me text; e jsonb; owned jsonb; n int;
@@ -1060,7 +1061,7 @@ returns jsonb language sql stable security definer set search_path = public as $
     'me', case when m.a = auth.uid() then 'a' else 'b' end, 'state', public.mp_state_for(m, case when m.a = auth.uid() then 'a' else 'b' end), 'winner', m.winner, 'reason', m.reason,
     'claimed', case when m.a = auth.uid() then m.a_claimed else m.b_claimed end, 'created_at', m.created_at, 'updated_at', m.updated_at,
     'now', now(), 'hours', public.mp_hours(), 'pace', m.pace, 'emotes', m.emotes,
-    'foe', (select jsonb_build_object('id', p.id, 'pseudo', p.pseudo, 'avatar', p.avatar, 'badge', p.badge, 'frame', p.frame, 'plate', p.plate) from public.profiles p where p.id = case when m.a = auth.uid() then m.b else m.a end))
+    'foe', (select jsonb_build_object('id', p.id, 'pseudo', p.pseudo, 'avatar', p.avatar, 'badge', p.badge, 'frame', p.frame, 'plate', p.plate, 'boards', p.boards) from public.profiles p where p.id = case when m.a = auth.uid() then m.b else m.a end))
   from public.mp_matches m where m.id = p_id and auth.uid() in (m.a, m.b)
 $$;
 

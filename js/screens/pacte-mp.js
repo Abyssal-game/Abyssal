@@ -49,9 +49,9 @@ export function createPacteMp(app, root, { modeBar }) {
       <span class="pa-sc"><b>${ctx.plate(v, mine, mine ? 'Toi' : esc(ctx.foeName(v)))}</b><span class="pa-bar"><i style="width:${Math.min(100, (sc / tg) * 100)}%"></i></span></span>
       <span class="pa-pts"><b>${sc}</b><small>/ ${tg}</small></span></div>`;
   }
-  function center(v, s) {
+  function center(v, s, ctx) {
     const e = eng(s), val = PA.rowValue(e), risk = Math.round(PA.bustChance(e) * 100), fs = PA.rowFactions(e), nf = fs.size, mine = s.turn === v.me;
-    const pb = boardOf(app.game.s.pboard), seals = sealsHTML(pb, fs, cat, sigil);
+    const pb = boardOf(ctx.board(v, 'pb')) /* v904 : celui de l'adversaire pendant son tour */, seals = sealsHTML(pb, fs, cat, sigil);
     const ban = banner ? `<div class="pa-ban">${banner.bust ? '<img class="pa-burn" alt="" src="assets/jeux/pa-brisure.webp">' : ''}<div class="mq-banner ${banner.cls}">${banner.html}</div></div>` : '';
     return `<div class="pa-parch pp ${pb}">
       <div class="pa-row" style="--n:${Math.max(1, e.row.length)}">${e.row.length ? e.row.map((c) => cardHTML(v, c)).join('') : `<span class="pa-empty">${mine && v.status === 'playing' ? 'Tire ta première carte.' : '…'}</span>`}</div>
@@ -77,7 +77,7 @@ export function createPacteMp(app, root, { modeBar }) {
       <div class="mq-bar"><button class="btn small ghost" data-mp="rules" aria-label="Règles">${icon('p:help')}</button><b>Le Pacte · contre un joueur</b><button class="btn small ghost" data-mp="back" aria-label="Revenir à la liste">${icon('close')}</button></div>
       ${seat(v, s, foe, ctx)}
       <div class="pa-deck"><span class="pa-pile"><img alt="" src="assets/sceaux/dos.webp"><b>${(s.deck || []).length}</b></span><span class="small muted">${over ? t('Tour {n}', { n: s.round || 1 }) : s.turn === me ? t('Tour {n} · à toi', { n: s.round || 1 }) : t('Tour {n} · à {name}', { n: s.round || 1, name: esc(ctx.foeName(v)) })}</span></div>
-      <div class="mq-table pa-table">${center(v, s)}</div>
+      <div class="mq-table pa-table">${center(v, s, ctx)}</div>
       ${seat(v, s, me, ctx)}
       ${over ? ctx.endHTML(v, fin ? t('Score final : toi {a}, {name} {b}.', { a: fin[me], b: fin[foe], name: esc(ctx.foeName(v)) }) : '')
         : `${ctx.clockHTML(v)}${msg ? `<p class="sc-msg">${msg}</p>` : ''}

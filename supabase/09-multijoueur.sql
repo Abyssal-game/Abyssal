@@ -1049,11 +1049,6 @@ begin
     if jsonb_typeof(st -> 'pending') <> 'object' then raise exception 'Aucun pouvoir en attente.'; end if;
     if jsonb_typeof(mv -> 'picks') <> 'array' then raise exception 'Choisis une carte face cachée.'; end if;
     select array_agg(v::int) into picks from jsonb_array_elements_text(mv -> 'picks') v;
-    f := st #>> '{pending,power}';
-    if f = 'abyssal' and coalesce(array_length(picks, 1), 0) = 0 then -- v851 : le Remous abyssal peut être refusé
-      ev := jsonb_build_object('who', who, 'kind', 'power', 'power', f, 'i', '[]'::jsonb, 'skipped', true);
-      st := jsonb_set(st, '{pending}', 'null');
-    else
     if coalesce(array_length(picks, 1), 0) <> (st #>> '{pending,pick}')::int or (select count(distinct v) from unnest(picks) v) <> array_length(picks, 1)
       or not (picks <@ hid) then raise exception 'Choisis une carte face cachée.'; end if;
     f := st #>> '{pending,power}';
@@ -1065,7 +1060,6 @@ begin
       st := jsonb_set(st, array['cards', picks[2]::text], tmp);
     end if;
     st := jsonb_set(st, '{pending}', 'null');
-    end if;
   elsif mv ? 'flip' then
     if jsonb_typeof(st -> 'pending') = 'object' then raise exception 'Choisis d’abord la cible du pouvoir.'; end if;
     i := (mv ->> 'flip')::int;
@@ -1538,6 +1532,7 @@ end $$;
 alter table public.mp_matches add column if not exists emotes jsonb not null default '{}'::jsonb;
 alter table public.profiles add column if not exists frame text;
 alter table public.profiles add column if not exists plate text;
+alter table public.profiles add column if not exists boards jsonb; -- v904 : plateaux et dos des mini-jeux, vus par l'adversaire (vérifiés par 15-vitrine.sql)
 create or replace function public.mp_emote(p_id uuid, p_key text)
 returns jsonb language plpgsql volatile security definer set search_path = public as $$
 declare m public.mp_matches; me text; e jsonb; owned jsonb; n int;
@@ -1569,7 +1564,7 @@ returns jsonb language sql stable security definer set search_path = public as $
     'me', case when m.a = auth.uid() then 'a' else 'b' end, 'state', public.mp_state_for(m, case when m.a = auth.uid() then 'a' else 'b' end), 'winner', m.winner, 'reason', m.reason,
     'claimed', case when m.a = auth.uid() then m.a_claimed else m.b_claimed end, 'created_at', m.created_at, 'updated_at', m.updated_at,
     'now', now(), 'hours', public.mp_hours(), 'pace', m.pace, 'emotes', m.emotes,
-    'foe', (select jsonb_build_object('id', p.id, 'pseudo', p.pseudo, 'avatar', p.avatar, 'badge', p.badge, 'frame', p.frame, 'plate', p.plate) from public.profiles p where p.id = case when m.a = auth.uid() then m.b else m.a end))
+    'foe', (select jsonb_build_object('id', p.id, 'pseudo', p.pseudo, 'avatar', p.avatar, 'badge', p.badge, 'frame', p.frame, 'plate', p.plate, 'boards', p.boards) from public.profiles p where p.id = case when m.a = auth.uid() then m.b else m.a end))
   from public.mp_matches m where m.id = p_id and auth.uid() in (m.a, m.b)
 $$;
 
@@ -1671,7 +1666,7 @@ grant execute on function public.mp_ranking(text, int) to authenticated;
 create table if not exists public.sql_stamps (file text primary key, stamp text not null, at timestamptz not null default now());
 alter table public.sql_stamps enable row level security;
 revoke all on public.sql_stamps from public, anon, authenticated;
-insert into public.sql_stamps (file, stamp) values ('09', 'c11b92ab25b9') on conflict (file) do update set stamp = excluded.stamp, at = now();
+insert into public.sql_stamps (file, stamp) values ('09', '32cde03e47fd') on conflict (file) do update set stamp = excluded.stamp, at = now();
 create or replace function public.sql_stamps() returns jsonb language sql stable security definer set search_path = public as $$
   select coalesce(jsonb_object_agg(file, stamp), '{}'::jsonb) from public.sql_stamps;
 $$;

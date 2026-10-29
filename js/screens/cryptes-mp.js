@@ -13,7 +13,6 @@ import { setScene } from '../ui/scene.js';
 import { t, tw } from '../i18n.js';
 import { createMpLobby } from './mp-lobby.js';
 import { howHTML, PW_LABEL, PW_MINE, PW_FOE, pwMed } from './cryptes.js';
-import { CBOARDS, CBACKS } from '../core/codex.js';
 
 const hash = (s) => { let h = 2166136261; for (const ch of s) h = Math.imul(h ^ ch.charCodeAt(0), 16777619) >>> 0; return h; };
 
@@ -50,7 +49,7 @@ export function createCryptesMp(app, root, { modeBar }) {
   }
   function grid(v, s, ctx) {
     const pick = s.pending && ctx.myTurn(v) && !anim;
-    const cb = CBOARDS[app.game.s.cboard] ? ` cb ${app.game.s.cboard}` : '', back = CBACKS[app.game.s.cback] ? `assets/cryptes/${app.game.s.cback}.webp` : 'assets/jeux/cr-dos.webp'; /* v898 : plateau et dos choisis */
+    const bk = ctx.board(v, 'cb'), dk = ctx.board(v, 'cd'), cb = bk ? ` cb ${bk}` : '', back = dk ? `assets/cryptes/${dk}.webp` : 'assets/jeux/cr-dos.webp'; /* v904 : ceux de l'adversaire pendant son tour */ /* v898 : plateau et dos choisis */
     return `<div class="cr-grid${cb} ${pick ? 'picking' : ''}">${(s.cards || []).map((c, i) => {
       const shown = ui.face.get(i);
       if (c.gone && !shown) return `<span class="cr-c gone g-${c.gone === v.me ? 'p' : 'a'}"></span>`;

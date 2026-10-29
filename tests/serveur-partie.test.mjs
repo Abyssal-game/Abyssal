@@ -177,6 +177,18 @@ test('serveur de partie : les objets du Gardien seulement pour le badge du créa
   assert.ok(!p2.g.needsCreatorKit());
 });
 
+/* v904 : plateaux et dos des mini-jeux publiés avec le profil (vus par l'adversaire en ligne) */
+test('serveur de partie : plateau du Pacte et des Cryptes publiés avec le profil', async () => {
+  const db = memDb(), p = phone(db);
+  p.adopt((await p.send({ want: true })).body.data);
+  p.g.s.obs = 5000; p.g.s.settings.dev = true; p.g.s.devCodex = true;
+  const d0 = db.rows.get('u1').data; d0.obs = 5000; d0.settings.dev = true; d0.devCodex = true;
+  p.g.catalogBuy('pp-autel'); p.g.setPboard('pp-autel'); p.g.catalogBuy('cd-forge'); p.g.setCback('cd-forge');
+  await p.send({ pub: true });
+  const b = db.published.at(-1)?.profile.boards;
+  assert.equal(b?.pb, 'pp-autel'); assert.equal(b?.cd, 'cd-forge'); assert.equal(b?.cb, null);
+});
+
 test('serveur de partie : une partie des Sceaux truquée ne compte pas (le serveur rejoue les vrais coups)', async () => {
   const db = memDb(), p = phone(db);
   p.adopt((await p.send({ want: true })).body.data);
