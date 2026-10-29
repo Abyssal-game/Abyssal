@@ -46,12 +46,18 @@ const tap = async (sel, ms = 1200) => { await p.locator(sel).first().click(); aw
 const only = process.argv.slice(2);
 const steps = {
   async accueil() { await open(); await go('#/'); await shot('accueil'); },
-  async collection() { await open(); await go('#/collection'); await p.evaluate(() => window.scrollTo(0, 560)); await wait(800); await shot('collection'); },
+  /* v889 : collection rangée par rareté (Secrètes et Mythiques avec leurs finitions en premier) */
+  async collection() { await open(); await p.evaluate(() => { window.__abyssal.state.col = { q: '', factions: [], rarities: [], show: 'owned', sort: 'rarity', view: 'grid', albumFac: 'infernal', albumPage: 0 }; }); await go('#/collection'); await p.evaluate((y) => window.scrollTo(0, y), Number(process.env.COL_Y || 0)); await wait(800); await shot('collection'); },
   /* v889 : carte et finition au choix (CARD, VARIANT), ouvertes directement : le toucher dans la grille ouvrait toujours la première carte */
   async carte() { await open(); await go('#/collection'); await p.evaluate(([id, v]) => window.__abyssal.openCard(id, v ? { variant: v } : {}), [process.env.CARD || 'ABY-045', process.env.VARIANT || 'gold']); await wait(2200); await shot('carte'); },
   async ouverture() { await open(); await go('#/boutique'); await tap('[data-act="buy"][data-type="premium"]', 2500); await p.getByText('Tout révéler').first().click(); await wait(Number(process.env.OPEN_MS || 4500)); await shot('ouverture'); },
   async equipe() { await open(); await go('#/equipe'); await shot('equipe'); },
-  async combat() { await open('combat'); await go('#/descente', 3500); await shot('combat'); },
+  /* v889 : combat contre un gardien des profondeurs (sa présentation attend un toucher) */
+  async combat() {
+    await open('gardien'); await go('#/descente', 3500);
+    for (let i = 0; i < 6 && await p.locator('.cb2').count() === 0; i++) { await p.mouse.click(220, 300); await wait(1500); }
+    await wait(Number(process.env.FIGHT_MS || 2500)); await shot('combat');
+  },
   async sceaux() { await open('sceaux'); await go('#/sceaux', 2500); await shot('sceaux'); },
   async bestiaire() { await open(); await go('#/bestiaire'); await shot('bestiaire'); },
 };
