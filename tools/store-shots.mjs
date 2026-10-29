@@ -47,7 +47,8 @@ const only = process.argv.slice(2);
 const steps = {
   async accueil() { await open(); await go('#/'); await shot('accueil'); },
   async collection() { await open(); await go('#/collection'); await p.evaluate(() => window.scrollTo(0, 560)); await wait(800); await shot('collection'); },
-  async carte() { await open(); await go('#/collection'); await tap(`[data-id="${process.env.CARD || 'INF-001'}"]`, 2200); await shot('carte'); },
+  /* v889 : carte et finition au choix (CARD, VARIANT), ouvertes directement : le toucher dans la grille ouvrait toujours la première carte */
+  async carte() { await open(); await go('#/collection'); await p.evaluate(([id, v]) => window.__abyssal.openCard(id, v ? { variant: v } : {}), [process.env.CARD || 'ABY-045', process.env.VARIANT || 'gold']); await wait(2200); await shot('carte'); },
   async ouverture() { await open(); await go('#/boutique'); await tap('[data-act="buy"][data-type="premium"]', 2500); await p.getByText('Tout révéler').first().click(); await wait(Number(process.env.OPEN_MS || 4500)); await shot('ouverture'); },
   async equipe() { await open(); await go('#/equipe'); await shot('equipe'); },
   async combat() { await open('combat'); await go('#/descente', 3500); await shot('combat'); },
