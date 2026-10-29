@@ -15,6 +15,8 @@ while ((g.s.tickets.premium || 0) > 0) g.openBooster('premium');
 // quelques pièces maîtresses, avec leurs finitions
 for (const r of ['S', 'M']) catalog.byRarity[r].slice(0, r === 'S' ? 3 : 8).forEach((c) => c.variants.forEach((v) => g.devGive(c.id, v)));
 g.devDuplicates(12);
+/* v889 : une seule carte en Prismatique sur les captures (le Rêveur Sous la Fosse), les autres en apparence normale (trop de Prismatiques « fait guirlande ») */
+for (const [id, e] of Object.entries(g.s.collection)) if (e.v?.normal > 0 && Object.keys(e.v).length > 1) e.show = id === 'ABY-048' ? 'prism' : 'normal';
 g.devGrant({ shards: 2400, ash: 1800 });
 g.devChests();
 g.setTeam(g.autoTeam());
