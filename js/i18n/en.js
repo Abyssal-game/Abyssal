@@ -9599,6 +9599,7 @@ export default {
   "Plateau de l’Ossuaire d’argent": "Silver Ossuary board",
   "Plateau de la Crypte aux lanternes": "Lantern Crypt board",
   "Plateau du Tombeau royal": "Royal Tomb board",
+  "Dos du Tombeau royal": "Royal Tomb back",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

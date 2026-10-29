@@ -9587,6 +9587,7 @@ export default {
   "Plateau de l’Ossuaire d’argent": "Tablero del Osario de plata",
   "Plateau de la Crypte aux lanternes": "Tablero de la Cripta de los faroles",
   "Plateau du Tombeau royal": "Tablero de la Tumba real",
+  "Dos du Tombeau royal": "Dorso de la Tumba real",
 };
 
 export const names = {

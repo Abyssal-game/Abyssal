@@ -9587,6 +9587,7 @@ export default {
   "Plateau de l’Ossuaire d’argent": "Spielbrett des Silbernen Beinhauses",
   "Plateau de la Crypte aux lanternes": "Spielbrett der Laternenkrypta",
   "Plateau du Tombeau royal": "Spielbrett des Königsgrabs",
+  "Dos du Tombeau royal": "Rückseite des Königsgrabs",
 };
 
 export const names = {
