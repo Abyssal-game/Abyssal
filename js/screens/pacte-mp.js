@@ -51,7 +51,7 @@ export function createPacteMp(app, root, { modeBar }) {
   }
   function center(v, s) {
     const e = eng(s), val = PA.rowValue(e), risk = Math.round(PA.bustChance(e) * 100), fs = PA.rowFactions(e), nf = fs.size, mine = s.turn === v.me;
-    const seals = SEALS.map(([f, x, y]) => `<i class="pa-seal ${fs.has(f) ? 'on' : ''}" data-f="${f}" style="left:${(x / 4.5).toFixed(1)}%;top:${(y / 3.3).toFixed(1)}%;--fc:${cat.faction[f]?.colors.secondary || '#C9A45A'}">${sigil(f)}</i>`).join('');
+    const seals = SEALS.map(([f, x, y]) => `<i class="pa-seal ${fs.has(f) ? 'on' : ''}" data-f="${f}" style="left:${(x / 4.5).toFixed(1)}%;--sy:${y};--fc:${cat.faction[f]?.colors.secondary || '#C9A45A'}">${sigil(f)}</i>`).join('');
     const ban = banner ? `<div class="pa-ban">${banner.bust ? '<img class="pa-burn" alt="" src="assets/jeux/pa-brisure.webp">' : ''}<div class="mq-banner ${banner.cls}">${banner.html}</div></div>` : '';
     return `<div class="pa-parch">
       <div class="pa-row" style="--n:${Math.max(1, e.row.length)}">${e.row.length ? e.row.map((c) => cardHTML(v, c)).join('') : `<span class="pa-empty">${mine && v.status === 'playing' ? 'Tire ta première carte.' : '…'}</span>`}</div>

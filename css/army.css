@@ -9034,3 +9034,14 @@ html.reduce-motion :is(.chx-leak, .chx-beam, .chx-ring, .chx-fx) { display: none
 .dv.cb.cb2 .dv-top .cb-law.cb-more { padding: 0 8px; }
 .dv.cb.cb2 .dv-top .cb-law.cb-more > b { display: inline; font: 700 .72rem/1 var(--f-ui); color: var(--gold-hi); }
 .cb-rulesheet hr.cb-rulesep { border: 0; border-top: 1px solid rgba(201, 164, 90, .25); margin: 12px 0; }
+/* v893 : Pacte, tapis plus haut (450 × 430) qui occupe le vide sous le parchemin quand la hauteur le permet : zone des
+   cartes deux fois plus haute, cartes plus grandes ; sinon (petits écrans), l'ancien tapis 450 × 330 */
+.pa-seal[style*="--sy"] { top: calc(var(--sy) / 3.3 * 1%); }
+@container (max-aspect-ratio: 450 / 380) {
+  .pa-game .mq-table .pa-parch { aspect-ratio: 450 / 430; background-image: url(../assets/jeux/pa-table3.webp); width: min(100%, 100cqh * 450 / 430); }
+  .pa-game .mq-table .pa-parch .pa-row { top: 4.2%; height: 48.8%; }
+  .pa-game .mq-table .pa-parch .pa-card { width: min(84px, calc((100% - 4px * (var(--n) - 1)) / var(--n))); max-height: 92%; }
+  .pa-game .mq-table .pa-parch .pa-info { top: 92.4%; }
+  .pa-game .mq-table .pa-parch .pa-ban .pa-card.big { width: 86px; }
+  .pa-game .mq-table .pa-seal[style*="--sy"] { top: calc((var(--sy) + 100) / 4.3 * 1%); }
+}
