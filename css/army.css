@@ -9137,3 +9137,10 @@ html.reduce-motion :is(.chx-leak, .chx-beam, .chx-ring, .chx-fx) { display: none
 .cxs-t .cx-mat.cx-ep, .cxs-at-pic .cx-mat.cx-ep, .cs-mat.cs-ep, .cs-epb img { aspect-ratio: 7 / 6; object-fit: cover; }
 .cx-pv-en { width: min(100%, 340px); margin: 0 auto; }
 .cx-pv-en .en-onlot .en-lot img { display: block; width: 100%; aspect-ratio: 5 / 7; object-fit: cover; border-radius: 4px; }
+/* v910 : 4 salles des Enchères de plus (mesurées sur chaque image), plateaux de la Crypte de givre et des Rouages */
+.en-stage.ep-racines { background-image: url(../assets/encheres/ep-racines.webp); --lb: 57%; --pt: 55%; --px: 31%; --ct: 40%; --cx: 1%; }
+.en-stage.ep-rouages { background-image: url(../assets/encheres/ep-rouages.webp); --lb: 55.5%; --pt: 56%; --px: 31%; --ct: 42%; --cx: 1.5%; }
+.en-stage.ep-tombeau { background-image: url(../assets/encheres/ep-tombeau.webp); --lb: 59%; --pt: 50%; --px: 32%; --ct: 42%; --cx: 3%; }
+.en-stage.ep-dragon { background-image: url(../assets/encheres/ep-dragon.webp); --lb: 61.5%; --pt: 50%; --px: 31%; --ct: 40%; --cx: 1%; }
+.cr-game .cr-grid.cp-givre { border-image-source: url(../assets/cryptes/cp-givre.webp); border-image-slice: 90 92 93 92 fill; border-image-width: 24px 24px 24px 24px; }
+.cr-game .cr-grid.cp-rouages { border-image-source: url(../assets/cryptes/cp-rouages.webp); border-image-slice: 60 60 61 60 fill; border-image-width: 21px 21px 21px 21px; }

@@ -9677,6 +9677,14 @@ export default {
   "Joue 2 parties du Cercle de l’Abysse": "Play 2 games in the Abyss Circle",
   "Bon retour dans l’Abysse ! <b>Un booster premium</b> t’attend dans la boutique.": "Welcome back to the Abyss! <b>A premium booster</b> awaits you in the shop.",
   "Bon retour dans l’Abysse ! <b>Un booster</b> t’attend dans la boutique.": "Welcome back to the Abyss! <b>A booster</b> awaits you in the shop.",
+  "Salle du Dragon primordial": "Primordial Dragon Hall",
+  "Salle de la Forge sans Maître": "Masterless Forge Hall",
+  "Salle du Tombeau royal": "Royal Tomb Hall",
+  "Salle du Réveil des Racines": "Awakening Roots Hall",
+  "Plateau de la Crypte de givre": "Frost Crypt board",
+  "Plateau de la Crypte des Rouages": "Gearwork Crypt board",
+  "Dos de la Crypte de givre": "Frost Crypt back",
+  "Dos de la Crypte des Rouages": "Gearwork Crypt back",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

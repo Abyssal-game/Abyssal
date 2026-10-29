@@ -9664,6 +9664,14 @@ export default {
   "Joue 2 parties du Cercle de l’Abysse": "Gioca 2 partite del Circolo dell’Abisso",
   "Bon retour dans l’Abysse ! <b>Un booster premium</b> t’attend dans la boutique.": "Bentornato nell’Abisso! <b>Un booster premium</b> ti aspetta nel negozio.",
   "Bon retour dans l’Abysse ! <b>Un booster</b> t’attend dans la boutique.": "Bentornato nell’Abisso! <b>Un booster</b> ti aspetta nel negozio.",
+  "Salle du Dragon primordial": "Sala del Drago primordiale",
+  "Salle de la Forge sans Maître": "Sala della Forgia senza Maestro",
+  "Salle du Tombeau royal": "Sala della Tomba reale",
+  "Salle du Réveil des Racines": "Sala del Risveglio delle Radici",
+  "Plateau de la Crypte de givre": "Tavola della Cripta di brina",
+  "Plateau de la Crypte des Rouages": "Tavola della Cripta degli Ingranaggi",
+  "Dos de la Crypte de givre": "Dorso della Cripta di brina",
+  "Dos de la Crypte des Rouages": "Dorso della Cripta degli Ingranaggi",
 };
 
 export const names = {

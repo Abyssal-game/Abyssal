@@ -9665,6 +9665,14 @@ export default {
   "Joue 2 parties du Cercle de l’Abysse": "Spiele 2 Partien im Zirkel des Abgrunds",
   "Bon retour dans l’Abysse ! <b>Un booster premium</b> t’attend dans la boutique.": "Willkommen zurück im Abgrund! <b>Ein Premium-Booster</b> wartet im Laden auf dich.",
   "Bon retour dans l’Abysse ! <b>Un booster</b> t’attend dans la boutique.": "Willkommen zurück im Abgrund! <b>Ein Booster</b> wartet im Laden auf dich.",
+  "Salle du Dragon primordial": "Saal des Urdrachen",
+  "Salle de la Forge sans Maître": "Saal der Meisterlosen Schmiede",
+  "Salle du Tombeau royal": "Saal des Königsgrabs",
+  "Salle du Réveil des Racines": "Saal des Erwachens der Wurzeln",
+  "Plateau de la Crypte de givre": "Spielbrett der Frostkrypta",
+  "Plateau de la Crypte des Rouages": "Spielbrett der Zahnradkrypta",
+  "Dos de la Crypte de givre": "Rückseite der Frostkrypta",
+  "Dos de la Crypte des Rouages": "Rückseite der Zahnradkrypta",
 };
 
 export const names = {
