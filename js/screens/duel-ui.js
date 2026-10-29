@@ -925,6 +925,9 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
         case 'combo': float(e.u, `Chaîne ×${e.n}`, 'combo'); app.sfx.chain?.(); await wait(T(260)); if (!g.s.tips?.['cb-combo'] && !settling()) tuto(app, 'cb-combo'); break;
         case 'finisher': { if (st.over === 'won') break; if (!reduced) { const d = $('.dv'); d.classList.add('slowmo'); setTimeout(() => d.classList.remove('slowmo'), 700); } banner('Coup de grâce !', 'finisher', 800); app.sfx.finisher?.(); await wait(T(380)); break; }
         case 'die': {
+          /* v892 : une fois son animation jouée, la créature tombée quitte la liste d'attente : sinon, quand l'action enchaînait sur le
+             tour suivant (même liste d'événements), sa carte revenait à l'écran avec 0 PV jusqu'à la fin de l'action */
+          const downDone = (uid) => { pendingDown.delete(uid); draw(); };
           const u = st.units[e.u];
           if (u?.boss) {
             // mort d'un gardien : ralenti, le décor réagit, il se dissipe en cendres
@@ -937,16 +940,16 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
             if (reduced) el(e.u)?.classList.add('dying', 'ashes');
             banner(`Gardien vaincu : ${esc(uName(u))}`, 'finisher', 1500); /* v729 : neutre (« La Matriarche … est vaincu ») */
             bossSay('down'); /* v855 : sa dernière phrase, sans narrateur */
-            await wait(T(reduced ? 1100 : 1500)); d?.classList.remove('slowmo', 'bossfall', 'grace'); draw(); break;
+            await wait(T(reduced ? 1100 : 1500)); d?.classList.remove('slowmo', 'bossfall', 'grace'); downDone(e.u); break;
           }
-          if (u?.side === 'ally' && await allyDown(e.u, ev, ei)) { draw(); break; } /* v832 : la carte se grise sous la tête de mort, bandeau « Créature à terre », la réserve réagit */
+          if (u?.side === 'ally' && await allyDown(e.u, ev, ei)) { downDone(e.u); break; } /* v832 : la carte se grise sous la tête de mort, bandeau « Créature à terre », la réserve réagit */
           // coup fatal : le dernier ennemi tombe sous un coup allié → gros plan, une fois par combat
           if (u?.side === 'enemy' && st.over === 'won' && lastAtk && !fatalDone) { fatalDone = true; await closeup(lastAtk, e.u, 'Coup fatal', { crit: true, sub: '' }); }
           // ennemi K.O. : fissures et flash, la carte vole en éclats, les braises montent (planches Gemini, v256)
           deathFx(e.u);
-          if (u?.side === 'enemy' && await shatterFx(e.u)) { draw(); break; }
+          if (u?.side === 'enemy' && await shatterFx(e.u)) { downDone(e.u); break; }
           // la carte blanchit, se fissure, puis part en cendres (braises qui montent)
-          app.sfx.death(); fxAt(e.u, 'death', { big: true }); sparks(e.u, 'ember'); el(e.u)?.classList.add('dying', 'cracking'); await wait(T(640)); draw(); break;
+          app.sfx.death(); fxAt(e.u, 'death', { big: true }); sparks(e.u, 'ember'); el(e.u)?.classList.add('dying', 'cracking'); await wait(T(640)); downDone(e.u); break;
         }
         case 'enter': draw(); el(e.u)?.classList.add('enter'); await wait(T(340)); break;
         case 'revive': draw(); app.sfx.summon?.(); float(e.u, 'Relevée !', 'heal'); await wait(T(280)); break;
