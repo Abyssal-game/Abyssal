@@ -9673,6 +9673,11 @@ export default {
   "Plateau de la Crypte des Rouages": "Spielbrett der Zahnradkrypta",
   "Dos de la Crypte de givre": "Rückseite der Frostkrypta",
   "Dos de la Crypte des Rouages": "Rückseite der Zahnradkrypta",
+  "À la une": "Im Rampenlicht",
+  "{0} nouveaux": "{0} neu",
+  "{0} nouveau": "{0} neu",
+  "Seulement pour des cosmétiques": "Nur für Kosmetik",
+  "Accueil de l’Échoppe": "Start des Ladens",
 };
 
 export const names = {

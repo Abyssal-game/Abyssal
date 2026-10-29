@@ -199,30 +199,45 @@ export default function codexScreen(app, root) {
   const ownedOf = (it) => (it.kind === 'title' ? g.s.titles.includes(it.id) : it.season ? g.s[{ frame: 'frames', back: 'backs', sachet: 'sachets', plate: 'plates', emote: 'emotes', mat: 'mats', pboard: 'pboards', cboard: 'cboards', cback: 'cbacks', eboard: 'eboards', fond: 'fonds' }[it.kind]]?.includes(it.id) : g.catalogOwned(it.id));
   const RANKS = ['myth', 'leg', 'epic', 'rare'];
   
+  /* v912 (refonte de l'Échoppe, demande du propriétaire : « faire mieux au niveau esthétique et organisation ») :
+     accueil = solde + vitrine « À la une » + « Nouveautés » + rayons + Pack du Fondateur ; rayon = en-tête compact,
+     une seule rangée de filtres, vignettes en 2 colonnes pour les grands visuels, rareté portée par la couleur */
+  const SHOP_NEW = ['ep-dragon', 'ep-rouages', 'ep-tombeau', 'ep-racines', 'cp-givre', 'cd-givre', 'cp-rouages', 'cd-rouages', 'ep-parvis', 'ep-engloutie', 'ep-givre', 'ep-braise', 'cp-tombeau', 'cd-tombeau', 'pp-braise', 'pp-marees'];
+  const isNew = (id) => SHOP_NEW.includes(id);
+  const BIG2 = ['live', 'board', 'fond', 'sachet', 'plate', 'bundle'];
+  const bigPic = (it) => it.kind === 'back' ? `<img alt="" src="assets/backs/${it.id}.webp">`
+    : it.kind === 'mat' ? `<img alt="" src="assets/tapis/${it.id}.webp">`
+    : it.kind === 'pboard' ? `<img alt="" src="assets/pacte/${it.id}.webp">`
+    : it.kind === 'cboard' ? `<img alt="" src="assets/cryptes/${it.id}.webp">`
+    : it.kind === 'cback' ? `<img alt="" src="assets/cryptes/${it.id}.webp">`
+    : it.kind === 'eboard' ? `<img alt="" src="assets/encheres/${it.id}.webp">`
+    : it.kind === 'fond' ? `<img alt="" src="assets/fonds/${it.id}.webp">`
+    : it.kind === 'sachet' ? `<img alt="" src="assets/packs/${it.id}.webp">` : picOf(it, true);
   function shopTab() {
     const have = g.obs();
-    const tile = (it, wide = false) => { const own = g.catalogOwned(it.id), cost = g.catalogCost(it.id), r = rank(it), on = own && worn(it);
-      return `<button class="cxs-t r-${r} ${it.kind} ${own ? 'own' : ''} ${wide ? 'wide' : ''}" data-cx="see" data-id="${it.id}"><span class="cxs-pic">${picOf(it)}</span><span class="cxs-rk">${RANK[r]}</span><b>${esc(nameOf(it))}</b>
-        ${on ? `<span class="cxs-own on">${icon('check')}Équipé</span>` : own ? `<span class="cxs-own">${icon('check')}Possédé</span>` : `<span class="cxs-pr ${cost <= have ? '' : 'short'}">${obsTxt(cost)}</span>`}</button>`; };
-    const wallet = `<section class="cxs-wallet"><span class="cxs-w-n">${obsTxt(have)}</span><span class="small">${esc(OBS.name)} · seulement pour des cosmétiques</span>
+    const price = (it) => { const own = g.catalogOwned(it.id), on = own && worn(it), cost = g.catalogCost(it.id);
+      return on ? `<span class="cxs-own on">${icon('check')}Équipé</span>` : own ? `<span class="cxs-own">${icon('check')}Possédé</span>` : `<span class="cxs-pr ${cost <= have ? '' : 'short'}">${obsTxt(cost)}</span>`; };
+    const tile = (it) => { const own = g.catalogOwned(it.id), r = rank(it);
+      return `<button class="cxs-t ech-t r-${r} ${it.kind} ${own ? 'own' : ''}" data-cx="see" data-id="${it.id}" aria-label="${esc(nameOf(it))} · ${RANK[r]}">${isNew(it.id) && !own ? '<span class="ech-new-tag">Nouveau</span>' : ''}<span class="cxs-pic">${picOf(it)}</span><b>${esc(nameOf(it))}</b>${price(it)}</button>`; };
+    const wallet = `<section class="cxs-wallet ech-wallet">${opt('assets/ui/obs-2.webp', 'ech-w-art')}<span class="ech-w-t"><span class="cxs-w-n">${obsTxt(have)}</span><small>${esc(OBS.name)} · seulement pour des cosmétiques</small></span>
         <button class="btn small primary" data-cx="cat" data-v="obs">Obtenir</button></section>`;
     const inKind = (k) => CATALOG.filter((x) => aisleOf(kindOf(x)) === k);
+    const back = (title, sub = '', extra = '') => `<i class="ech-anchor"></i><header class="ech-head"><div class="ech-hrow"><button class="ech-back" data-cx="cat" data-v="" aria-label="Accueil de l’Échoppe">${icon('prev')}</button><span><h2>${title}</h2>${sub ? `<small>${sub}</small>` : ''}</span></div>${extra}</header>`; /* v912 : les filtres restent dans l'en-tête fixe */
     if (aisleOf(ui.cat) === 'board' && ui.cat !== 'board') { ui.sub = gameOf(ui.cat); ui.cat = 'board'; } /* lien direct vers un jeu (Personnaliser) */
     /* — un rayon — */
     if (ui.cat && ui.cat !== 'obs' && KINDS[ui.cat]) {
       const k = ui.cat, [label, , desc] = KINDS[k], all = inKind(k), owned = all.filter((x) => g.catalogOwned(x.id)).length;
       const rar = RANKS.includes(ui.rar) ? ui.rar : null, games = k === 'board' ? BOARD_GAMES.filter(([x]) => all.some((it) => gameOf(kindOf(it)) === x)) : [], sub = games.some(([x]) => x === ui.sub) ? ui.sub : null;
       const list = all.filter((x) => (!rar || rank(x) === rar) && (!sub || gameOf(kindOf(x)) === sub) && (!ui.hideOwned || !g.catalogOwned(x.id)));
-      const groups = RANKS.map((r) => [r, list.filter((x) => rank(x) === r).sort((a, b) => (g.catalogOwned(a.id) - g.catalogOwned(b.id)) || (b.cost - a.cost))]).filter(([, l]) => l.length);
-      const tabs = AISLES.filter((x) => inKind(x).length);
-      return `${wallet}
-        <nav class="cxs-nav" aria-label="Rayons"><button class="cxs-home" data-cx="cat" data-v="">${icon('prev')}Accueil</button>${tabs.map((x) => `<button class="cxs-cat ${x === k ? 'on' : ''}" data-cx="cat" data-v="${x}">${KINDS[x][0]}</button>`).join('')}</nav>
-        <section class="cxs-aisle"><h2>${label}</h2><p class="small muted">${desc}</p><p class="small cxs-cnt"><b>${owned} / ${all.length}</b> possédés</p>
-          ${games.length > 1 ? `<div class="cxs-filt cxs-games" role="group" aria-label="Jeu">${[[null, 'Tous les jeux'], ...games].map(([x, l]) => `<button class="chip" data-cx="sub" data-v="${x || ''}" aria-pressed="${sub === x}">${l}</button>`).join('')}</div>` : ''}
-          <div class="cxs-filt">${[[null, 'Toutes'], ...RANKS.map((r) => [r, RANK[r]])].filter(([r]) => !r || all.some((x) => rank(x) === r)).map(([r, l]) => `<button class="chip ${r ? `r-${r}` : ''}" data-cx="rar" data-v="${r || ''}" aria-pressed="${(rar || null) === r}">${l}</button>`).join('')}
-            <button class="chip" data-cx="hide" aria-pressed="${!!ui.hideOwned}">${icon('eye')}Masquer ce que j’ai</button></div></section>
-        ${k === 'board' && list.length ? games.filter(([x]) => !sub || x === sub).map(([x, n]) => [n, list.filter((it) => gameOf(kindOf(it)) === x).sort((a, b) => Object.keys(KINDS).indexOf(a.kind) - Object.keys(KINDS).indexOf(b.kind) || RANKS.indexOf(rank(a)) - RANKS.indexOf(rank(b)) || (g.catalogOwned(a.id) - g.catalogOwned(b.id)) || (b.cost - a.cost))]).filter(([, gl]) => gl.length).map(([n, gl]) => `<h3 class="cxs-gh cxs-game"><span>${n}</span><small>${gl.length}</small></h3><div class="cxs-grid board">${gl.map((x) => tile(x)).join('')}</div>`).join('') /* v896 : un groupe par jeu */
-          : groups.length ? groups.map(([r, l]) => `<h3 class="cxs-gh r-${r}"><span>${RANK[r]}</span><small>${l.length}</small></h3><div class="cxs-grid ${k === 'live' ? 'back' : k}">${l.map((x) => tile(x)).join('')}</div>`).join('')
+      const groups = RANKS.map((r) => [r, list.filter((x) => rank(x) === r).sort((a, b) => (g.catalogOwned(a.id) - g.catalogOwned(b.id)) || (isNew(b.id) - isNew(a.id)) || (b.cost - a.cost))]).filter(([, l]) => l.length);
+      const cols = BIG2.includes(k) ? 'two' : 'three';
+      const chips = [...(games.length > 1 ? [[null, 'Tous les jeux'], ...games].map(([x, l]) => `<button class="chip" data-cx="sub" data-v="${x || ''}" aria-pressed="${sub === x}">${l}</button>`) : []),
+        ...(games.length > 1 ? ['<span class="ech-sep" aria-hidden="true"></span>'] : []),
+        ...[[null, 'Toutes'], ...RANKS.map((r) => [r, RANK[r]])].filter(([r]) => !r || all.some((x) => rank(x) === r)).map(([r, l]) => `<button class="chip ${r ? `r-${r}` : ''}" data-cx="rar" data-v="${r || ''}" aria-pressed="${(rar || null) === r}">${r ? '<i class="ech-gem"></i>' : ''}${l}</button>`),
+        `<button class="chip ech-hide" data-cx="hide" aria-pressed="${!!ui.hideOwned}">${icon('eye')}Masquer ce que j’ai</button>`].join('');
+      return `${back(label, `<b>${owned} / ${all.length}</b> possédés`, `<div class="ech-flt" role="group" aria-label="Filtres">${chips}</div>`)}
+        ${k === 'board' && list.length ? games.filter(([x]) => !sub || x === sub).map(([x, n]) => [n, list.filter((it) => gameOf(kindOf(it)) === x).sort((a, b) => Object.keys(KINDS).indexOf(a.kind) - Object.keys(KINDS).indexOf(b.kind) || RANKS.indexOf(rank(a)) - RANKS.indexOf(rank(b)) || (g.catalogOwned(a.id) - g.catalogOwned(b.id)) || (b.cost - a.cost))]).filter(([, gl]) => gl.length).map(([n, gl]) => `<h3 class="cxs-gh cxs-game"><span>${n}</span><small>${gl.length}</small></h3><div class="cxs-grid ech-grid ${cols} board">${gl.map((x) => tile(x)).join('')}</div>`).join('') /* v896 : un groupe par jeu */
+          : groups.length ? groups.map(([r, l]) => `<h3 class="cxs-gh r-${r}"><span>${RANK[r]}</span><small>${l.length}</small></h3><div class="cxs-grid ech-grid ${cols} ${k === 'live' ? 'back' : k}">${l.map((x) => tile(x)).join('')}</div>`).join('')
           : `<p class="muted center cxs-none">${ui.hideOwned ? 'Tu as déjà tout ce rayon. Bravo !' : 'Rien ici pour l’instant.'}</p>`}`;
     }
     /* — les obsidiennes — */
@@ -233,25 +248,32 @@ export default function codexScreen(app, root) {
           ${it.desc ? `<small>${esc(it.desc)}</small>` : ''}</div>
           ${own ? `<span class="cxs-own">${icon('check')}Possédé</span>` : `<button class="btn primary small" data-cx="buy" data-id="${it.id}">${esc(priceOf(it))}</button>`}</article>`; };
       let obsI = 0;
-      return `${wallet}<nav class="cxs-nav"><button class="cxs-home" data-cx="cat" data-v="">${icon('prev')}Accueil</button></nav>
-        <section class="cxs-aisle"><h2>${esc(OBS.name)}</h2><p class="small muted">Elles ne servent qu’aux cosmétiques : rien ici ne rend tes créatures plus fortes.</p></section>
+      return `${back(esc(OBS.name), 'Seulement pour des cosmétiques')}
         <div class="cxs-euro" id="cx-euro">${SHOP.filter((it) => it.kind === 'obs').map((it) => euro(it, it.kind === 'obs' ? obsI++ : 0)).join('')}</div>
         ${payNote()}
         <button class="btn ghost block" data-cx="restore">Restaurer mes achats</button>
         <p class="small muted center">${onAndroid() ? 'Le paiement passe par ton compte Google Play. Les obsidiennes ne servent qu’aux cosmétiques.' : 'Le paiement passe par ton compte de l’App Store. Les obsidiennes ne servent qu’aux cosmétiques.'}</p>`;
     }
-    /* — l'accueil (v637 : sans vitrine ni nouveautés ; obsidiennes et Pack du Fondateur en tête, bien visibles) — */
-    const aisles = AISLES.filter((k) => inKind(k).length).map((k) => { const l = inKind(k), own = l.filter((x) => g.catalogOwned(x.id)).length;
+    /* — l'accueil — */
+    const aisleKeys = AISLES.filter((k) => inKind(k).length);
+    /* À la une : dans chaque rayon, un des plus beaux objets pas encore à toi (il change chaque semaine) */
+    const week = Math.floor(Date.now() / 6048e5);
+    const feat = aisleKeys.filter((k) => k !== 'bundle' && k !== 'emote').map((k, i) => { const l = inKind(k).filter((x) => !g.catalogOwned(x.id)); if (!l.length) return null;
+      const best = RANKS.find((r) => l.some((x) => rank(x) === r)), top = l.filter((x) => rank(x) === best); return [k, top[(week + i) % top.length]]; }).filter(Boolean);
+    const featCard = ([k, it]) => { const r = rank(it);
+      return `<button class="ech-feat r-${r} ${it.kind}" data-cx="see" data-id="${it.id}"><span class="ech-feat-pic">${bigPic(it)}</span>
+        <span class="ech-feat-t"><small class="ech-kick"><span>${RANK[r]}</span><span>${KINDS[k][0]}</span></small><b>${esc(nameOf(it))}</b>${price(it)}</span></button>`; };
+    const news = SHOP_NEW.map((id) => CATALOG.find((x) => x.id === id)).filter(Boolean);
+    const aisles = aisleKeys.map((k) => { const l = inKind(k), own = l.filter((x) => g.catalogOwned(x.id)).length, nw = l.filter((x) => isNew(x.id) && !g.catalogOwned(x.id)).length;
       const show = l.slice().sort((a, b) => RANKS.indexOf(rank(a)) - RANKS.indexOf(rank(b)))[0];
-      return `<button class="cxs-aisle-t k-${k}" data-cx="cat" data-v="${k}"><span class="cxs-at-pic">${picOf(show)}</span><b>${KINDS[k][0]}</b><small>${KINDS[k][2]}</small><span class="cxs-at-n">${own} / ${l.length}</span></button>`; }).join('');
+      return `<button class="cxs-aisle-t k-${k}" data-cx="cat" data-v="${k}">${nw ? `<span class="ech-new-tag">${nw} nouveau${nw > 1 ? 'x' : ''}</span>` : ''}<span class="cxs-at-pic">${picOf(show)}</span><b>${KINDS[k][0]}</b><small>${KINDS[k][2]}</small><span class="cxs-at-n">${own} / ${l.length}</span></button>`; }).join('');
     const fd = SHOP.find((x) => x.id === 'fondateur'), fdOwn = fd && g.shopOwned(fd.id);
-    const big = `<div class="cxs-bigs">
-        <button class="cxs-big k-obs" data-cx="cat" data-v="obs"><span class="cxs-big-pic">${[1, 2, 3, 4].map((n) => opt(`assets/ui/obs-${n}.webp`)).join('')}</span>
-          <span class="cxs-big-t"><b>${esc(OBS.name)}</b><small>De 100 à 2 800 · bonus offert sur les gros paquets</small></span><span class="cxs-big-go">${icon('next')}</span></button>
-        ${fd ? `<button class="cxs-big k-founder ${fdOwn ? 'own' : ''}" data-cx="founder">${opt('assets/ui/ech-fondateur2.webp', 'cxs-big-bg')}
-          <span class="cxs-big-t"><small class="cx-kick">Une seule fois</small><b>${esc(fd.name)}</b><small>${fdOwn ? `${icon('check')}Déjà à toi` : `Voir ce qu’il contient · ${esc(priceOf(fd))}`}</small></span><span class="cxs-big-go">${icon('next')}</span></button>` : ''}</div>`;
-    return `${wallet}${big}
-      <h3 class="cxs-sh">${icon('chest')}Les rayons</h3><div class="cxs-aisles">${aisles}</div>`;
+    return `${wallet}
+      ${feat.length ? `<h3 class="cxs-sh ech-sh">${icon('star')}À la une</h3><div class="ech-une" data-rail="une">${feat.map(featCard).join('')}</div>` : ''}
+      ${news.length ? `<h3 class="cxs-sh ech-sh">${icon('sparkle')}Nouveautés</h3><div class="ech-news" data-rail="new">${news.map((it) => tile(it)).join('')}</div>` : ''}
+      <h3 class="cxs-sh ech-sh">${icon('chest')}Les rayons</h3><div class="cxs-aisles">${aisles}</div>
+      ${fd ? `<div class="cxs-bigs ech-founder"><button class="cxs-big k-founder ${fdOwn ? 'own' : ''}" data-cx="founder">${opt('assets/ui/ech-fondateur2.webp', 'cxs-big-bg')}
+          <span class="cxs-big-t"><small class="cx-kick">Une seule fois</small><b>${esc(fd.name)}</b><small>${fdOwn ? `${icon('check')}Déjà à toi` : `Voir ce qu’il contient · ${esc(priceOf(fd))}`}</small></span><span class="cxs-big-go">${icon('next')}</span></button></div>` : ''}`;
   }
 
   /* v911 (« la fenêtre Acheter est pénible quand on regarde un objet ») : la barre d'achat du bas se range quand on fait
@@ -467,11 +489,11 @@ export default function codexScreen(app, root) {
       if (k === 'jump') { ui.cat = 'obs'; draw(); return; }
       if (k === 'founder') { app.sfx.tap?.(); founder(); return; } /* v637 */
       if (k === 'sub') { ui.sub = b.dataset.v || null; app.sfx.tap?.(); return draw(); } /* v896 */
-      if (k === 'cat') { ui.cat = b.dataset.v || null; ui.rar = null; ui.sub = null; app.sfx.tap?.(); draw(); root.querySelector('.cxs-wallet')?.scrollIntoView({ block: 'start' }); return; }
+      if (k === 'cat') { ui.cat = b.dataset.v || null; ui.rar = null; ui.sub = null; app.sfx.tap?.(); draw(); (root.querySelector('.ech-anchor') || root.querySelector('.cxs-wallet'))?.scrollIntoView({ block: 'start' }); return; } /* v912 : en haut du rayon */
       if (k === 'rar') { ui.rar = b.dataset.v || null; app.sfx.tap?.(); return draw(); } /* v636 */
       if (k === 'hide') { ui.hideOwned = !ui.hideOwned; app.sfx.tap?.(); return draw(); }
       if (k === 'see') { /* v484, v636 : on passe d'un objet à l'autre dans le rayon ouvert */
-        const it = CATALOG.find((x) => x.id === b.dataset.id); const ids = it ? [...root.querySelectorAll('[data-cx="see"]')].map((x) => x.dataset.id).filter((v, i, a) => a.indexOf(v) === i) : null;
+        const it = CATALOG.find((x) => x.id === b.dataset.id); const ids = it ? [...(b.closest('[data-rail]') || root).querySelectorAll('[data-cx="see"]')].map((x) => x.dataset.id).filter((v, i, a) => a.indexOf(v) === i) : null;
         preview(it || b.dataset.id, ids); return; }
       if (k === 'seez') { const tr = tiersOf(g.codex().season)[+b.dataset.t - 1]; const l = seasonItems(tr?.prem, +b.dataset.t, true); if (l.length) preview(l[0], l); return; } /* v640 : toutes les récompenses du palier */
       if (k === 'seel') { const l = ui.loot || []; if (l[+b.dataset.i]) preview(l[+b.dataset.i], l); return; } /* v640 : vitrine de la saison */

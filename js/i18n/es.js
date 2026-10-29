@@ -9673,6 +9673,11 @@ export default {
   "Plateau de la Crypte des Rouages": "Tablero de la Cripta de los Engranajes",
   "Dos de la Crypte de givre": "Dorso de la Cripta de escarcha",
   "Dos de la Crypte des Rouages": "Dorso de la Cripta de los Engranajes",
+  "À la une": "Destacados",
+  "{0} nouveaux": "{0} nuevos",
+  "{0} nouveau": "{0} nuevo",
+  "Seulement pour des cosmétiques": "Solo para cosméticos",
+  "Accueil de l’Échoppe": "Inicio del Bazar",
 };
 
 export const names = {

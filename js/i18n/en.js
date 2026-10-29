@@ -9685,6 +9685,11 @@ export default {
   "Plateau de la Crypte des Rouages": "Gearwork Crypt board",
   "Dos de la Crypte de givre": "Frost Crypt back",
   "Dos de la Crypte des Rouages": "Gearwork Crypt back",
+  "À la une": "Featured",
+  "{0} nouveaux": "{0} new",
+  "{0} nouveau": "{0} new",
+  "Seulement pour des cosmétiques": "For cosmetics only",
+  "Accueil de l’Échoppe": "Emporium home",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

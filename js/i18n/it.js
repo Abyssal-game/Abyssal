@@ -9672,6 +9672,11 @@ export default {
   "Plateau de la Crypte des Rouages": "Tavola della Cripta degli Ingranaggi",
   "Dos de la Crypte de givre": "Dorso della Cripta di brina",
   "Dos de la Crypte des Rouages": "Dorso della Cripta degli Ingranaggi",
+  "À la une": "In evidenza",
+  "{0} nouveaux": "{0} nuovi",
+  "{0} nouveau": "{0} nuovo",
+  "Seulement pour des cosmétiques": "Solo per i cosmetici",
+  "Accueil de l’Échoppe": "Home della Bottega",
 };
 
 export const names = {
