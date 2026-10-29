@@ -1,7 +1,7 @@
 // v470 : ÉBAUCHE du pass de saison (« Le Codex de l'Abîme ») et de la boutique en argent réel (« L'Échoppe »).
 // v680 : ouverts à tous le premier jour de la Saison I (1er décembre 2026) ; les achats en euros passent par l'App Store
 // (js/iap.js, RevenueCat) et sont vérifiés par le serveur. Avant l'ouverture : aperçu Créateur, achats simulés.
-import { iapStatus, IAP_WHY, iapBuy, iapRestore, priceOf } from '../iap.js'; /* v680 */
+import { iapStatus, IAP_WHY, iapBuy, iapRestore, priceOf, onAndroid } from '../iap.js'; /* v680 */
 import { CODEX, CODEX_XP, CODEX_XP_LABEL, tiersOf, seasonByKey, CODEX_FRAMES, CODEX_BACKS, FINISHES, PLATES, EMOTES, SACHETS, TAPIS, PBOARDS, CBOARDS, CBACKS, EBOARDS, FONDS, SHOP, CATALOG, OBS, codexTier, tierProgress, claimable, freshCodex, SEASONS } from '../core/codex.js';
 import { FRAMES } from '../config.js';
 import { CHESTS } from '../core/descent.js';
@@ -238,7 +238,7 @@ export default function codexScreen(app, root) {
         <div class="cxs-euro" id="cx-euro">${SHOP.filter((it) => it.kind === 'obs').map((it) => euro(it, it.kind === 'obs' ? obsI++ : 0)).join('')}</div>
         ${payNote()}
         <button class="btn ghost block" data-cx="restore">Restaurer mes achats</button>
-        <p class="small muted center">Le paiement passe par ton compte de l’App Store. Les obsidiennes ne servent qu’aux cosmétiques.</p>`;
+        <p class="small muted center">${onAndroid() ? 'Le paiement passe par ton compte Google Play. Les obsidiennes ne servent qu’aux cosmétiques.' : 'Le paiement passe par ton compte de l’App Store. Les obsidiennes ne servent qu’aux cosmétiques.'}</p>`;
     }
     /* — l'accueil (v637 : sans vitrine ni nouveautés ; obsidiennes et Pack du Fondateur en tête, bien visibles) — */
     const aisles = AISLES.filter((k) => inKind(k).length).map((k) => { const l = inKind(k), own = l.filter((x) => g.catalogOwned(x.id)).length;

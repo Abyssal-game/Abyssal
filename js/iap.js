@@ -22,9 +22,11 @@ export function iapStatus() {
   if (!cloud.isLoggedIn()) return 'login';
   return 'ok';
 }
+/* v908 : sur Android, le magasin est Google Play (Google refuse une app qui renvoie vers l'App Store) */
+export const onAndroid = () => cap()?.getPlatform?.() === 'android';
 export const IAP_WHY = {
   web: 'Les achats se font dans l’application ABYSSAL (App Store).',
-  'old-app': 'Mets l’application à jour depuis l’App Store pour acheter.',
+  get 'old-app'() { return onAndroid() ? 'Mets l’application à jour depuis Google Play pour acheter.' : 'Mets l’application à jour depuis l’App Store pour acheter.'; },
   closed: 'Les achats ouvrent bientôt.',
   login: 'Connecte-toi à ton compte pour acheter.',
 };
@@ -70,13 +72,13 @@ export async function iapBuy(app, id) {
   const it = SHOP.find((x) => x.id === id);
   await loadPrices();
   const prod = products[it?.store];
-  if (!prod) throw new Error('Cet article n’est pas disponible sur l’App Store pour l’instant. Réessaie plus tard.');
+  if (!prod) throw new Error(onAndroid() ? 'Cet article n’est pas disponible sur Google Play pour l’instant. Réessaie plus tard.' : 'Cet article n’est pas disponible sur l’App Store pour l’instant. Réessaie plus tard.');
   lsSet(PENDING, '1'); /* si l'app se ferme avant la vérification, on la refait au prochain lancement */
   try { await P().purchaseStoreProduct({ product: prod }); }
   catch (e) {
     if (e?.userCancelled || String(e?.code) === '1') { lsSet(PENDING, null); return null; }
     lsSet(PENDING, null);
-    throw new Error(`Achat impossible : ${e?.message || 'erreur de l’App Store'}.`);
+    throw new Error(e?.message ? `Achat impossible : ${e.message}.` : onAndroid() ? 'Achat impossible : erreur de Google Play.' : 'Achat impossible : erreur de l’App Store.');
   }
   try { return await claim(app); }
   catch (e) { throw new Error('Ton achat est bien payé : il sera ajouté dès que le serveur l’aura vérifié (au prochain lancement ou avec « Restaurer mes achats »).'); }
