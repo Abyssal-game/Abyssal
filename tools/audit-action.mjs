@@ -32,7 +32,8 @@ const SCENES = {
   async combat(p) {
     await p.evaluate(() => { const g = window.__abyssal.game; g.setSetting('defense', 'auto'); g.setSetting('combatFast', true); g.setTeam(g.autoTeam()); g.startRun(); const run = g.s.descent.run; if (run.phase === 'omen') g.chooseOmen(run.omenOffer[0]); g.startBattle('fight'); location.hash = '#/aventure'; });
     await p.waitForTimeout(400); await p.evaluate(() => { location.hash = '#/descente'; }); await p.waitForTimeout(1800);
-    return { step: () => p.evaluate(() => { const e = document.querySelector('.dv-c.enemy:not(.dead)'); if (e) e.click(); }),
+    let k = 0; /* change de cible à chaque geste : un ennemi protégé refuse les coups */
+    return { step: () => p.evaluate((i) => { const es = [...document.querySelectorAll('.dv-c.enemy:not(.dead)')]; if (es.length) es[i % es.length].click(); }, k++),
       over: () => p.evaluate(() => !window.__abyssal.game.s.descent.run?.battle || !!window.__abyssal.game.s.descent.run.battle.over), max: 260, wait: 450 };
   },
   async sceaux(p) {
