@@ -1,7 +1,7 @@
 // Service worker d'ABYSSAL : l'application et les données sont mises en cache
 // pour fonctionner hors ligne après une première visite. Incrémenter VERSION à
 // chaque publication pour que les joueurs reçoivent la mise à jour.
-const VERSION = 'abyssal-v904';
+const VERSION = 'abyssal-v905';
 const ART_CACHE = 'abyssal-media';  // images du jeu : gardées entre les versions
 const FONT_CACHE = 'abyssal-fonts';
 const CORE = [
@@ -32,7 +32,7 @@ const CORE = [
   // tous les effets de combat (v305 : crit.webp du « Coup fatal » manquait hors ligne → carré « ? » sur iPhone)
   ...['boost', 'break', 'burst', 'collapse', 'crit', 'curse', 'd20', 'd20-crit', 'd20-fumble', 'death', 'dodge', 'fervor', 'frost', 'fx-duo', 'fx-enrage', 'fx-explode', 'fx-rune', 'heal', 'iceshatter', 'impact', 'kill-crack', 'kill-embers', 'kill-shatter', 'parry', 'prey', 'role-claw', 'strike', 'foe-strike', 'crit-strike', 'role-frost', 'role-heal', 'role-mark', 'role-shock', 'role-venom', 'role-wave', 'seal', 'shield', 'slash', 'swallow', 'syn-beam', 'taunt', 'ult-seal', 'venom', 'fx-parry', 'fx-break', 'fx-dodge', 'fx-venom', 'fx-shield', 'fx-taunt', 'fx-boost', 'fx-curse', 'fx-iceshatter', 'fx-prey', 'fx-collapse', 'fx-swallow', 'ult-sceau', 'ult-revive', 'ult-nova', 'ult-smite', 'ult-aegis', 'dice-ring', 'dice-charge', 'dice-perfect', 'dice-land', 'circle-infernal', 'circle-abyssal', 'circle-celeste', 'circle-sauvage', 'circle-necrotique', 'circle-primordial', 'circle-artificiel', 'sk-estoc', 'sk-contagion', 'sk-entrave', 'sk-marque', 'sk-raz', 'sk-rempart', 'sk-priere', 'def-ring', 'def-clash'].map((k) => `assets/fx/${k}.webp`),
   ...['salle', 'salle-artificiel', 'salle-celeste', 'salle-necrotique', 'salle-abyssal', 'plateau2', 'case', 'dos', 'benie', 'maudite', 'rival2-initie', 'rival2-collectionneur', 'rival2-stratege', 'rival2-maitre', 'rival2-echo', 'rival2-banquier', 'rival2-archiviste', 'rival2-souverain', 'salle-pacte', 'salle-cryptes', 'salle-encheres'].map((k) => `assets/sceaux/${k}.webp`),
-  ...['cr-plateau', 'cr-dos', 'cr-paire', 'pa-table2', 'pa-sceau', 'pa-gardien', 'pa-offrande', 'pa-presage', 'pa-malediction', 'pa-pioche', 'pa-defi', 'pa-brisure', 'en-salle', 'en-jeton', 'kc-jeton2', 'sh-jeton', 'en-malediction', 'en-marteau'].map((k) => `assets/jeux/${k}.webp`),
+  ...['cr-plateau2', 'cr-dos2', 'cr-paire', 'pa-table2', 'pa-sceau', 'pa-gardien', 'pa-offrande', 'pa-presage', 'pa-malediction', 'pa-pioche', 'pa-defi', 'pa-brisure', 'en-salle', 'en-jeton', 'kc-jeton2', 'sh-jeton', 'en-malediction', 'en-marteau'].map((k) => `assets/jeux/${k}.webp`),
   'assets/pacte/pp-cuir.webp', /* v895 : plateau du Pacte d'origine */
   ...['infernal', 'abyssal-3', 'celeste-3', 'sauvage-3', 'necrotique-3', 'primordial-3', 'artificiel-3'].map((k) => `assets/realms/${k}.webp`),
   ...['devoreur', 'matriarche', 'roi', 'architecte', 'eclipse', 'essaim', 'bourreau', 'choeur', 'chaines', 'horloge', 'miroirs', 'golem', 'peste', 'chasseur', 'voeux', 'titan', 'jumeaux', 'juge', 'bete', 'abysse', 'jumeaux-nuit', 'abysse-2'].map((k) => `assets/bosses/${k}.webp`),

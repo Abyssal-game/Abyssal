@@ -106,7 +106,7 @@ export default function cryptesScreen(app, root) {
   const face = (c) => { const card = c.id && cat.get(c.id), cursed = (g.s.cryptes.cur?.curse || []).includes(c.k); return `<img alt="" src="${card ? artUrl(card, { lite: true }) : 'assets/sceaux/dos.webp'}"><span class="cr-f" style="--fc:${cat.faction[c.f].colors.secondary}">${sigil(c.f)}</span>${cursed ? '<span class="cr-curse" title="Paire maudite"><img alt="" src="assets/icons/maudite.webp"></span>' : ''}`; }; /* v492 : marque des paires maudites */
   function grid(st) {
     const pick = st.pending && st.turn === 'p';
-    const cb = CBOARDS[app.game.s.cboard] ? ` cb ${app.game.s.cboard}` : '', back = CBACKS[app.game.s.cback] ? `assets/cryptes/${app.game.s.cback}.webp` : 'assets/jeux/cr-dos.webp'; /* v898 : plateau et dos choisis */
+    const cb = CBOARDS[app.game.s.cboard] ? ` cb ${app.game.s.cboard}` : '', back = CBACKS[app.game.s.cback] ? `assets/cryptes/${app.game.s.cback}.webp` : 'assets/jeux/cr-dos2.webp'; /* v898 : plateau et dos choisis */
     return `<div class="cr-grid${cb} ${pick ? 'picking' : ''}">${st.cards.map((c, i) => {
       if (c.gone && !ui.up.has(i)) return `<span class="cr-c gone g-${c.gone}"></span>`;
       const up = st.open.includes(i) || ui.up.has(i);

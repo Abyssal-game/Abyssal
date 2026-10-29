@@ -3974,7 +3974,7 @@ body:not(.battle-mode) .btn.small { min-height: 44px; }
 
 /* v464 : Les Cryptes habillées (images Gemini) : sol de crypte au cadre de runes (border-image, tranches mesurées par
    tools/jeux-art.py), cartes posées dans des niches, dos de pierre tombale, flammes violettes autour d'une paire trouvée */
-.cr-game .cr-grid { gap: 7px 6px; padding: 4px 2px; background: none; border-radius: 0; border-style: solid; border-width: 36px 26px 38px 27px; border-image: url(../assets/jeux/cr-plateau.webp) 94 66 98 70 fill / 36px 26px 38px 27px round; filter: drop-shadow(0 10px 18px rgba(0, 0, 0, .7)); }
+.cr-game .cr-grid { gap: 7px 6px; padding: 4px 2px; background: none; border-radius: 0; border-style: solid; border-width: 36px 26px 38px 27px; border-image: url(../assets/jeux/cr-plateau2.webp) 94 66 98 70 fill / 36px 26px 38px 27px round; filter: drop-shadow(0 10px 18px rgba(0, 0, 0, .7)); }
 .cr-game .cr-c { overflow: visible; border: 0; border-radius: 4px; background: transparent; box-shadow: 0 0 0 1px rgba(150, 110, 60, .55), 0 0 0 3px rgba(10, 8, 12, .85), 0 6px 10px rgba(0, 0, 0, .7); }
 .cr-game .cr-c > img { border-radius: 4px; }
 .cr-game .cr-c.up { box-shadow: 0 0 0 2px #C9A45A, 0 6px 12px rgba(0, 0, 0, .7); }
@@ -9121,3 +9121,5 @@ html.reduce-motion :is(.chx-leak, .chx-beam, .chx-ring, .chx-fx) { display: none
   .pa-game .pa-pss::-webkit-scrollbar { display: none; }
   .pa-game .pa-ps { flex: none; font-size: .66rem; padding: 2px 7px; }
 }
+/* v905 : plateau d'origine des Cryptes refait sans runes (crypte de pierre aux bougies, cr-plateau2.webp, 512 de large) */
+.cr-game .cr-grid { border-image-source: url(../assets/jeux/cr-plateau2.webp); border-image-slice: 74 79 74 79 fill; border-image-width: 20px 21px 20px 21px; border-image-repeat: stretch; }

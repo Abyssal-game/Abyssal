@@ -379,7 +379,7 @@ export default function codexScreen(app, root) {
       if (o.kind === 'sachet') return `<p class="pv2-cap">Dans la boutique des boosters (au choix : standard ou premium)</p><div class="cx-pv-packs">${['standard', 'premium'].map((t) => packHTML(t, null, { skin: L.sachet || null })).join('')}</div>`;
       if (o.kind === 'mat') return `<p class="pv2-cap">Ton plateau des Duels des Sceaux</p>${board(L.mat)}`;
       if (o.kind === 'pboard') return `<p class="pv2-cap">Ta table du Pacte</p><img class="pv2-pp" alt="" src="assets/pacte/${PBOARDS[L.pboard] ? L.pboard : 'pp-cuir'}.webp">`;
-      if (o.kind === 'cboard' || o.kind === 'cback') { const bk = CBACKS[L.cback] ? `assets/cryptes/${L.cback}.webp` : 'assets/jeux/cr-dos.webp'; /* v898 : plateau et dos ensemble */
+      if (o.kind === 'cboard' || o.kind === 'cback') { const bk = CBACKS[L.cback] ? `assets/cryptes/${L.cback}.webp` : 'assets/jeux/cr-dos2.webp'; /* v898 : plateau et dos ensemble */
         return `<p class="pv2-cap">Ta table des Cryptes</p><div class="cr-game cx-pv-cr"><div class="cr-grid${CBOARDS[L.cboard] ? ` cb ${L.cboard}` : ''}">${Array.from({ length: 20 }, () => `<span class="cr-c"><img alt="" src="${bk}"></span>`).join('')}</div></div>`; }
       if (o.kind === 'emote') return `<p class="pv2-cap">Chez ton adversaire, pendant une partie en ligne</p><div class="pv2-emote-scene">${seatMock(L)}<div class="re-bubble demo on">${emoteHTML(o.id)}<small>${esc(myName())}</small></div></div>`;
       if (o.give?.emotes) return `<p class="pv2-cap">Les réactions du lot</p><div class="re-grid">${o.give.emotes.map((k) => `<span class="re-pick">${emoteHTML(k)}</span>`).join('')}</div>`;
