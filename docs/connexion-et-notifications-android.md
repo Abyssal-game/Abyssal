@@ -62,3 +62,17 @@ majuscules) et le nouveau **`supabase/22-tableau-de-bord.sql`** (Mode Créateur 
 Elle apparaît après le 1er, le 3e et le 10e gardien vaincu, ou au fond de l'Abysse, au plus 3 fois et à 45 jours
 d'écart. Apple décide lui-même s'il l'affiche (jamais dans une app lancée depuis Xcode de façon fiable, et sur TestFlight
 elle ne fait rien : c'est normal) ; elle ne marche vraiment que dans l'app de l'App Store et du Play Store.
+
+---
+
+## Quand le propriétaire écrit « j'ai le Mac » (liste à lui redonner, dans l'ordre)
+1. GitHub Desktop → Fetch origin → Pull.
+2. Terminal : `cd ~/Documents/GitHub/Abyssal && npm install && node tools/build-www.mjs && npx cap sync ios && npx cap open ios`
+   (`npm install` obligatoire : nouveaux modules SocialLogin et InAppReview depuis la v917).
+3. Xcode : cible **App** → **Signing & Capabilities** → **+ Capability** → **Sign in with Apple** (réglage local, ne pas
+   envoyer `project.pbxproj` ni le fichier `.entitlements` dans GitHub, comme l'équipe de signature).
+4. Vérifier que le build passe (▶ sur l'iPhone) : boutons Apple / Google cachés tant que `SOCIAL.apple` est faux.
+5. Me dire « Apple est prêt » → je passe `SOCIAL.apple` à `true` (le bouton Google iPhone s'allume avec, règle 4.8),
+   puis reconstruire (étapes 1, 2, ▶).
+6. Pour la 1.2 (quand le propriétaire choisit d'attendre ou de retirer la 1.1) : ouvrir l'Échoppe (`CODEX.shopFrom`),
+   site `--echoppe`, Product → Archive, joindre les 6 achats, notes de `store/fiche.md`, confidentialité « Historique d'achats ».
