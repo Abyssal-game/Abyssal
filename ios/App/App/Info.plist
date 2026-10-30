@@ -61,5 +61,18 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>google-sign-in</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.1017321596932-vnqbkrgij3gf99csles3kdh95aovjmqm</string>
+			</array>
+		</dict>
+	</array>
+	<key>GIDClientID</key>
+	<string>1017321596932-vnqbkrgij3gf99csles3kdh95aovjmqm.apps.googleusercontent.com</string>
 </dict>
 </plist>

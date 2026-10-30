@@ -16,7 +16,8 @@ export function socialProviders() {
   if (!plugin()) return [];
   const out = [];
   if (os() === 'ios' && SOCIAL.apple) out.push('apple');
-  if (SOCIAL.google?.web && (os() === 'android' || (os() === 'ios' && SOCIAL.google.ios))) out.push('google');
+  /* règle 4.8 d'Apple : sur iPhone, Google seulement si « Continuer avec Apple » est proposé aussi */
+  if (SOCIAL.google?.web && (os() === 'android' || (os() === 'ios' && SOCIAL.google.ios && SOCIAL.apple))) out.push('google');
   return out;
 }
 
