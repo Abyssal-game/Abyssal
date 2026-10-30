@@ -9245,3 +9245,6 @@ html.fx-light .pa-crack { filter: none; }
 .soc .soc-b[disabled] { opacity: .6; }
 .soc-or { display: flex; align-items: center; gap: 10px; margin: 2px 0 0; }
 .soc-or::before, .soc-or::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,.14); }
+
+/* v918 : socle des ennemis sans veines de sang (le propriétaire : « c'est pas beau du tout ») : obsidienne seule */
+.dv.cb.cb2 .dv-row.enemy::before { background-image: url(../assets/ui/cb-socle-foe2.webp); }
