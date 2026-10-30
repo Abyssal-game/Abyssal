@@ -69,8 +69,8 @@ export default function settings(app, root) {
       <!-- v699 : le combat juste après la langue (réglage le plus utilisé) ; les ambiances repliées -->
       <section class="panel stack">
         <h2>Combat</h2>
-        ${seg('defense', 'Défense active en combat', [['on', 'Manuelle'], ['auto', 'Automatique']])}
-        <p class="small muted set-note">Manuelle : chaque attaque ennemie se défend sur la barre, coup par coup (enchaînements, feintes, coups chargés) ; sur le trait blanc, c’est une parade parfaite. Automatique : rien à toucher, mais seulement 7 esquives sur 10 et jamais de parade parfaite (moins de Ferveur et de PA).</p>
+        ${seg('defense', 'Défense active en combat', [['on', 'Manuelle'], ['auto', 'Automatique (accessibilité)']])}
+        <p class="small muted set-note">Manuelle : chaque attaque ennemie se défend sur la barre, coup par coup (enchaînements, feintes, coups chargés) ; sur le trait blanc, c’est une parade parfaite. Automatique : une aide d’accessibilité, pour qui ne peut pas faire le geste. Rien à toucher, mais 7 esquives sur 10 seulement et jamais de parade parfaite : le jeu devient nettement plus dur.</p>
         ${seg('decor', 'Décor des combats', [['riche', 'Riche'], ['sobre', 'Sobre']])}
         <p class="small muted set-note">Sobre : la salle reste en place, sans particules ni flammes qui vacillent. Plus reposant, et un peu plus économe en batterie.</p>
         ${seg('quality', 'Effets des combats', [['auto', 'Complets'], ['light', 'Allégés']])}

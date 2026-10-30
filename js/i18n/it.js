@@ -9687,6 +9687,9 @@ export default {
   "Connexion indisponible sur cet appareil.": "Accesso non disponibile su questo dispositivo.",
   "La connexion n’a pas abouti. Réessaie.": "L’accesso non è riuscito. Riprova.",
   "Parties en ligne, défis et amis": "Partite online, sfide e amici",
+  "Automatique (accessibilité)": "Automatica (accessibilità)",
+  "Manuelle : chaque attaque ennemie se défend sur la barre, coup par coup (enchaînements, feintes, coups chargés) ; sur le trait blanc, c’est une parade parfaite. Automatique : une aide d’accessibilité, pour qui ne peut pas faire le geste. Rien à toucher, mais {0} esquives sur {1} seulement et jamais de parade parfaite : le jeu devient nettement plus dur.": "Manuale: ogni attacco nemico si difende sulla barra, colpo per colpo (combinazioni, finte, colpi caricati); sulla linea bianca è una parata perfetta. Automatica: un aiuto per l’accessibilità, per chi non può fare il gesto. Niente da toccare, ma solo {0} schivate su {1} e mai una parata perfetta: il gioco diventa molto più difficile.",
+  "Astuce défense : ne touche pas trop tôt. Attends que le curseur entre dans la <b>zone d’or</b> pour esquiver ; le <b>trait blanc</b>, tout au bout, donne une parade parfaite. Chaque touche réussie retire sa part de dégâts.": "Consiglio di difesa: non toccare troppo presto. Aspetta che il cursore entri nella <b>zona dorata</b> per schivare; la <b>linea bianca</b>, proprio alla fine, dà una parata perfetta. Ogni tocco riuscito toglie la sua parte di danni.",
 };
 
 export const names = {

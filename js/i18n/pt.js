@@ -9687,6 +9687,9 @@ export default {
   "Connexion indisponible sur cet appareil.": "Login indisponível neste aparelho.",
   "La connexion n’a pas abouti. Réessaie.": "O login não deu certo. Tente de novo.",
   "Parties en ligne, défis et amis": "Partidas online, desafios e amigos",
+  "Automatique (accessibilité)": "Automática (acessibilidade)",
+  "Manuelle : chaque attaque ennemie se défend sur la barre, coup par coup (enchaînements, feintes, coups chargés) ; sur le trait blanc, c’est une parade parfaite. Automatique : une aide d’accessibilité, pour qui ne peut pas faire le geste. Rien à toucher, mais {0} esquives sur {1} seulement et jamais de parade parfaite : le jeu devient nettement plus dur.": "Manual: cada ataque inimigo é defendido na barra, golpe a golpe (encadeamentos, fintas, golpes carregados); na linha branca, é um aparo perfeito. Automática: uma ajuda de acessibilidade, para quem não consegue fazer o gesto. Nada para tocar, mas apenas {0} esquivas em {1} e nunca um aparo perfeito: o jogo fica bem mais difícil.",
+  "Astuce défense : ne touche pas trop tôt. Attends que le curseur entre dans la <b>zone d’or</b> pour esquiver ; le <b>trait blanc</b>, tout au bout, donne une parade parfaite. Chaque touche réussie retire sa part de dégâts.": "Dica de defesa: não toques cedo demais. Espera que o cursor entre na <b>zona dourada</b> para esquivar; a <b>linha branca</b>, mesmo no fim, dá um aparo perfeito. Cada toque certeiro retira a sua parte do dano.",
 };
 
 export const names = {

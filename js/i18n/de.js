@@ -9688,6 +9688,9 @@ export default {
   "Connexion indisponible sur cet appareil.": "Anmeldung auf diesem Gerät nicht verfügbar.",
   "La connexion n’a pas abouti. Réessaie.": "Die Anmeldung hat nicht geklappt. Versuch es noch einmal.",
   "Parties en ligne, défis et amis": "Online-Partien, Herausforderungen und Freunde",
+  "Automatique (accessibilité)": "Automatisch (Barrierefreiheit)",
+  "Manuelle : chaque attaque ennemie se défend sur la barre, coup par coup (enchaînements, feintes, coups chargés) ; sur le trait blanc, c’est une parade parfaite. Automatique : une aide d’accessibilité, pour qui ne peut pas faire le geste. Rien à toucher, mais {0} esquives sur {1} seulement et jamais de parade parfaite : le jeu devient nettement plus dur.": "Manuell: Jeder gegnerische Angriff wird auf dem Balken abgewehrt, Schlag für Schlag (Ketten, Finten, aufgeladene Schläge); auf der weißen Linie ist es eine perfekte Parade. Automatisch: eine Hilfe zur Barrierefreiheit, für alle, die die Geste nicht ausführen können. Nichts zu tippen, aber nur {0} Ausweichen von {1} und nie eine perfekte Parade: Das Spiel wird deutlich schwerer.",
+  "Astuce défense : ne touche pas trop tôt. Attends que le curseur entre dans la <b>zone d’or</b> pour esquiver ; le <b>trait blanc</b>, tout au bout, donne une parade parfaite. Chaque touche réussie retire sa part de dégâts.": "Abwehr-Tipp: Tippe nicht zu früh. Warte, bis der Zeiger in die <b>goldene Zone</b> kommt, um auszuweichen; die <b>weiße Linie</b> ganz am Ende ergibt eine perfekte Parade. Jedes gelungene Tippen nimmt seinen Anteil am Schaden weg.",
 };
 
 export const names = {

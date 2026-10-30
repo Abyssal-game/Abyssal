@@ -9700,6 +9700,9 @@ export default {
   "Connexion indisponible sur cet appareil.": "Sign-in is not available on this device.",
   "La connexion n’a pas abouti. Réessaie.": "Sign-in didn’t go through. Try again.",
   "Parties en ligne, défis et amis": "Online games, challenges and friends",
+  "Automatique (accessibilité)": "Automatic (accessibility)",
+  "Manuelle : chaque attaque ennemie se défend sur la barre, coup par coup (enchaînements, feintes, coups chargés) ; sur le trait blanc, c’est une parade parfaite. Automatique : une aide d’accessibilité, pour qui ne peut pas faire le geste. Rien à toucher, mais {0} esquives sur {1} seulement et jamais de parade parfaite : le jeu devient nettement plus dur.": "Manual: every enemy attack is defended on the bar, hit by hit (combos, feints, charged hits); on the white line, it’s a perfect parry. Automatic: an accessibility aid, for those who can’t perform the gesture. Nothing to tap, but only {0} dodges out of {1} and never a perfect parry: the game becomes much harder.",
+  "Astuce défense : ne touche pas trop tôt. Attends que le curseur entre dans la <b>zone d’or</b> pour esquiver ; le <b>trait blanc</b>, tout au bout, donne une parade parfaite. Chaque touche réussie retire sa part de dégâts.": "Defense tip: don’t tap too early. Wait for the cursor to enter the <b>gold zone</b> to dodge; the <b>white line</b>, at the very end, gives a perfect parry. Each successful tap removes its share of the damage.",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {

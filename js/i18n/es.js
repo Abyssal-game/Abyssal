@@ -9688,6 +9688,9 @@ export default {
   "Connexion indisponible sur cet appareil.": "Inicio de sesión no disponible en este dispositivo.",
   "La connexion n’a pas abouti. Réessaie.": "No se pudo iniciar sesión. Vuelve a intentarlo.",
   "Parties en ligne, défis et amis": "Partidas en línea, desafíos y amigos",
+  "Automatique (accessibilité)": "Automática (accesibilidad)",
+  "Manuelle : chaque attaque ennemie se défend sur la barre, coup par coup (enchaînements, feintes, coups chargés) ; sur le trait blanc, c’est une parade parfaite. Automatique : une aide d’accessibilité, pour qui ne peut pas faire le geste. Rien à toucher, mais {0} esquives sur {1} seulement et jamais de parade parfaite : le jeu devient nettement plus dur.": "Manual: cada ataque enemigo se defiende en la barra, golpe a golpe (encadenamientos, fintas, golpes cargados); en la línea blanca, es una parada perfecta. Automática: una ayuda de accesibilidad, para quien no puede hacer el gesto. Nada que tocar, pero solo {0} esquivas de cada {1} y nunca una parada perfecta: el juego se vuelve mucho más difícil.",
+  "Astuce défense : ne touche pas trop tôt. Attends que le curseur entre dans la <b>zone d’or</b> pour esquiver ; le <b>trait blanc</b>, tout au bout, donne une parade parfaite. Chaque touche réussie retire sa part de dégâts.": "Consejo de defensa: no toques demasiado pronto. Espera a que el cursor entre en la <b>zona dorada</b> para esquivar; la <b>línea blanca</b>, al final del todo, da una parada perfecta. Cada toque acertado quita su parte del daño.",
 };
 
 export const names = {

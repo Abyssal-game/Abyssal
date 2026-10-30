@@ -1253,7 +1253,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
           else if (bigK && def0) { const shot = await castFx(s.a, `${def0.name} !`, { ic: intentIcon(s.kind), foe: true }); if (!shot && (s.kind === 'heavy' || s.kind === 'blast')) banner(`${intentIcon(s.kind)} ${esc(def0.name)} !`, 'danger', 700); preShown = s.a; } } /* v871 : le coup s'annonce avant la défense, plus après */
         res = await defenseQTE(s);
         // v331 : après 3 défenses ratées dans l'expédition, on rappelle qu'il existe une défense assistée ou automatique (une seule fois)
-        if (res === 'none') { run.defMiss = (run.defMiss || 0) + 1; if (run.defMiss >= 3 && !g.s.tips?.['def-help']) { g.s.tips = { ...(g.s.tips || {}), 'def-help': Date.now() }; toast('Les défenses sont difficiles ? Dans <b>Réglages → Jeu</b>, tu peux choisir la défense <b>automatique</b> (7 esquives sur 10, sans parade).', { icon: 'info', ms: 8000 }); } }
+        if (res === 'none') { run.defMiss = (run.defMiss || 0) + 1; if (run.defMiss >= 3 && !g.s.tips?.['def-help']) { g.s.tips = { ...(g.s.tips || {}), 'def-help': Date.now() }; toast('Astuce défense : ne touche pas trop tôt. Attends que le curseur entre dans la <b>zone d’or</b> pour esquiver ; le <b>trait blanc</b>, tout au bout, donne une parade parfaite. Chaque touche réussie retire sa part de dégâts.', { icon: 'info', ms: 9000 }); /* v929 : un conseil de geste, plus la défense automatique (gardée pour l’accessibilité) */ } }
       }
       if (!alive_) return;
       acting = s.a; drawTimeline();
