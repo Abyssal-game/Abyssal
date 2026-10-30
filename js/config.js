@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v920'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v921'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -73,7 +73,7 @@ export const IAP_KEY = { ios: 'appl_MDPGtxYAssEAbwJfuGfKeZqbjeM', android: null 
 /* v917 : notifications du serveur sur Android (Firebase). v920 : plus petit numéro de build Android qui contient le fichier
    google-services.json (secret GitHub GOOGLE_SERVICES_JSON, posé le 30 octobre 2026) ; une application plus ancienne, sans
    Firebase, se fermerait à l'inscription : elle ne s'inscrit pas (0 = jamais). */
-export const PUSH_ANDROID = 920;
+export const PUSH_ANDROID = 0; /* v921 : le build 920 a été construit sans le secret (vide) : éteint jusqu'au prochain build qui le contient */
 /* v917 : « Continuer avec Apple / Google » (js/social.js), dans l'application seulement. Apple : à passer à true quand
    le fournisseur Apple est activé dans Supabase et la capacité « Sign in with Apple » ajoutée dans Xcode (iPhone seulement).
    Google : identifiants publics des clients OAuth de Google Cloud (web : celui donné à Supabase ; ios : client iOS) ;
