@@ -32,3 +32,6 @@ jobs:
       - name: Publier la fonction « push » (notifications, v693)
         if: env.SUPABASE_ACCESS_TOKEN != ''
         run: supabase functions deploy push --project-ref zwyxnrvvctanzsssyirm --use-api --no-verify-jwt
+      - name: Publier la fonction « apple » (lien Apple coupé à la suppression du compte, v925)
+        if: env.SUPABASE_ACCESS_TOKEN != ''
+        run: supabase functions deploy apple --project-ref zwyxnrvvctanzsssyirm --use-api --no-verify-jwt

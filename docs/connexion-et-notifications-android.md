@@ -76,3 +76,14 @@ elle ne fait rien : c'est normal) ; elle ne marche vraiment que dans l'app de l'
    puis reconstruire (étapes 1, 2, ▶).
 6. Pour la 1.2 (quand le propriétaire choisit d'attendre ou de retirer la 1.1) : ouvrir l'Échoppe (`CODEX.shopFrom`),
    site `--echoppe`, Product → Archive, joindre les 6 achats, notes de `store/fiche.md`, confidentialité « Historique d'achats ».
+
+---
+
+## F. Couper le lien Apple à la suppression du compte (v925, à faire avant d'envoyer la 1.2)
+1. developer.apple.com → Account → **Certificates, Identifiers & Profiles** → **Keys** → **+**.
+2. Key Name : `ABYSSAL Sign in with Apple` ; cocher **Sign in with Apple** → **Configure** → Primary App ID
+   `com.abyssalgame.abyssal` → Save → Continue → **Register**.
+3. **Download** (une seule fois possible) : fichier `AuthKey_XXXXXXXXXX.p8` ; noter le **Key ID** (10 caractères).
+4. Supabase → Edge Functions → Secrets : `APPLE_SIWA_KEY` = tout le texte du fichier .p8 ; `APPLE_SIWA_KEY_ID` = le Key ID.
+   (`APNS_TEAM_ID` est déjà posé.) Puis supprimer le fichier .p8 de l'appareil.
+5. Supabase → SQL Editor : coller `supabase/23-apple.sql` → Run.

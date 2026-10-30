@@ -251,6 +251,10 @@ export const mpFriendRecord = async (game) => (await rpc('mp_friend_record', { p
 export async function reportPseudo(target, reason) {
   return authed('/rest/v1/rpc/report_pseudo', { method: 'POST', body: { p_target: target, p_reason: reason } });
 }
+/* v925 : jeton « Sign in with Apple » gardé par la fonction serveur « apple » (supabase/functions/apple), rendu à Apple
+   quand le joueur supprime son compte (règle 5.1.1(v) d'Apple). Sans effet si la fonction n'est pas encore publiée. */
+export const appleStore = (code) => authed('/functions/v1/apple', { method: 'POST', body: { action: 'store', code } });
+export const appleRevoke = () => authed('/functions/v1/apple', { method: 'POST', body: { action: 'revoke' } });
 export async function deleteAccount() {
   await authed('/rest/v1/rpc/delete_my_account', { method: 'POST', body: {} });
   setSession(null);

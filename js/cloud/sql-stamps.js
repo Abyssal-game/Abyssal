@@ -44,6 +44,10 @@ export const SQL_STAMPS = {
     "file": "22-tableau-de-bord.sql",
     "stamp": "de66d14d05c3"
   },
+  "23": {
+    "file": "23-apple.sql",
+    "stamp": "5a2e93e60c14"
+  },
   "05": {
     "file": "05-tirage.sql",
     "stamp": "f221529b32d6"

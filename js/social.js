@@ -51,5 +51,9 @@ export async function socialLogin(provider) {
   } catch (e) { if (cancelled(e)) return null; throw e; }
   const idToken = r?.result?.idToken;
   if (!idToken) throw new Error('La connexion n’a pas abouti. Réessaie.');
-  return cloud.signInIdToken(provider, idToken, raw);
+  const u = await cloud.signInIdToken(provider, idToken, raw);
+  /* v925 : le code d'autorisation d'Apple part au serveur, qui garde de quoi couper le lien si le compte est supprimé */
+  const code = provider === 'apple' ? (r?.result?.authorizationCode || r?.result?.accessToken?.token || '') : '';
+  if (code) cloud.appleStore(code).catch(() => {});
+  return u;
 }

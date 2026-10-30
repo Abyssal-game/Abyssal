@@ -237,7 +237,7 @@ export default function account(app, root) {
     async delete() {
       if (!(await confirmBox('Supprimer définitivement ton compte, ton profil, ta sauvegarde en ligne et tes scores ?', { ok: 'Supprimer', danger: true }))) return;
       if (!(await confirmBox('Dernière confirmation : cette action est irréversible.', { ok: 'Oui, supprimer', danger: true }))) return;
-      try { await cloud.deleteAccount(); wipeLocal(); toast('Compte supprimé.', { icon: 'trash' }); } catch (err) { toast(esc(err.message), { kind: 'error' }); }
+      try { await cloud.appleRevoke().catch(() => {}); /* v925 : couper d'abord le lien avec Apple */ await cloud.deleteAccount(); wipeLocal(); toast('Compte supprimé.', { icon: 'trash' }); } catch (err) { toast(esc(err.message), { kind: 'error' }); }
       render();
     },
   });

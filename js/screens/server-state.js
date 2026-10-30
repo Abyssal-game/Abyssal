@@ -30,6 +30,7 @@ const FILES = [
   { n: '19', file: '19-cadeaux.sql', what: 'Cadeaux non repris en recréant un compte' }, /* v796 */
   { n: '21', file: '21-parrainage.sql', what: 'Parrainage', test: R('parrain_list') }, /* v917 */
   { n: '22', file: '22-tableau-de-bord.sql', what: 'Tableau de bord du créateur', test: R('createur_stats') }, /* v917 */
+  { n: '23', file: '23-apple.sql', what: 'Connexion Apple : lien coupé à la suppression du compte', test: T('apple_tokens?select=user_id&limit=0') }, /* v925 */
 ];
 /* une réponse d'erreur qui prouve que l'objet existe (exception levée, accès refusé) ou qu'il manque */
 const present = (r) => r.ok || r.code === 'P0001' || r.code === '42501' || (r.status === 400 && !/^(PGRST20[0-9]|42P01|42883|42703)$/.test(r.code));
