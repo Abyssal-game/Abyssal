@@ -47,11 +47,11 @@ export function initNative({ suspendAudio, resumeAudio } = {}) {
 
 // Export de la sauvegarde : dans l'application, on passe par le menu Partager du téléphone
 // (Enregistrer dans Fichiers, Drive, e-mail…). Renvoie false hors application.
-export async function shareFile(name, text) {
+export async function shareFile(name, text, title = 'Sauvegarde ABYSSAL') {
   const Filesystem = plugin('Filesystem'), Share = plugin('Share');
   if (!isNative() || !Filesystem || !Share) return false;
   const { uri } = await Filesystem.writeFile({ path: name, data: text, directory: 'CACHE', encoding: 'utf8' });
-  try { await Share.share({ title: 'Sauvegarde ABYSSAL', files: [uri] }); }
+  try { await Share.share({ title, files: [uri] }); }
   catch (e) { if (!/cancel/i.test(String(e?.message || e))) throw e; }
   return true;
 }

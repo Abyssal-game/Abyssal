@@ -12,6 +12,8 @@ import { sfx, audioInfo } from '../ui/sound.js'; /* v622 */
 import { openServerState } from './server-state.js'; /* v678 */
 import { openDashboard } from './dashboard.js'; /* v917 */
 import { perfOn, setPerf, perfLog, perfClear, perfReport } from '../ui/perf.js'; /* v601 */
+import { clogOn, setClog, clogList, clogClear, clogText } from '../ui/combat-log.js'; /* v927 */
+import { shareFile } from '../native.js';
 import { partieErrs, partie } from '../cloud/partie.js'; /* v740 */
 import { openPack } from './opening.js'; /* v769 */
 import { playEnding, playPrologue, CINE_SCENES } from './ending.js';
@@ -119,6 +121,9 @@ export function openCreator(app) {
       ${S('Moniteur de fluidité', `${P('Allumé, chaque combat est suivi image par image : compteur d’images par seconde en haut à gauche, chaque saccade notée avec ce que le combat faisait, et le délai entre tes touchers et l’écran. Joue quelques combats, puis copie le rapport.')}
         <p class="small">${perfOn() ? '<b class="dc-good">Allumé</b>' : 'Éteint'} · ${perfLog().length} combat(s) relevé(s)${perfLog()[0] ? ` · dernier : ${perfLog()[0].fps} i/s, ${perfLog()[0].nHitch} saccade(s)` : ''}</p>
         ${row(B('perf', perfOn() ? 'Éteindre le moniteur' : 'Allumer le moniteur', perfOn() ? '' : 'gold'), B('perfcopy', 'Copier le rapport'), perfLog().length ? B('perfclear', 'Effacer les relevés') : '')}`)}
+      ${S('Enregistreur de combats', `${P('Allumé, chaque combat est noté coup par coup : ton équipe et les ennemis (niveaux, PV, ATQ), chaque action, chaque lancer de dé, chaque défense touche par touche (trop tôt, trop tard, en millisecondes), les dégâts donnés et reçus, les PV à chaque tour. À la fin de chaque combat : difficulté ressentie et abus possibles. Joue autant de combats que tu veux, puis envoie-moi le fichier. Un petit «&nbsp;●&nbsp;REC&nbsp;» rouge s’affiche pendant les combats enregistrés.')}
+        <p class="small">${clogOn() ? '<b class="dc-good">Allumé</b>' : 'Éteint'} · ${clogList().length} combat(s) enregistré(s)${clogList()[0]?.sum?.level ? ` · dernier : ${esc(clogList()[0].sum.level)}` : ''}</p>
+        ${row(B('clog', clogOn() ? 'Éteindre l’enregistreur' : 'Allumer l’enregistreur', clogOn() ? '' : 'gold'), clogList().length ? B('clogsend', `${icon('upload')}Envoyer le fichier`, 'gold') : '', clogList().length ? B('clogcopy', 'Copier le résumé') : '', clogList().length ? B('clogclear', 'Effacer') : '')}`)}
       ${S('État du serveur', `${P('Vérifie ce qui est installé sur Supabase et dit quels fichiers SQL coller ou recoller.')}${row(B('srv', 'Vérifier le serveur'))}`)}
       ${S('Son', `${P((() => { const a = audioInfo(); return `Son : ${esc(a.state)} · ${a.samples}${a.expected != null ? `/${a.expected}` : ''} sons chargés · session ${esc(String(a.session))}${a.enabled ? '' : ' · coupé dans les réglages'}${a.diag.failGet || a.diag.failDecode || a.diag.err ? ` · échecs lecture ${a.diag.failGet}, décodage ${a.diag.failDecode}${a.diag.err ? ` · ${esc(a.diag.err)}` : ''}` : ''}`; })())}${row(B('sndtest', 'Tester le son'))}`)}`;
   }
@@ -233,6 +238,26 @@ export function openCreator(app) {
       if (x === 'sndtest') { app.applySettings(); sfx.victory?.(); setTimeout(draw, 900); return; } /* v622 */
       if (x === 'perf') { setPerf(!perfOn()); toast(perfOn() ? 'Moniteur allumé : lance un combat.' : 'Moniteur éteint.', { icon: 'check' }); return draw(); } /* v601 */
       if (x === 'perfclear') { perfClear(); return draw(); }
+      if (x === 'clog') { setClog(!clogOn()); toast(clogOn() ? 'Enregistreur allumé : lance des combats.' : 'Enregistreur éteint.', { icon: 'check' }); return draw(); } /* v927 */
+      if (x === 'clogclear') { if (!(await confirmBox('Effacer tous les combats enregistrés ?', { ok: 'Effacer', danger: true }))) return; clogClear(); return draw(); }
+      if (x === 'clogsend' || x === 'clogcopy') {
+        const list = clogList(), resume = clogText(list);
+        if (x === 'clogcopy') {
+          try { await navigator.clipboard.writeText(resume); toast('Résumé copié : colle-le dans la conversation.', { kind: 'success', icon: 'check' }); }
+          catch (er) { openSheet(`<h3>Résumé des combats</h3><textarea class="input plain" style="width:100%;height:50vh" readonly>${esc(resume)}</textarea>`); }
+          return;
+        }
+        const st = g.s.settings || {};
+        const file = JSON.stringify({ app: 'ABYSSAL', kind: 'combats', version: VERSION, at: new Date().toISOString(), device: navigator.userAgent, screen: `${innerWidth}x${innerHeight}@${devicePixelRatio}`, settings: { defense: st.defense || 'on', fast: st.combatFast || 0, quality: st.quality || 'full' }, resume: resume.split('\n'), combats: list });
+        const name = `abyssal-combats-${new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-')}.json`;
+        try {
+          if (await shareFile(name, file, 'Combats ABYSSAL')) return;
+          const f = typeof File !== 'undefined' ? new File([file], name, { type: 'application/json' }) : null;
+          if (f && navigator.canShare?.({ files: [f] })) { await navigator.share({ files: [f], title: 'Combats ABYSSAL' }); return; }
+          const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([file], { type: 'application/json' })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+        } catch (er) { if (!/abort|cancel/i.test(String(er?.message || er))) toast(esc(er.message || 'Envoi impossible.'), { kind: 'error' }); }
+        return;
+      }
       if (x === 'errcopy') {
         const txt = `Journal du serveur · ${VERSION}\n` + (partieErrs().map((e) => `${new Date(e.t).toISOString()} ${e.m} : ${e.e}`).join('\n') || 'Rien de refusé.');
         try { await navigator.clipboard.writeText(txt); toast('Journal copié : colle-le dans la conversation avec Claude.', { kind: 'success', icon: 'check' }); }

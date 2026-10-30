@@ -37,6 +37,7 @@ import { BOSS_LINES } from '../core/voices.js';
 import { playBar, stampHost, defVerdict, FAM_RHYTHM, KIND_RHYTHM, BOSS_ASSAULT } from '../ui/def-bar.js'; /* v594 */
 import { getTune } from '../ui/def-tune.js';
 import { perfStart, perfStop, perfMark } from '../ui/perf.js'; /* v601 : moniteur de fluidité */
+import { clogStart, clogWrap, clogEnd, clogHit, clogDice, clogDefInfo } from '../ui/combat-log.js'; /* v927 : enregistreur de combats (Mode Créateur) */
 /* v716 : carte de combat peinte de chaque gardien (assets/bosses/combat-<clé>.webp, tools/boss-card.py) : remplace le fond et la figure qui déborde */
 const BOSS_CARD = new Set(['devoreur', 'matriarche', 'roi', 'architecte', 'eclipse', 'essaim', 'bourreau', 'choeur', 'chaines', 'horloge', 'miroirs', 'golem', 'peste', 'chasseur', 'voeux', 'titan', 'jumeaux', 'jumeaux-nuit', 'juge', 'bete', 'abysse', 'abysse-2']);
 
@@ -73,7 +74,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   app.state.lastEnemyTurn = null; /* v729 : le dernier tour ennemi d'un ancien combat ne s'affiche plus */
   const where = run.lab ? 'lab' : run.trial ? 'trial' : 'run';
   perfStart(`${where === 'lab' ? 'Labo' : where === 'trial' ? 'Épreuve' : 'Descente'} · étage ${run.floor || '?'}${run.room === 'boss' || st.bossKey ? ` · gardien ${st.bossKey || ''}` : run.room === 'elite' ? ' · élite' : ''}`);
-  const E = engine || g; /* v595 : le banc d'essai du Labo joue sur son propre combat (js/core/lab.js), hors sauvegarde et serveur */ /* v540 : chaque coup passe par le jeu (g.duel…) : le serveur de partie rejoue le combat */
+  let E = engine || g; /* v595 : le banc d'essai du Labo joue sur son propre combat (js/core/lab.js), hors sauvegarde et serveur */ /* v540 : chaque coup passe par le jeu (g.duel…) : le serveur de partie rejoue le combat */
   const ui = (app.state.duel ||= { fast: 0 });
   ui.fast = g.s.settings.combatFast ? 1 : 0; // v331 : bouton ×2 de retour (étude joueurs : un combat ≈ 1,2 min) ; la défense active garde son rythme
   const reduced = app.reduced();
@@ -85,6 +86,13 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   const light = g.s.settings?.quality === 'light'; // v374 : « Effets allégés » (Réglages) pour les téléphones qui peinent
   const T = (ms) => (reduced ? Math.min(ms, 80) : ui.fast === 3 ? ms * 0.25 : ui.fast ? ms * 0.45 : ms); // vitesse ×1, ×2 ou ×3
   const defMode = g.s.settings?.defense === 'auto' ? 'auto' : 'on'; // v269 : manuelle ou automatique (v333 : mode « assistée » retiré, il redevient manuel)
+  /* v927 : enregistreur de combats (allumé dans le Mode Créateur) : chaque appel au moteur est noté, rien ne change dans le combat */
+  try {
+    clogStart(st, { where, floor: run.floor, room: run.room, title: String(title || ''), rule: run.day && !run.trial && !run.lab ? g.rule(run.day)?.key : undefined,
+      omen: run.omen || undefined, nightmare: run.nightTier || undefined, cursed: run.cursed || undefined, veille: run.veille || undefined,
+      gap: Math.round(gapOf(st) * 100) / 100, defMode, fast: ui.fast, light: g.s.settings?.quality === 'light' || undefined });
+    E = clogWrap(E, st);
+  } catch (e) { /* l'enregistreur ne bloque jamais un combat */ }
   let alive_ = true, busy = false, sel = null, mode = null; // mode : action en attente de cible
   let holdT = null, held = false; // appui long sur une action : sa description (v249, plus de fenêtre de confirmation)
   const ctl = new AbortController();
@@ -1069,7 +1077,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     (st.over === 'won' ? (st.bossKey ? app.sfx.bossvictory : app.sfx.victory) : app.sfx.defeat)();
     $('.dv').insertAdjacentHTML('beforeend', `<div class="cb-end cb-end2 ${st.over === 'won' ? 'won' : 'lost'}"><div class="cb-end-in"><img class="cb-end-em" alt="" src="assets/ui/cb-${st.over === 'won' ? 'victoire' : 'defaite'}.webp"><b>${st.over === 'won' ? 'Victoire' : 'Défaite'}</b></div></div>`); /* v826 : médailles peintes de fin de combat */
     await wait(T(st.over === 'won' ? 850 : 1200));
-    if (alive_) { alive_ = false; musicMood('normal'); perfStop(); ctl.abort(); dio.destroy(); document.body.classList.remove('battle-mode'); onEnd(); }
+    if (alive_) { alive_ = false; clogEnd(st); musicMood('normal'); perfStop(); ctl.abort(); dio.destroy(); document.body.classList.remove('battle-mode'); onEnd(); }
   }
 
   // ——— Défense active ———
@@ -1116,6 +1124,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
         ov.removeEventListener('pointerdown', press); removeEventListener('pointerup', release); removeEventListener('pointercancel', release);
         const gap = v === null ? 9 : Math.abs(v - TGT);
         const bonus = gap <= PERF ? RHYTHM.perfect : gap <= GOOD ? RHYTHM.good : 0;
+        clogDice({ bonus, gap: v === null ? null : Math.round(gap * 1000) / 1000, held: v === null ? 0 : Math.round(performance.now() - t0) });
         ov.classList.remove('hold', 'near', 'hot'); ov.classList.add(bonus === RHYTHM.perfect ? 'perfect' : bonus ? 'good' : 'miss', 'thrown');
         die.style.translate = '';
         res.textContent = bonus === RHYTHM.perfect ? `Parfait ! +${bonus}` : bonus ? `Bien ! +${bonus}` : v === null ? 'Lancé au hasard' : 'Raté';
@@ -1193,7 +1202,8 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
     const tEls = s.kind === 'blast' || intentInfo(st, e)?.aoe ? front(st, 'ally').map((u) => el(u.uid)) : [el(realT)];
     el(s.a)?.classList.add('aim'); tEls.forEach((x) => x?.classList.add('aimed'));
     const def = INTENTS[s.kind] || INTENTS.hit;
-    const out = await playBar({ mid: $('.dv-mid'), dv: $('.dv'), letters: [...q], tier: e?.boss ? 'boss' : e?.elite ? 'elite' : 'normal',
+    clogDefInfo({ seq: q, assault: title ? true : undefined, tier: e?.boss ? 'boss' : e?.elite ? 'elite' : undefined });
+    const out = await playBar({ onResult: clogHit, mid: $('.dv-mid'), dv: $('.dv'), letters: [...q], tier: e?.boss ? 'boss' : e?.elite ? 'elite' : 'normal',
       win: () => defenseWindow(st, s.a, s.t, T), beat, titleHTML: `${intentIcon(s.kind)} ${esc(title || `${def.name} !`)}`,
       reduced, alive: () => alive_, setTap: (f) => { defTap = f; }, sfx: app.sfx, hap, T });
     el(s.a)?.classList.remove('aim'); tEls.forEach((x) => x?.classList.remove('aimed'));
@@ -1236,7 +1246,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       logEvents(skips);
       if (skips.length) await play(skips);
       let res = 'none';
-      if (s.qte && defMode === 'auto') res = Math.random() < 0.4 ? 'dodge' : 'none'; // automatique : 40 % d'esquives, jamais de parade
+      if (s.qte && defMode === 'auto') { res = Math.random() < 0.4 ? 'dodge' : 'none'; clogDefInfo({ auto: true }); } // automatique : 40 % d'esquives, jamais de parade
       else if (s.qte && defMode !== 'off') {
         /* v558 : un conseil court à la première rencontre de chaque geste (tipFor), à la place du long texte cb-defense4 */
         if (!alive_) return;
@@ -1614,5 +1624,5 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       draw(); if (!guide) tips();
     });
   }
-  return { stop() { alive_ = false; stopVoice(); musicMood('normal'); perfStop(); ctl.abort(); dio.destroy(); document.body.classList.remove('battle-mode'); } };
+  return { stop() { alive_ = false; clogEnd(st, 'quitté'); stopVoice(); musicMood('normal'); perfStop(); ctl.abort(); dio.destroy(); document.body.classList.remove('battle-mode'); } };
 }
