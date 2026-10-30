@@ -1159,11 +1159,11 @@ export class Game {
     st.nextQte = s ? { a: s.a, qte: !!s.qte } : null;
     return s ? { s, skips: takeSkips(st) } : null;
   }
-  duelEnemy(where, a, res = 'none') {
-    const st = this.duelState(where), q = st.nextQte;
-    const d = q && q.a === a && q.qte && (res === 'dodge' || res === 'parry') ? res : 'none'; // une défense seulement sur un coup qui se défend
+  duelEnemy(where, a, res = 'none', hits = null) {
+    const st = this.duelState(where), q = st.nextQte, ok = q && q.a === a && q.qte;
+    const d = ok && (res === 'dodge' || res === 'parry') ? res : 'none'; // une défense seulement sur un coup qui se défend
     st.nextQte = null;
-    const ev = enemyAct(st, a, d);
+    const ev = enemyAct(st, a, d, ok ? hits : null); /* v928 : la séquence touche par touche (P, E, x) décide, quand l'écran l'envoie */
     this.persist();
     return ev;
   }

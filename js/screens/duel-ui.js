@@ -17,7 +17,7 @@ import { tuto } from '../ui/tutos.js';
 import { cardHTML } from '../ui/card.js';
 import {
   BOSS_POWERS, FORBID, INTENTS, SYNERGIES, PACK_BONUS, FERVOR_MAX, DUO_FERVOR, AP_MAX, PA_MAX, passTurn, speedOf, front, reserve, FRONT, actionsFor, actionTargets, act, preview,
-  ENTRANCES, GOALS, goalState, RUNES, runesLeft, SERVANT_POWER, RHYTHM, PHASE2, beginEnemyTurn, nextEnemy, enemyAct, endEnemyTurn, takeSkips, defenseWindow, intentInfo, useUlt, ultReady, autoActs, comboOf,
+  ENTRANCES, GOALS, goalState, RUNES, runesLeft, SERVANT_POWER, RHYTHM, PHASE2, beginEnemyTurn, nextEnemy, enemyAct, endEnemyTurn, takeSkips, defenseWindow, intentInfo, useUlt, ultReady, autoActs, comboOf, defOutcome,
 } from '../core/duel.js';
 import { KITS, AI_FAMILIES, DICE_TIERS, WEAK_TO, TALENTS } from '../core/skills.js';
 import { BOSSES, LAWS, ASPECTS } from '../core/bosses.js';
@@ -34,7 +34,8 @@ import { hap, haptic } from '../ui/sound.js';
 import { speak, stopVoice } from '../ui/voice.js'; /* v794 : voix */
 import { musicMood } from '../ui/music.js';
 import { BOSS_LINES } from '../core/voices.js';
-import { playBar, stampHost, defVerdict, FAM_RHYTHM, KIND_RHYTHM, BOSS_ASSAULT } from '../ui/def-bar.js'; /* v594 */
+import { seqOf } from '../core/def-seq.js';
+import { playBar, stampHost, defVerdict, defHits, FAM_RHYTHM, KIND_RHYTHM, BOSS_ASSAULT } from '../ui/def-bar.js'; /* v594 */
 import { getTune } from '../ui/def-tune.js';
 import { perfStart, perfStop, perfMark } from '../ui/perf.js'; /* v601 : moniteur de fluidité */
 import { clogStart, clogWrap, clogEnd, clogHit, clogDice, clogDefInfo } from '../ui/combat-log.js'; /* v927 : enregistreur de combats (Mode Créateur) */
@@ -1148,14 +1149,11 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
   const ASSAULT_K = ['heavy', 'blast', 'gorge', 'blizzard', 'copy', 'swarm', 'execute', 'lament', 'ambush', 'price', 'quake', 'chain', 'tick2'];
   /* v594 : FAM_RHYTHM, KIND_RHYTHM, BOSS_ASSAULT dans js/ui/def-bar.js (partagés avec le Labo des défenses) */
   /* séquence d'une attaque : propre au coup, sinon au rythme de la famille ; une élite ajoute un coup rapide */
-  function seqFor(s) {
-    const e = st.units[s.a];
-    let q = KIND_RHYTHM[s.kind] || (intentInfo(st, e)?.aoe ? 'lx' : FAM_RHYTHM[e?.fam] || 'n');
-    if (e?.elite && !e.boss && q.length < 3 && !/[hHoO]/.test(q)) q += 'f';
-    return q;
-  }
+  const seqFor = (s) => seqOf(st, s); /* v928 : js/core/def-seq.js (même séquence pour les simulations) */
   /* bilan d'une séquence pour le moteur : tout paré = parade ; un raté sur trois coups ou plus = esquive ; sinon touché */
-  const verdict = (res) => defVerdict(res, getTune()); /* v594 : règle réglable au Labo des défenses */
+  const AUTO_DODGE = 0.7; /* v928 : part des touches esquivées en défense automatique (mesurée : mêmes victoires qu'avant) */
+  let lastHits = null; /* v928 : la séquence touche par touche, envoyée au moteur avec le verdict */
+  const verdict = (res) => { lastHits = defHits(res); return defVerdict(res); };
   async function tipFor(q) {
     for (const k of [/[^oO]/.test(q) && 'cb-def-tap', /[oO]/.test(q) && 'cb-def-ring', q.length > 1 && 'cb-def-combo', /[xH]/.test(q) && 'cb-def-feint'].filter(Boolean)) {
       if (!g.s.tips?.[k]) await tuto(app, k);
@@ -1246,7 +1244,7 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
       logEvents(skips);
       if (skips.length) await play(skips);
       let res = 'none';
-      if (s.qte && defMode === 'auto') { res = Math.random() < 0.4 ? 'dodge' : 'none'; clogDefInfo({ auto: true }); } // automatique : 40 % d'esquives, jamais de parade
+      if (s.qte && defMode === 'auto') { lastHits = [...seqFor(s)].map(() => (Math.random() < AUTO_DODGE ? 'E' : 'x')).join(''); res = defOutcome(lastHits)?.def || 'none'; clogDefInfo({ auto: true, seq: seqFor(s) }); } /* v928 : automatique, touche par touche : 7 esquives sur 10, jamais de parade */
       else if (s.qte && defMode !== 'off') {
         /* v558 : un conseil court à la première rencontre de chaque geste (tipFor), à la place du long texte cb-defense4 */
         if (!alive_) return;
@@ -1255,11 +1253,11 @@ export function runDuel(app, root, { title, onEnd, onAbandon = null, onPause = n
           else if (bigK && def0) { const shot = await castFx(s.a, `${def0.name} !`, { ic: intentIcon(s.kind), foe: true }); if (!shot && (s.kind === 'heavy' || s.kind === 'blast')) banner(`${intentIcon(s.kind)} ${esc(def0.name)} !`, 'danger', 700); preShown = s.a; } } /* v871 : le coup s'annonce avant la défense, plus après */
         res = await defenseQTE(s);
         // v331 : après 3 défenses ratées dans l'expédition, on rappelle qu'il existe une défense assistée ou automatique (une seule fois)
-        if (res === 'none') { run.defMiss = (run.defMiss || 0) + 1; if (run.defMiss >= 3 && !g.s.tips?.['def-help']) { g.s.tips = { ...(g.s.tips || {}), 'def-help': Date.now() }; toast('Les défenses sont difficiles ? Dans <b>Réglages → Jeu</b>, tu peux choisir la défense <b>automatique</b> (4 esquives sur 10, sans parade).', { icon: 'info', ms: 8000 }); } }
+        if (res === 'none') { run.defMiss = (run.defMiss || 0) + 1; if (run.defMiss >= 3 && !g.s.tips?.['def-help']) { g.s.tips = { ...(g.s.tips || {}), 'def-help': Date.now() }; toast('Les défenses sont difficiles ? Dans <b>Réglages → Jeu</b>, tu peux choisir la défense <b>automatique</b> (7 esquives sur 10, sans parade).', { icon: 'info', ms: 8000 }); } }
       }
       if (!alive_) return;
       acting = s.a; drawTimeline();
-      const ev = E.duelEnemy(where, s.a, res);
+      const ev = E.duelEnemy(where, s.a, res, lastHits); lastHits = null;
       logEvents(ev);
       lastDef = res; // pas de gros plan d'impact si le coup est esquivé ou paré
       await play(ev);

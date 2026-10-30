@@ -6,6 +6,7 @@
 // en ms), les PV à chaque tour. À la fin : bilan calculé (dégâts, défense, dés, difficulté, abus possibles).
 // Tout reste sur l'appareil (localStorage) ; « Envoyer le fichier » le passe par le menu Partager de l'app.
 // Rien ici ne change le combat : on lit seulement ce que le moteur renvoie.
+import { defOutcome } from '../core/duel.js';
 const KEY = 'abyssal.clog', LOG = 'abyssal.clogLog', MAX = 40, MAX_STEPS = 900;
 let on = false, cur = null, pendHits = [], pendDice = null;
 try { on = localStorage.getItem(KEY) === '1'; } catch (e) { /* rien */ }
@@ -93,8 +94,9 @@ function note(st, kind, args, res, t1) {
     if (pendDice) { step.dice = pendDice; pendDice = null; }
     ev = res || [];
   } else if (kind === 'enemy') {
-    const [, a, def] = args;
+    const [, a, def, hs] = args;
     Object.assign(step, { u: a, def });
+    if (hs) { const o = defOutcome(hs); step.hs = hs; if (o) { step.def = o.def; step.f = o.f; } } /* v928 : séquence touche par touche et part du coup qui passe */
     if (cur.nextQ && cur.nextQ.a === a) { step.kind = cur.nextQ.kind; step.tgtU = cur.nextQ.t; step.qte = cur.nextQ.qte; }
     if (pendHits.length) { step.hits = pendHits; pendHits = []; }
     if (cur.defInfo) { Object.assign(step, cur.defInfo); cur.defInfo = null; }

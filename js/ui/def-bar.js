@@ -2,33 +2,9 @@
 // Créateur joue exactement le même geste. Un passage du curseur par lettre de la séquence (n simple · f rapide · l lent ·
 // x feinte · m zone mobile · h chargé · H chargé avec feinte · v871 : o cercle · O cercle rapide avec hésitation). Zone réglée en TEMPS (v388), toucher jugé sur l'image affichée
 // à cet instant (v509). Retourne la liste des résultats ('parry' | 'dodge' | 'none'), un par coup.
-/* rythme des ennemis (déplacé de duel-ui.js en v594) */
-export const FAM_RHYTHM = { predateur: 'nf', assassin: 'ff', berserker: 'x', protecteur: 'n', mage: 'l', parasite: 'nf', controleur: 'm', soutien: 'n', gardien: 'nx' };
-/* v871 : les gros coups se défendent au cercle (o : un cercle ; O : rapide, avec une hésitation ; oo : deux à la suite) */
-export const KIND_RHYTHM = { tick2: 'ff', poison: 'nf', flurry: 'fff', grab: 'nx', chain: 'nnf', frost: 'm', heavy: 'o', gorge: 'o', execute: 'oO', ambush: 'xf', blast: 'lo' };
-/* chaque gardien : nom de son Assaut et sa séquence (de 3 à 5 coups, rythme propre ; l'Horloger frappe en mesure) */
-export const BOSS_ASSAULT = {
-  devoreur: { name: 'La Faim sans fond', seq: 'fxo' },
-  matriarche: { name: 'L’Hiver mordant', seq: 'mmx' },
-  roi: { name: 'Le Reflet volé', seq: 'xnx' },
-  architecte: { name: 'L’Effondrement', seq: 'lxO' },
-  eclipse: { name: 'Éclipse totale', seq: 'mox' },
-  essaim: { name: 'La Nuée', seq: 'ffff' },
-  bourreau: { name: 'La Hache du Bourreau', seq: 'oxO' },
-  choeur: { name: 'Le Chant des Noyés', seq: 'lmx' },
-  chaines: { name: 'Les Mille Chaînes', seq: 'nnnf' },
-  horloge: { name: 'L’Heure exacte', seq: 'nnnn', beat: 320 },
-  miroirs: { name: 'Le Palais des Miroirs', seq: 'xxn' },
-  golem: { name: 'Avalanche de cendres', seq: 'llO' },
-  peste: { name: 'Le Souffle gris', seq: 'mfx' },
-  chasseur: { name: 'La Traque', seq: 'fxf' },
-  voeux: { name: 'Le Prix à payer', seq: 'nmo' },
-  titan: { name: 'Le Réveil du Titan', seq: 'Oxf' },
-  jumeaux: { name: 'Crépuscule double', seq: 'ffxx' },
-  juge: { name: 'Le Jugement', seq: 'onx' },
-  bete: { name: 'L’Apocalypse', seq: 'fxmO' },
-  abysse: { name: 'La Nuit sans fin', seq: 'xfmxO' },
-};
+import { defOutcome } from '../core/duel.js';
+/* v928 : rythmes et Assauts dans js/core/def-seq.js (le simulateur de la campagne s'en sert aussi) */
+export { FAM_RHYTHM, KIND_RHYTHM, BOSS_ASSAULT } from '../core/def-seq.js';
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -40,7 +16,10 @@ export const CUSTOM_QTE = {};
 export const QTE_BRICKS = { name: 'Défense inventée', base: 'tap', speed: 1, zone: 1, parry: 0.2, accel: 1.7, feint: false, move: 0, hide: 0, reverse: false, bounce: false };
 
 /* bilan d'une séquence pour le moteur : tout paré = parade ; trop de ratés = touché ; sinon esquive */
-export const defVerdict = (res, T) => res.every((r) => r === 'parry') ? 'parry' : res.filter((r) => r === 'none').length / res.length > T.missShare + 0.005 ? 'none' : 'dodge';
+/* v928 : la séquence touche par touche, en lettres pour le moteur (P parade, E esquive, x raté) ; le moteur en tire la part du coup
+   qui passe (defOutcome, js/core/duel.js) : le verdict affiché est le même que celui du moteur */
+export const defHits = (res) => (res.length ? res : ['none']).slice(0, 16).map((r) => (r === 'parry' ? 'P' : r === 'dodge' ? 'E' : 'x')).join('');
+export const defVerdict = (res) => defOutcome(defHits(res))?.def || 'none';
 
 /* v670 : les tampons (« Esquive ! », « Parade ! », « Assaut amorti »…) ne sont plus posés dans l'écran du combat : sur l'iPhone,
    le tampon de fin d'Assaut faisait passer tout l'écran au noir le temps de son affichage (vidéo du propriétaire, Dévoreur).

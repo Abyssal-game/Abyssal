@@ -71,7 +71,6 @@ export const DEF_GROUPS = [
     ['pause', 'Pause après chaque coup', 'Temps où le résultat reste affiché.', 0, 800, 10, 'ms'],
     ['leadMs', 'Avance de l’affichage', 'Décalage entre ce que l’écran montre et le calcul : le toucher est jugé à son instant plus ce temps. Si un toucher pile sur le trait blanc donne une esquive, monte-le ; si un toucher en retard donne une parade, baisse-le.', 0, 120, 1, 'ms'],
     ['tolPx', 'Tolérance du toucher', 'Marge autour de la zone, en pixels de barre.', 0, 30, 1, 'px'],
-    ['missShare', 'Ratés permis pour une esquive', 'Au-delà de cette part de coups ratés, la séquence compte comme « touché » (0,33 = un sur trois).', 0, 1, 0.01, ''],
   ]],
 ];
 

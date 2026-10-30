@@ -4,6 +4,7 @@
 // (PV, attaque) étage par étage et note ce qu'il ressent ; fitCurve en tire une courbe pour tous les étages.
 import { labKinds, createDuel, duelUnit, act as duelActRaw, useUlt, beginEnemyTurn, nextEnemy, takeSkips, enemyAct, endEnemyTurn, startInitiative, autoDuel, RHYTHM } from './duel.js';
 import { FERVOR_START } from './skills.js';
+import { seqOf } from './def-seq.js';
 import { bossOf } from './bosses.js';
 import { cardPower, advisedPower, enemyScale, lateSoft, bossEase, FOE_EASE, BOSS_EASE, chapterOf } from './descent.js';
 import { refPowFor } from './game.js';
@@ -13,7 +14,10 @@ export const LAB_ROOMS = { fight: 'Combat', elite: 'Élite', boss: 'Gardien' };
 /* notes du propriétaire : multiplicateur proposé sur la force essayée (« trop facile » = ennemis 25 % plus forts) */
 export const LAB_NOTES = { easy2: ['Trop facile', 1.25], easy: ['Un peu facile', 1.1], ok: ['Juste bien', 1], hard: ['Un peu dur', 0.9], hard2: ['Trop dur', 0.78] };
 /* profils de défense pour la simulation (part de parades, part d'esquives), comme les bancs d'essai des versions 502 à 509 */
-export const LAB_DEF = { none: ['Sans défense', 0, 0], weak: ['Défense faible', 0.05, 0.4], mid: ['Défense moyenne', 0.15, 0.5], good: ['Bonne défense', 0.3, 0.5] };
+/* v928 : défense jugée touche par touche (defOutcome) : [nom, part de parades, part d'esquives] PAR TOUCHE de la séquence (seqOf).
+   « mid » (33 % / 35 %) donnait, avec l'ancienne règle « tout ou rien », les mêmes victoires que l'ancien « mid » (15 % / 50 %
+   par attaque) : c'est le joueur moyen sur lequel la campagne est calée (tools/campagne-cal.mjs). */
+export const LAB_DEF = { none: ['Sans défense', 0, 0], weak: ['Défense faible', 0.15, 0.35], mid: ['Défense moyenne', 0.33, 0.35], good: ['Bonne défense', 0.5, 0.3] };
 
 const RAR = ['C', 'PC', 'R', 'HR', 'M', 'S'];
 let seedN = 1;
@@ -70,7 +74,7 @@ export function labEngine(st) {
     duelUlt() { return useUlt(st); },
     duelPass() { return beginEnemyTurn(st); },
     duelNext() { const s = nextEnemy(st); st.nextQte = s ? { a: s.a, qte: !!s.qte } : null; return s ? { s, skips: takeSkips(st) } : null; },
-    duelEnemy(w, a, res = 'none') { const q = st.nextQte; const d = q && q.a === a && q.qte && (res === 'dodge' || res === 'parry') ? res : 'none'; st.nextQte = null; return enemyAct(st, a, d); },
+    duelEnemy(w, a, res = 'none', hits = null) { const q = st.nextQte, ok = q && q.a === a && q.qte; const d = ok && (res === 'dodge' || res === 'parry') ? res : 'none'; st.nextQte = null; return enemyAct(st, a, d, ok ? hits : null); }, /* v928 : touche par touche */
     duelEndEnemy() { return endEnemyTurn(st); },
   };
 }
@@ -90,7 +94,7 @@ export function labSimulate(g, opts, n = 20, def = 'mid') {
     const day = new Date(Date.UTC(2026, 10, 1) + i * 86400000).toISOString().slice(0, 10); /* jours sans règle du jour (retirées le 18 octobre 2026) */
     const { st } = labBattle(g, { ...opts, day, seed: 1000 + i * 31 });
     let r = 12345 + i * 977; const rnd = () => ((r = (r * 1103515245 + 12345) % 2147483648) / 2147483648);
-    autoDuel(st, 60, () => { const x = rnd(); return x < pp ? 'parry' : x < pp + pd ? 'dodge' : 'none'; });
+    autoDuel(st, 60, (s2, q) => ({ hits: [...seqOf(s2, q)].map(() => { const x = rnd(); return x < pp ? 'P' : x < pp + pd ? 'E' : 'x'; }).join('') }));
     const s = labSummary(st); wins += s.won ? 1 : 0; lost += s.lost; rounds += s.rounds; fallen += s.fallen;
   }
   return { n, win: Math.round((100 * wins) / n), lost: Math.round(lost / n), rounds: +(rounds / n).toFixed(1), fallen: +(fallen / n).toFixed(1) };

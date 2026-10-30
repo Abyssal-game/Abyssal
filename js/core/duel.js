@@ -341,6 +341,26 @@ export const QTE_HIT = 1.8, PLAIN_HIT = 0.6; /* v575 : 1,6 → 1,8 (« même ave
 // v502 : chaque attaque qui blesse se défend (avant, les petits coups des ennemis ordinaires passaient sans rien faire) ;
 // une esquive n'évite plus tout : la créature est éraflée (GRAZE des dégâts) ; seule la parade parfaite annule le coup
 export const GRAZE = 0.5; /* v575 : 0,35 → 0,5 : l'esquive protège moins, la parade compte */
+/* v928 : défense jugée touche par touche (demande du propriétaire, d'après l'enregistreur de combats : « 3 parades et 2 ratés ne
+   doivent pas faire comme 2 parades, 2 ratés et 1 esquive » ; avant, une séquence était « tout ou rien » : un raté sur deux
+   touches = coup entier, une esquive = la moitié du coup). Chaque touche d'une séquence porte sa part du coup : parade 0,
+   esquive DODGE_SHARE, raté 1 ; toute la séquence parée reste une parade parfaite (contre-attaque, Brisure, Ferveur).
+   hits : une lettre par touche (P parade, E esquive, x raté), envoyée par l'écran ; sans elle (défense automatique, anciennes
+   apps, simulations), l'ancienne règle (GRAZE) s'applique. */
+export const DODGE_SHARE = 0.35, SEQ_WEIGHT = 0.2, SEQ_MAX = 1.8, DEF_MAX = 0.9;
+export function defOutcome(hits) {
+  if (typeof hits !== 'string' || !/^[PEx]{1,16}$/.test(hits)) return null;
+  if (!/[Ex]/.test(hits)) return { def: 'parry', f: 0 };
+  if (!/[PE]/.test(hits)) return { def: 'none', f: 1 };
+  /* une longue séquence (Assaut de gardien) reste plus dangereuse qu'un coup simple : chaque raté y pèse davantage (SEQ_WEIGHT
+     par touche en plus, ×1,8 au plus) ; une esquive pèse toujours DODGE_SHARE ; toute touche réussie protège un peu (DEF_MAX) */
+  const k = Math.min(SEQ_MAX, 1 + SEQ_WEIGHT * (hits.length - 1));
+  let s = 0;
+  for (const c of hits) s += c === 'x' ? k : c === 'E' ? DODGE_SHARE : 0;
+  const f = Math.min(DEF_MAX, Math.round((1000 * s) / hits.length) / 1000);
+  return { def: 'dodge', f };
+}
+let GZ = null; /* part du coup qui passe pendant enemyAct (null : GRAZE) */
 export const allyCap = (u, kind, st = null) => {
   const gap = st?.refPow && u.pow ? Math.max(1, st.refPow / u.pow) : 1;
   return Math.max(1, Math.round(u.maxHp * ipow(gap, GAP_POW) * (BIG.includes(kind) ? ALLY_BIG_CAP : ALLY_HIT_CAP)));
@@ -348,7 +368,7 @@ export const allyCap = (u, kind, st = null) => {
 function hurt(st, u, n, ev, src = null, { pierce = false, graze = false } = {}) {
   if (u.hp <= 0 || n <= 0) return 0;
   if (u.boss && u.side === 'enemy') n = Math.min(n, bossCap(u));
-  if (u.side === 'ally' && src && st.units[src]?.side === 'enemy') n = Math.min(n, Math.max(1, Math.round(allyCap(u, st.curKind, st) * (graze ? GRAZE : 1)))); /* v575 : l'éraflure reste une fraction du coup même quand le coup plein est plafonné */
+  if (u.side === 'ally' && src && st.units[src]?.side === 'enemy') n = Math.min(n, Math.max(1, Math.round(allyCap(u, st.curKind, st) * (graze ? GZ ?? GRAZE : 1)))); /* v575 : l'éraflure reste une fraction du coup même quand le coup plein est plafonné */
   // Brèche (v250) : posée par un allié, exploitée par un autre → le coup perce le bouclier, +20 %, +3 Brisure
   let breached = null;
   if (src && u.side === 'enemy' && u.breach && st.units[src]?.side === 'ally' && u.breach.by !== src) { breached = u.breach; u.breach = null; pierce = true; n *= 1.2; }
@@ -1324,7 +1344,13 @@ function refreshIntent(st, e) {
 }
 
 // Résout l'action d'un ennemi. defense : 'none' | 'dodge' | 'parry' (défense active réussie).
-export function enemyAct(st, aUid, defense = 'none') {
+export function enemyAct(st, aUid, defense = 'none', hits = null) {
+  const o = defOutcome(hits); /* v928 : défense touche par touche */
+  if (o) defense = o.def;
+  GZ = o && o.def === 'dodge' ? o.f : null;
+  try { return enemyActIn(st, aUid, defense, GZ ?? GRAZE); } finally { GZ = null; }
+}
+function enemyActIn(st, aUid, defense, G) {
   const ev = takeSkips(st);
   st.seq = (st.seq || 0) + 1;
   if (st.queue[0] === aUid) st.queue.shift();
@@ -1352,7 +1378,7 @@ export function enemyAct(st, aUid, defense = 'none') {
     if (target.role === 'protecteur') chargeRiposte(target, ev); // elle encaisse pour l'équipe : sa riposte se charge
     ev.push({ t: 'attack', a: aUid, u: target.uid, kind });
     if (defense === 'parry') { defended(st, e, target, ev, defense, kind); return null; }
-    if (defense === 'dodge') { defended(st, e, target, ev, defense, kind); hurt(st, target, dmgOf(st, e, target, m * GRAZE), ev, aUid, { graze: true }); return null; } /* v502 : éraflure */
+    if (defense === 'dodge') { defended(st, e, target, ev, defense, kind); hurt(st, target, dmgOf(st, e, target, m * G), ev, aUid, { graze: true }); return null; } /* v502 : éraflure */
     const d = hurt(st, target, dmgOf(st, e, target, m), ev, aUid);
     if (target !== t && d > 0 && hasP(target, 'colere')) {
       const cap = boosted(target, 'colere') ? 5 : 3;
@@ -1374,7 +1400,7 @@ export function enemyAct(st, aUid, defense = 'none') {
     e.charged = null;
     ev.push({ t: 'aoe', u: aUid, side: 'enemy' });
     if (defense !== 'none') defended(st, e, null, ev, defense, kind);
-    if (defense !== 'parry') for (const x of front(st, 'ally')) { if (e.hp <= 0) break; hurt(st, x, dmgOf(st, e, x, (e.boss ? 1 : 0.8) * pow * (defense === 'dodge' ? GRAZE : 1)), ev, aUid, { graze: defense === 'dodge' }); } // v344 : un ennemi tué en plein coup de zone (riposte, épines) s'arrête
+    if (defense !== 'parry') for (const x of front(st, 'ally')) { if (e.hp <= 0) break; hurt(st, x, dmgOf(st, e, x, (e.boss ? 1 : 0.8) * pow * (defense === 'dodge' ? G : 1)), ev, aUid, { graze: defense === 'dodge' }); } // v344 : un ennemi tué en plein coup de zone (riposte, épines) s'arrête
   } else if (kind === 'charge') { e.charged = 'heavy'; ev.push({ t: 'status', u: aUid, s: 'Se charge…', k: 'charge' }); }
   else if (kind === 'channel') { e.charged = 'blast'; ev.push({ t: 'status', u: aUid, s: 'Concentration…', k: 'charge' }); }
   else if (kind === 'shield') { const t = st.units[it.t]; if (t && t.hp > 0) { t.shield = 1; ev.push({ t: 'status', u: t.uid, s: 'Bouclier', k: 'guard' }); } }
@@ -1392,7 +1418,7 @@ export function enemyAct(st, aUid, defense = 'none') {
     e.charged = null;
     ev.push({ t: 'aoe', u: aUid, side: 'enemy' });
     if (defense !== 'none') defended(st, e, null, ev, defense, 'blast');
-    if (defense === 'dodge') for (const x of front(st, 'ally')) { if (e.hp <= 0) break; hurt(st, x, dmgOf(st, e, x, 0.9 * pow * GRAZE), ev, aUid, { graze: true }); }
+    if (defense === 'dodge') for (const x of front(st, 'ally')) { if (e.hp <= 0) break; hurt(st, x, dmgOf(st, e, x, 0.9 * pow * G), ev, aUid, { graze: true }); }
     if (defense === 'none') {
       for (const x of front(st, 'ally')) { if (e.hp <= 0) break; hurt(st, x, dmgOf(st, e, x, 0.9 * pow), ev, aUid); }
       if (e.hp > 0) front(st, 'ally').filter((x) => x.hp > 0 && !x.frozen).sort((x, y) => y.atk - x.atk).slice(0, e.phase2 ? 2 : 1).forEach((x) => { x.frozen = 1; ev.push({ t: 'status', u: x.uid, s: 'Gelée', k: 'frost' }); });
@@ -1409,7 +1435,7 @@ export function enemyAct(st, aUid, defense = 'none') {
     else if (k === 'rempart') front(st, 'enemy').forEach((x) => { x.shield = 1; ev.push({ t: 'status', u: x.uid, s: 'Bouclier', k: 'guard' }); });
     else if (k === 'priere') heal(e, e.maxHp * 0.25, ev);
     else if (k === 'contagion') { if (defense !== 'none') defended(st, e, null, ev, defense, 'blast'); else front(st, 'ally').forEach((x) => addPoison(st, x, 3, ev, e)); }
-    else { ev.push({ t: 'aoe', u: aUid, side: 'enemy' }); if (defense !== 'none') defended(st, e, null, ev, defense, 'blast'); if (defense !== 'parry') for (const x of front(st, 'ally')) { if (e.hp <= 0) break; hurt(st, x, dmgOf(st, e, x, 0.7 * (defense === 'dodge' ? GRAZE : 1)), ev, aUid, { graze: defense === 'dodge' }); } } /* v870 : l'esquive éraflé (GRAZE), comme pour la Déflagration ; seule la parade annule */
+    else { ev.push({ t: 'aoe', u: aUid, side: 'enemy' }); if (defense !== 'none') defended(st, e, null, ev, defense, 'blast'); if (defense !== 'parry') for (const x of front(st, 'ally')) { if (e.hp <= 0) break; hurt(st, x, dmgOf(st, e, x, 0.7 * (defense === 'dodge' ? G : 1)), ev, aUid, { graze: defense === 'dodge' }); } } /* v870 : l'esquive éraflé (GRAZE), comme pour la Déflagration ; seule la parade annule */
   } else if (kind === 'decree') {
     st.law = it.law; logBoss(st, LAWS[it.law].name);
     ev.push({ t: 'boss', u: aUid, s: LAWS[it.law].name }); ev.push({ t: 'law', law: it.law });
@@ -1429,7 +1455,7 @@ export function enemyAct(st, aUid, defense = 'none') {
     e.charged = null;
     ev.push({ t: 'aoe', u: aUid, side: 'enemy' });
     if (defense !== 'none') defended(st, e, null, ev, defense, 'blast');
-    if (defense === 'dodge') for (const x of front(st, 'ally')) { if (e.hp <= 0) break; hurt(st, x, dmgOf(st, e, x, AOE_M[kind] * pow * GRAZE), ev, aUid, { graze: true }); } /* v870 : l'esquive éraflé (GRAZE), comme pour la Déflagration ; seule la parade annule */
+    if (defense === 'dodge') for (const x of front(st, 'ally')) { if (e.hp <= 0) break; hurt(st, x, dmgOf(st, e, x, AOE_M[kind] * pow * G), ev, aUid, { graze: true }); } /* v870 : l'esquive éraflé (GRAZE), comme pour la Déflagration ; seule la parade annule */
     else if (defense === 'none') {
       for (const x of front(st, 'ally')) {
         if (e.hp <= 0) break;
@@ -1473,7 +1499,7 @@ export function enemyAct(st, aUid, defense = 'none') {
     const m = 1 + Math.min(1, (e.sleepDmg || 0) / e.maxHp) * 1.5;
     logBoss(st, 'Séisme'); ev.push({ t: 'boss', u: aUid, s: `Le Titan s’éveille : Séisme ×${m.toFixed(1)}` }); ev.push({ t: 'aoe', u: aUid, side: 'enemy' });
     if (defense !== 'none') defended(st, e, null, ev, defense, 'blast');
-    if (defense !== 'parry') for (const x of front(st, 'ally')) { if (e.hp <= 0) break; hurt(st, x, dmgOf(st, e, x, 0.8 * m * pow * (defense === 'dodge' ? GRAZE : 1)), ev, aUid, { graze: defense === 'dodge' }); } /* v870 : l'esquive éraflé (GRAZE), comme pour la Déflagration ; seule la parade annule */
+    if (defense !== 'parry') for (const x of front(st, 'ally')) { if (e.hp <= 0) break; hurt(st, x, dmgOf(st, e, x, 0.8 * m * pow * (defense === 'dodge' ? G : 1)), ev, aUid, { graze: defense === 'dodge' }); } /* v870 : l'esquive éraflé (GRAZE), comme pour la Déflagration ; seule la parade annule */
   } else if (kind === 'verdict') {
     st.forbid = it.forbid; logBoss(st, 'Verdict');
     ev.push({ t: 'boss', u: aUid, s: `Verdict : interdit de ${FORBID[it.forbid]}` }); ev.push({ t: 'law', forbid: it.forbid });
@@ -1490,7 +1516,7 @@ export function enemyAct(st, aUid, defense = 'none') {
     if (d.target === 'all') {
       ev.push({ t: 'aoe', u: aUid, side: 'enemy' });
       if (defense !== 'none') defended(st, e, null, ev, defense, 'blast');
-      if (defense !== 'parry') for (const x of front(st, 'ally')) { if (e.hp <= 0) break; for (let h = 0; h < hits && x.hp > 0; h++) hurt(st, x, dmgOf(st, e, x, d.mult * pow * (defense === 'dodge' ? GRAZE : 1)), ev, aUid, { graze: defense === 'dodge' }); if (defense === 'none') fx(x); }
+      if (defense !== 'parry') for (const x of front(st, 'ally')) { if (e.hp <= 0) break; for (let h = 0; h < hits && x.hp > 0; h++) hurt(st, x, dmgOf(st, e, x, d.mult * pow * (defense === 'dodge' ? G : 1)), ev, aUid, { graze: defense === 'dodge' }); if (defense === 'none') fx(x); }
     } else {
       let t = st.units[it.t], hitT = null;
       for (let h = 0; h < hits && t && t.hp > 0 && e.hp > 0; h++) { hitT = strike(t, d.mult); if (!hitT) break; t = hitT; }
@@ -1990,7 +2016,7 @@ export function endTurn(st, defense = () => 'none') {
   const ev = beginEnemyTurn(st);
   // ordre d'initiative : « Passer » si une alliée a la main, puis les ennemis jouent jusqu'à la prochaine alliée
   for (let k = 0; k < (st.init ? 12 : 1) && !st.over && st.turn === 'enemy'; k++) {
-    for (let s = nextEnemy(st); s; s = nextEnemy(st)) ev.push(...enemyAct(st, s.a, s.qte ? defense(st, s) : 'none'));
+    for (let s = nextEnemy(st); s; s = nextEnemy(st)) { const d = s.qte ? defense(st, s) : 'none'; ev.push(...enemyAct(st, s.a, typeof d === 'object' && d ? 'none' : d, d?.hits)); } /* v928 : la défense peut être une séquence { hits: 'PEx' } */
     ev.push(...endEnemyTurn(st));
   }
   return ev;

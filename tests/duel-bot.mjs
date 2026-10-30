@@ -22,7 +22,11 @@ export function playDuelOps(g, where, r, max = 600) {
     }
     // tour des ennemis, comme l'écran : chacun joue, le joueur défend, puis fin du tour
     for (let k = 0; k < 16 && !g.duelState(where).over && g.duelState(where).turn === 'enemy'; k++) {
-      for (let x = g.duelNext(where); x; x = g.duelNext(where)) g.duelEnemy(where, x.s.a, x.s.qte ? ['none', 'dodge', 'parry'][Math.floor(r() * 3)] : 'none');
+      for (let x = g.duelNext(where); x; x = g.duelNext(where)) {
+          const k = Math.floor(r() * 4); /* v928 : une fois sur quatre, la séquence touche par touche (comme l'écran) */
+          if (x.s.qte && k === 3) g.duelEnemy(where, x.s.a, 'none', Array.from({ length: 1 + Math.floor(r() * 4) }, () => 'PEx'[Math.floor(r() * 3)]).join(''));
+          else g.duelEnemy(where, x.s.a, x.s.qte ? ['none', 'dodge', 'parry'][k % 3] : 'none');
+        }
       g.duelEndEnemy(where);
     }
   }

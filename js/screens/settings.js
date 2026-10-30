@@ -70,7 +70,7 @@ export default function settings(app, root) {
       <section class="panel stack">
         <h2>Combat</h2>
         ${seg('defense', 'Défense active en combat', [['on', 'Manuelle'], ['auto', 'Automatique']])}
-        <p class="small muted set-note">Manuelle : chaque attaque ennemie se défend sur la barre, coup par coup (enchaînements, feintes, coups chargés) ; sur le trait blanc, c’est une parade parfaite. Automatique : rien à toucher, mais seulement 4 esquives sur 10 et jamais de parade parfaite (moins de Ferveur et de PA).</p>
+        <p class="small muted set-note">Manuelle : chaque attaque ennemie se défend sur la barre, coup par coup (enchaînements, feintes, coups chargés) ; sur le trait blanc, c’est une parade parfaite. Automatique : rien à toucher, mais seulement 7 esquives sur 10 et jamais de parade parfaite (moins de Ferveur et de PA).</p>
         ${seg('decor', 'Décor des combats', [['riche', 'Riche'], ['sobre', 'Sobre']])}
         <p class="small muted set-note">Sobre : la salle reste en place, sans particules ni flammes qui vacillent. Plus reposant, et un peu plus économe en batterie.</p>
         ${seg('quality', 'Effets des combats', [['auto', 'Complets'], ['light', 'Allégés']])}

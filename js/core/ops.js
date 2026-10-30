@@ -130,7 +130,7 @@ export const ARGS = {
   setName: ['S'], setAvatar: ['S'], toggleShowcase: ['s'], reset: [],
   chooseOmen: ['s'], startRun: [{ cursed: 'b', nightmare: '*', start: 'I', veille: 'b' }], startBattle: ['s', { room: 'S', pact: 'S' }], choosePact: ['S'], chooseTalent: ['i'],
   chooseReward: ['s'], cancelAltar: [], chooseBlessing: ['s'], swapRunTeam: ['i', 'i'], nextFloor: [], cancelRun: [], abandonRun: [], reviveFallen: ['s'], buyBraise: [],
-  finishBattle: [], duelAct: ['s', 's', 's', 'S', 'n'], duelUlt: ['s'], duelPass: ['s'], duelNext: ['s'], duelEnemy: ['s', 's', 'S'], duelEndEnemy: ['s'],
+  finishBattle: [], duelAct: ['s', 's', 's', 'S', 'n'], duelUlt: ['s'], duelPass: ['s'], duelNext: ['s'], duelEnemy: ['s', 's', 'S', 'S'], duelEndEnemy: ['s'],
   startTrial: ['i'], finishTrial: [], abandonTrial: [],
   setSceauxHand: ['as'], sceauxStart: [{ rival: 'S', daily: 'b', awake: 'b' }], sceauxFinish: [], sceauxTrophy: ['s'], sceauxQuit: [],
   pacteStart: [{ table: 'S', daily: 'b' }], pacteFinish: [], pacteQuit: [], cryptesStart: [{ table: 'S', daily: 'b' }], cryptesFinish: [], cryptesQuit: [], cryptesResume: [],
