@@ -72,6 +72,13 @@ export async function signIn(email, password) {
   store(tok);
   return currentUser();
 }
+// v917 : « Continuer avec Apple / Google » : le téléphone obtient un jeton d'identité signé par Apple ou Google
+// (js/social.js) ; Supabase le vérifie et ouvre la session (même compte si l'e-mail est déjà connu).
+export async function signInIdToken(provider, idToken, nonce) {
+  const tok = await call('/auth/v1/token?grant_type=id_token', { method: 'POST', auth: false, body: { provider, id_token: idToken, ...(nonce ? { nonce } : {}) } });
+  store(tok);
+  return currentUser();
+}
 // Inscription. Avec la confirmation par e-mail (réglage Supabase par défaut), la réponse n'a pas de jeton :
 // le joueur reçoit un lien, qui ramène au jeu connecté (voir consumeAuthHash). Sans confirmation, il est connecté tout de suite.
 // v322 : les liens des e-mails (confirmation, mot de passe oublié) ramènent toujours à l'adresse publique du jeu,

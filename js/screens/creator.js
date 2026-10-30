@@ -10,6 +10,7 @@ import { errLog, errClear } from '../ui/errlog.js'; /* v804 */
 import { openDefenseLab } from './defense-lab.js'; /* v594 */
 import { sfx, audioInfo } from '../ui/sound.js'; /* v622 */
 import { openServerState } from './server-state.js'; /* v678 */
+import { openDashboard } from './dashboard.js'; /* v917 */
 import { perfOn, setPerf, perfLog, perfClear, perfReport } from '../ui/perf.js'; /* v601 */
 import { partieErrs, partie } from '../cloud/partie.js'; /* v740 */
 import { openPack } from './opening.js'; /* v769 */
@@ -106,6 +107,8 @@ export function openCreator(app) {
   function tabDiag() {
     const errs = errLog();
     return `
+      ${S('Tableau de bord', `${P('Combien de joueurs, où ils s’arrêtent dans le jeu, combien reviennent le lendemain et la semaine suivante. Tiré de nos propres données, sans pistage.')}
+        ${row(B('dash', `${icon('crown')}Ouvrir le tableau de bord`, 'gold'))}`)}
       ${S('Signaler un problème', `${P('Copie en un geste tout ce qui m’aide à trouver un bug : version, appareil, état du serveur de partie, dernières erreurs de l’app et du serveur, dernier relevé de fluidité. Colle-le dans la conversation avec ta description.')}
         ${row(B('report', `${icon('check')}Copier le rapport complet`, 'gold'))}`)}
       ${S('Erreurs de l’app', `${P('Les 25 dernières erreurs survenues sur ce téléphone (même quand rien ne s’est vu à l’écran).')}
@@ -207,6 +210,7 @@ export function openCreator(app) {
       if (x === 'missions') g.devMissions();
       if (x === 'codex') { g.s.devCodex = !g.s.devCodex; g.persist(); app.chrome?.(); } /* v470 */
       if (x === 'srv') { openServerState(); return; } /* v678 */
+      if (x === 'dash') { openDashboard(); return; } /* v917 */
       if (x === 'guide') { sheet.close(); setTimeout(() => showWelcome(app, { force: true }), 350); return; } /* v804 */
       if (x === 'errlogclear') { errClear(); return draw(); }
       if (x === 'report') { /* v804 : rapport complet pour signaler un problème */

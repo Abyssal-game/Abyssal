@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v916'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v917'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -70,6 +70,14 @@ export const LIVE_KEY = { x: 'o0UvHUxr62DiBrjrD6a-CyZiQfbXwx0UIdnVeOuWIyY', y: '
 // v680 : clés PUBLIQUES RevenueCat (paiements dans l'app ; faites pour être dans l'app). Tant qu'elles valent null,
 // les achats en euros restent fermés. La clé SECRÈTE n'est jamais ici : secret REVENUECAT_SECRET de la fonction Supabase.
 export const IAP_KEY = { ios: 'appl_MDPGtxYAssEAbwJfuGfKeZqbjeM', android: null };
+/* v917 : notifications du serveur sur Android (Firebase) : à passer à true seulement quand le fichier google-services.json
+   est fourni à la construction (secret GitHub GOOGLE_SERVICES_JSON) ; sans lui, l'app Android se fermerait à l'inscription. */
+export const PUSH_ANDROID = false;
+/* v917 : « Continuer avec Apple / Google » (js/social.js), dans l'application seulement. Apple : à passer à true quand
+   le fournisseur Apple est activé dans Supabase et la capacité « Sign in with Apple » ajoutée dans Xcode (iPhone seulement).
+   Google : identifiants publics des clients OAuth de Google Cloud (web : celui donné à Supabase ; ios : client iOS) ;
+   vides, le bouton Google n'apparaît pas. */
+export const SOCIAL = { apple: false, google: { web: '', ios: '' } };
 export const FINAL_FLOOR = 100; // v394 : le fond de la Descente (pour l'instant)
 
 // Chance (en %) qu'une carte tirée sorte dans chaque finition (×2 dans un booster premium).

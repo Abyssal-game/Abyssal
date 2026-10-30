@@ -37,6 +37,11 @@ jobs:
           npm ci
           node --test tests/*.test.mjs
           node tools/validate.mjs
+      - name: Firebase (notifications Android, v917 ; si le secret GOOGLE_SERVICES_JSON est posé)
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          if [ -n "$GOOGLE_SERVICES_JSON" ]; then printf '%s' "$GOOGLE_SERVICES_JSON" > android/app/google-services.json; echo "google-services.json posé"; else echo "pas de google-services.json : notifications du serveur absentes sur Android"; fi
       - name: Copie du jeu dans l'application
         run: |
           node tools/build-www.mjs

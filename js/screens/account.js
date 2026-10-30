@@ -9,6 +9,7 @@ import { clearAll, pushOff } from '../notify.js';
 import { resetWatch } from '../cloud/mpwatch.js';
 import { serverMode } from '../cloud/partie.js';
 import { stashCode, pendingCode, tryPendingParrain } from '../ui/parrain.js'; /* v881 */
+import { socialProviders, socialLogin } from '../social.js'; /* v917 */
 
 // v321 : règle des mots de passe réglée dans Supabase (Authentication → Password requirements)
 const PW_RULE = '8 caractères au moins, avec une majuscule, une minuscule, un chiffre et un symbole (! ? # …)';
@@ -29,6 +30,17 @@ export function askPseudo(app) {
     try { await setPseudo(v); if (!app.game.s.name) app.game.setName?.(v); toast(`Bienvenue, <b>${esc(v)}</b> !`, { kind: 'success', icon: 'user' }); sh.close(); app.refresh?.(); setTimeout(() => tryPendingParrain(app), 1500); }
     catch (err) { toast(esc(err.message), { kind: 'error', icon: 'info' }); }
   });
+}
+
+/* v917 : boutons « Continuer avec Apple / Google » (logos officiels, comme le demandent Apple et Google) */
+const APPLE_SVG = '<svg viewBox="0 0 17 20" aria-hidden="true"><path fill="currentColor" d="M14.1 10.6c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9s-2-.9-3.4-.9C3.6 4.8 1.9 5.8 1 7.4c-1.9 3.2-.5 8 1.3 10.6.9 1.3 2 2.7 3.4 2.7 1.3-.1 1.9-.9 3.5-.9s2.1.9 3.5.8c1.4 0 2.4-1.3 3.3-2.6 1-1.5 1.4-2.9 1.5-3-.1 0-2.9-1.1-2.9-4.4zM11.5 3c.7-.9 1.2-2.1 1.1-3.3-1 0-2.3.7-3 1.6-.7.8-1.3 2-1.1 3.2 1.1.1 2.3-.6 3-1.5z"/></svg>';
+const GOOGLE_SVG = '<svg viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.33A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.97 10.72a5.4 5.4 0 0 1 0-3.44V4.95H.96a9 9 0 0 0 0 8.1l3.01-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58A9 9 0 0 0 .96 4.95l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58z"/></svg>';
+function socialHTML() {
+  const ps = socialProviders();
+  if (!ps.length) return '';
+  const b = { apple: `<button type="button" class="btn block soc-b soc-apple" data-soc="apple">${APPLE_SVG}<span>Continuer avec Apple</span></button>`,
+    google: `<button type="button" class="btn block soc-b soc-google" data-soc="google">${GOOGLE_SVG}<span>Continuer avec Google</span></button>` };
+  return `<div class="soc stack">${ps.map((p) => b[p]).join('')}<p class="soc-or small muted"><span>ou avec ton e-mail</span></p></div>`;
 }
 
 const ago = (t) => {
@@ -88,6 +100,7 @@ export default function account(app, root) {
       root.innerHTML = `
         <header class="screen-head ui-hero bn-account"><h1>Compte</h1><p class="muted">Garde ta progression en ligne, retrouve-la sur n’importe quel appareil et affronte les joueurs du monde entier.</p></header>
         <div class="seg wide acc-seg" role="group" aria-label="Connexion ou inscription"><button type="button" class="seg-b" data-mode="login" aria-pressed="${!signup}">Se connecter</button><button type="button" class="seg-b" data-mode="signup" aria-pressed="${signup}">Créer un compte</button></div>
+        ${forgot ? '' : socialHTML()}
         <form class="panel stack acc-form" id="login" novalidate>
           <label class="acc-l"><span class="small muted">E-mail</span><input class="input plain" type="email" name="email" autocomplete="username" inputmode="email" required value="${esc(lastEmail)}"></label>
           ${forgot ? '' : `<label class="acc-l"><span class="small muted">Mot de passe</span><input class="input plain" type="password" name="password" autocomplete="${signup ? 'new-password' : 'current-password'}" required ${signup ? 'minlength="8" placeholder="8 caractères, Aa1 et symbole"' : ''}></label>${signup ? `<p class="small muted acc-pwrule">${PW_RULE}.</p><label class="acc-l"><span class="small muted">Code de parrainage (facultatif)</span><input class="input plain" name="parrain" maxlength="16" autocomplete="off" autocapitalize="off" placeholder="Pseudo du joueur qui t’a invité" value="${esc(pendingCode())}"></label>` : ''}`}
@@ -97,6 +110,22 @@ export default function account(app, root) {
         </form>
         <p class="small muted acc-privacy">${icon('lock')} Données conservées : ton e-mail, ton pseudo, ta sauvegarde et ce qui sert aux fonctions en ligne (amis, parties, classements). Détails dans la politique de confidentialité. Tu peux supprimer ton compte à tout moment.</p>`;
       root.querySelectorAll('[data-mode]').forEach((b) => b.addEventListener('click', () => { lastEmail = root.querySelector('[name=email]')?.value || lastEmail; mode = b.dataset.mode; render(); }));
+      /* v917 : Continuer avec Apple / Google : même suite qu'une connexion (partie envoyée ou chargée, pseudo demandé) */
+      root.querySelectorAll('[data-soc]').forEach((b) => b.addEventListener('click', async () => {
+        if (busy) return;
+        const parrain = root.querySelector('[name=parrain]')?.value;
+        busy = true; render();
+        try {
+          const u = await socialLogin(b.dataset.soc);
+          if (u) {
+            if (parrain) stashCode(parrain);
+            const r = await afterLogin();
+            if (!sync.profile?.pseudo) setTimeout(() => askPseudo(app), 900);
+            toast(r === 'pulled' ? 'Connecté : ta partie en ligne est chargée.' : 'Connecté : ta partie est sauvegardée en ligne.', { kind: 'success', icon: 'user' });
+          }
+        } catch (err) { toast(esc(err.message || 'La connexion n’a pas abouti. Réessaie.'), { kind: 'error', icon: 'info', ms: 6000 }); }
+        busy = false; render();
+      }));
       root.querySelector('#login').addEventListener('submit', async (e) => {
         e.preventDefault();
         if (busy) return;

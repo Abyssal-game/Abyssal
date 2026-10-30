@@ -28,6 +28,8 @@ const FILES = [
   { n: '16', file: '16-en-ligne.sql', what: 'Joueurs en ligne (compte « Le Gardien »)', test: R('online_list') },
   { n: '17', file: '17-notifications.sql', what: 'Notifications envoyées par le serveur', test: R('push_unregister', { p_token: '-' }) }, /* v693 */
   { n: '19', file: '19-cadeaux.sql', what: 'Cadeaux non repris en recréant un compte' }, /* v796 */
+  { n: '21', file: '21-parrainage.sql', what: 'Parrainage', test: R('parrain_list') }, /* v917 */
+  { n: '22', file: '22-tableau-de-bord.sql', what: 'Tableau de bord du créateur', test: R('createur_stats') }, /* v917 */
 ];
 /* une réponse d'erreur qui prouve que l'objet existe (exception levée, accès refusé) ou qu'il manque */
 const present = (r) => r.ok || r.code === 'P0001' || r.code === '42501' || (r.status === 400 && !/^(PGRST20[0-9]|42P01|42883|42703)$/.test(r.code));

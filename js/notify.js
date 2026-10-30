@@ -9,6 +9,7 @@ import { isNative } from './native.js';
 import { LANG, t } from './i18n.js';
 import { CODEX, codexTier } from './core/codex.js';
 import { today } from './core/save.js';
+import { PUSH_ANDROID } from './config.js'; /* v917 */
 
 const LN = () => (isNative() ? window.Capacitor?.Plugins?.LocalNotifications : null);
 const DAILY_ID = 1001, CODEX_ID = 1002, STREAK_ID = 1003, EVE_ID = 1004, SHADOW_ID = 1005, CHOC_ID = 1006; /* v839 : jeton du Choc */ /* v680 : fin de saison du Codex ; v708 : série d'offrandes brisée ; v709 : offrande du soir, Tirage des Ombres */
@@ -16,10 +17,11 @@ const REMIND_BASE = 20000;
 const REMIND_HOURS = 2;
 export const notifSupported = () => !!LN();
 export const pushSupported = () => !!PN();
-/* v693 : notifications du serveur (iPhone seulement pour l'instant : Android demandera Firebase) */
+/* v693 : notifications du serveur (iPhone) ; v917 : Android aussi, par Firebase, quand PUSH_ANDROID est vrai */
+const platform = () => (isNative() ? window.Capacitor?.getPlatform?.() : '') || '';
 const PN = () => {
-  const C = isNative() ? window.Capacitor : null;
-  return C && C.getPlatform?.() === 'ios' && C.isPluginAvailable?.('PushNotifications') ? C.Plugins.PushNotifications : null;
+  const C = isNative() ? window.Capacitor : null, p = platform();
+  return C && (p === 'ios' || (p === 'android' && PUSH_ANDROID)) && C.isPluginAvailable?.('PushNotifications') ? C.Plugins.PushNotifications : null;
 };
 const TOK = 'abyssal.pushToken';
 const tokGet = () => { try { return localStorage.getItem(TOK) || ''; } catch (e) { return ''; } };
@@ -34,8 +36,10 @@ export async function syncPush(app) {
     try {
       await P.addListener('registration', ({ value }) => {
         try { localStorage.setItem(TOK, value); } catch (e) { /* rien */ }
-        if (cloud.isLoggedIn() && g.s.settings.notif) cloud.pushRegister(value, 'ios', LANG).catch(() => {});
+        if (cloud.isLoggedIn() && g.s.settings.notif) cloud.pushRegister(value, platform(), LANG).catch(() => {});
       });
+      /* v917 : Android range les notifications du serveur dans le canal « abyssal » (serveur/push.mjs, FCM_CHANNEL) */
+      if (platform() === 'android') await P.createChannel?.({ id: 'abyssal', name: 'ABYSSAL', description: t('Parties en ligne, défis et amis'), importance: 4, visibility: 1 }).catch?.(() => {});
       await P.addListener('pushNotificationActionPerformed', (a) => {
         const r = a?.notification?.data?.route;
         if (typeof r === 'string' && /^#\/[a-z-]*$/.test(r)) app.go(r.slice(2));

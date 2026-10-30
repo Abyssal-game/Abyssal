@@ -23,6 +23,7 @@ import { playEndingSure } from './ending.js';
 import { BRAISE_IC, braiseBar, openRevive, openBraiseInfo } from '../ui/braise.js';
 import { t, tw } from '../i18n.js';
 import { musicPrefetch } from '../ui/music.js'; /* v679 */
+import { maybeAskReview } from '../review.js'; /* v917 */
 
 // Illustrations des portes et des bonus
 const DOOR_ART = { fight: 'door-fight', elite: 'door-elite', boss: 'door-boss', rest: 'rest', altar: 'altar', treasure: 'treasure' };
@@ -315,7 +316,7 @@ export default function descent(app, root) {
       try { out = g.finishBattle(); } catch (e) { app.flushProgress(); toast(esc(e.message), { kind: 'error' }); return render(); }
       app.chrome();
       if (out.lost) { app.sfx.error(); ui.outcome = out.summary; ui.win = null; render(); }
-      else if (out.summit) { ui.outcome = out.summary; ui.win = null; ui.start = null; ui.nightmare = false; render(); playEndingSure(app).then(() => { render(); if (out.abyssPack && !out.abyss) toast('<b>Tu as atteint le fond de l’Abysse !</b> Le Booster de l’Abysse t’attend dans les Boosters.', { kind: 'epic', icon: 'crown', ms: 7000 }); }); return; } /* v793 : la fin à chaque victoire contre l'Abysse */
+      else if (out.summit) { ui.outcome = out.summary; ui.win = null; ui.start = null; ui.nightmare = false; render(); playEndingSure(app).then(() => { render(); maybeAskReview(g, out); if (out.abyssPack && !out.abyss) toast('<b>Tu as atteint le fond de l’Abysse !</b> Le Booster de l’Abysse t’attend dans les Boosters.', { kind: 'epic', icon: 'crown', ms: 7000 }); }); return; } /* v793 : la fin à chaque victoire contre l'Abysse */
       else if (out.chapter || (out.summary && !g.descent().run)) { /* v808 : la Veille tenue (out.chapter = 0) finissait ici sans bilan : écran bloqué sur « Victoire » */ app.sfx.reveal('M'); /* v855 : plus de narrateur après un chapitre gagné */ ui.outcome = out.summary; ui.win = null; ui.start = null; render(); /* v731 : plus d’annonce en double, le bilan dit déjà tout */ }
       else {
         app.sfx.reveal(out.room === 'boss' ? 'M' : 'R');
@@ -325,6 +326,7 @@ export default function descent(app, root) {
       }
       window.scrollTo(0, 0);
       app.flushProgress();
+      maybeAskReview(g, out); /* v917 : fenêtre de note de l'App Store après un gardien vaincu pour la première fois */
       // v328 : le premier gardien vaincu ouvre les Duels des Sceaux ; on le dit (avant, seul le succès s'affichait)
     } });
   }

@@ -2,7 +2,9 @@
 // La base met chaque notification dans la file push_queue (supabase/17-notifications.sql) ; cette fonction la vide :
 // texte dans la langue du joueur, puis envoi à Apple (APNs, HTTP/2, jeton JWT ES256 signé avec la clé .p8 du
 // propriétaire, gardée dans les secrets de la fonction : APNS_KEY, APNS_KEY_ID, APNS_TEAM_ID ; jamais dans le dépôt).
-// Android (Firebase) : pas encore branché, ses notifications sont marquées envoyées sans rien faire.
+// v917 : Android par Firebase Cloud Messaging (API HTTP v1, jeton OAuth signé RS256 avec le compte de service du
+// propriétaire, secret FCM_SERVICE_ACCOUNT ; jamais dans le dépôt). Sans ce secret, les notifications Android sont
+// marquées envoyées sans rien faire.
 
 export const TOPIC = 'com.abyssalgame.abyssal';
 /* v841 : le nom du jeu porte déjà sa préposition (avant : « a joué aux Le Pacte ») */
@@ -128,14 +130,25 @@ export async function apnsJwt({ key, keyId, teamId, now = Date.now() }) {
 }
 
 // Vide la file : take() rend [{ id, kind, data, tokens: [{ token, platform, lang }] }] ; send(token, payload) → { status, reason }
-export async function drain({ take, done, drop, send, limit = 50 }) {
+// sendAndroid(token, message) → { status, reason } (absent : Android ignoré)
+export async function drain({ take, done, drop, send, sendAndroid = null, limit = 50 }) {
   const rows = await take(limit);
   const ok = [];
   let sent = 0;
   for (const r of rows || []) {
     let delivered = true;
     for (const t of r.tokens || []) {
-      if (t.platform !== 'ios') continue; /* Android : pas encore branché */
+      if (t.platform === 'android') {
+        if (!sendAndroid) continue;
+        const m = messageOf(r.kind, r.data, t.lang);
+        if (!m) continue;
+        const res = await sendAndroid(t.token, fcmMessage(t.token, m, r));
+        if (res.status === 200) sent++;
+        else if (res.status === 404 || /UNREGISTERED|registration-token-not-registered|INVALID_ARGUMENT/.test(res.reason || '')) await drop(t.token);
+        else delivered = false;
+        continue;
+      }
+      if (t.platform !== 'ios') continue;
       const m = messageOf(r.kind, r.data, t.lang);
       if (!m) continue;
       const payload = { aps: { alert: { title: m.title, body: m.body }, sound: 'default', 'thread-id': `${r.kind}:${r.data?.game || ''}` }, route: m.route };
@@ -169,5 +182,43 @@ export function apnsSender({ getJwt, fetchFn = fetch }) {
       } catch (e) { last = { status: 0, reason: String(e?.message || e) }; }
     }
     return last;
+  };
+}
+
+// ——— Android : Firebase Cloud Messaging (v917) ———
+export const FCM_CHANNEL = 'abyssal';
+export function fcmMessage(token, m, r = {}) {
+  return { message: { token, notification: { title: m.title, body: m.body }, data: { route: m.route },
+    android: { priority: 'high', collapse_key: `${r.kind || ''}:${r.data?.game || ''}`.slice(0, 60), notification: { channel_id: FCM_CHANNEL, sound: 'default' } } } };
+}
+// Jeton d'accès Google (OAuth 2, valable 1 h) à partir du compte de service (fichier JSON de Firebase)
+export async function fcmJwt({ sa, now = Date.now() }) {
+  const k = await crypto.subtle.importKey('pkcs8', pemToDer(sa.private_key), { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['sign']);
+  const iat = Math.floor(now / 1000);
+  const head = b64uStr(JSON.stringify({ alg: 'RS256', typ: 'JWT', ...(sa.private_key_id ? { kid: sa.private_key_id } : {}) }));
+  const body = b64uStr(JSON.stringify({ iss: sa.client_email, scope: 'https://www.googleapis.com/auth/firebase.messaging', aud: 'https://oauth2.googleapis.com/token', iat, exp: iat + 3600 }));
+  const sig = await crypto.subtle.sign({ name: 'RSASSA-PKCS1-v1_5' }, k, new TextEncoder().encode(`${head}.${body}`));
+  return `${head}.${body}.${b64u(sig)}`;
+}
+export async function fcmAccessToken({ sa, fetchFn = fetch }) {
+  const res = await fetchFn('https://oauth2.googleapis.com/token', {
+    method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    body: `grant_type=${encodeURIComponent('urn:ietf:params:oauth:grant-type:jwt-bearer')}&assertion=${await fcmJwt({ sa })}`,
+  });
+  const j = await res.json().catch(() => ({}));
+  if (!j.access_token) throw new Error(`Firebase : ${res.status} ${String(j.error_description || j.error || '').slice(0, 120)}`);
+  return j.access_token;
+}
+export function fcmSender({ projectId, getToken, fetchFn = fetch }) {
+  return async (token, body) => {
+    try {
+      const res = await fetchFn(`https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`, {
+        method: 'POST', headers: { authorization: `Bearer ${await getToken()}`, 'content-type': 'application/json' }, body: JSON.stringify(body),
+      });
+      if (res.status === 200) return { status: 200 };
+      let reason = '';
+      try { const j = await res.json(); reason = j?.error?.details?.find?.((d) => d.errorCode)?.errorCode || j?.error?.status || ''; } catch (e) { /* rien */ }
+      return { status: res.status, reason };
+    } catch (e) { return { status: 0, reason: String(e?.message || e) }; }
   };
 }

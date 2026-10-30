@@ -9681,6 +9681,12 @@ export default {
   "<b>Codex enluminé</b> débloqué : la voie enluminée de la saison est à toi.": "<b>Codice miniato</b> sbloccato: la via miniata della stagione è tua.",
   "<b>{name}</b> : tes objets t’attendent dans Profil › Personnaliser.": "<b>{name}</b>: i tuoi oggetti ti aspettano in Profilo › Personalizza.",
   "dont {0} offertes": "di cui {0} in omaggio",
+  "Continuer avec Apple": "Continua con Apple",
+  "Continuer avec Google": "Continua con Google",
+  "ou avec ton e-mail": "o con la tua e-mail",
+  "Connexion indisponible sur cet appareil.": "Accesso non disponibile su questo dispositivo.",
+  "La connexion n’a pas abouti. Réessaie.": "L’accesso non è riuscito. Riprova.",
+  "Parties en ligne, défis et amis": "Partite online, sfide e amici",
 };
 
 export const names = {

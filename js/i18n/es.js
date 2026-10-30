@@ -9682,6 +9682,12 @@ export default {
   "<b>Codex enluminé</b> débloqué : la voie enluminée de la saison est à toi.": "<b>Códice iluminado</b> desbloqueado: la vía iluminada de la temporada es tuya.",
   "<b>{name}</b> : tes objets t’attendent dans Profil › Personnaliser.": "<b>{name}</b>: tus objetos te esperan en Perfil › Personalizar.",
   "dont {0} offertes": "{0} de regalo incluidas",
+  "Continuer avec Apple": "Continuar con Apple",
+  "Continuer avec Google": "Continuar con Google",
+  "ou avec ton e-mail": "o con tu correo",
+  "Connexion indisponible sur cet appareil.": "Inicio de sesión no disponible en este dispositivo.",
+  "La connexion n’a pas abouti. Réessaie.": "No se pudo iniciar sesión. Vuelve a intentarlo.",
+  "Parties en ligne, défis et amis": "Partidas en línea, desafíos y amigos",
 };
 
 export const names = {

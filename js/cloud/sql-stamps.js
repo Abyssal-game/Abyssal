@@ -30,7 +30,7 @@ export const SQL_STAMPS = {
   },
   "17": {
     "file": "17-notifications.sql",
-    "stamp": "18907fa281ee"
+    "stamp": "2e6f02f2b22b"
   },
   "19": {
     "file": "19-cadeaux.sql",
@@ -39,6 +39,10 @@ export const SQL_STAMPS = {
   "21": {
     "file": "21-parrainage.sql",
     "stamp": "8f93dd3632b2"
+  },
+  "22": {
+    "file": "22-tableau-de-bord.sql",
+    "stamp": "de66d14d05c3"
   },
   "05": {
     "file": "05-tirage.sql",

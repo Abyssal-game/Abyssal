@@ -4,7 +4,8 @@
 // (pg_net, pg_cron) : elle ne prend aucune donnée de l'appel, elle envoie seulement ce qui attend dans la file.
 // Secrets (Supabase → Edge Functions → Secrets), jamais dans le dépôt : APNS_KEY (contenu du fichier .p8),
 // APNS_KEY_ID (identifiant de la clé, 10 caractères), APNS_TEAM_ID (identifiant de l'équipe Apple, 10 caractères).
-import { drain, apnsJwt, apnsSender } from '../../../serveur/push.mjs';
+// v917 : Android : FCM_SERVICE_ACCOUNT (contenu du fichier JSON du compte de service Firebase).
+import { drain, apnsJwt, apnsSender, fcmAccessToken, fcmSender } from '../../../serveur/push.mjs';
 
 const env = (k) => Deno.env.get(k) || '';
 const pick = (k) => { try { const o = JSON.parse(env(k) || '{}'); return o.default || Object.values(o)[0] || ''; } catch (e) { return ''; } };
@@ -23,16 +24,25 @@ const getJwt = async () => {
   if (!jwt.v || Date.now() - jwt.at > 50 * 60 * 1000) jwt = { v: await apnsJwt({ key: env('APNS_KEY'), keyId: env('APNS_KEY_ID'), teamId: env('APNS_TEAM_ID') }), at: Date.now() };
   return jwt.v;
 };
+let sa = null;
+try { sa = env('FCM_SERVICE_ACCOUNT') ? JSON.parse(env('FCM_SERVICE_ACCOUNT')) : null; } catch (e) { sa = null; }
+let gtok = { v: '', at: 0 };
+const getGoogle = async () => {
+  if (!gtok.v || Date.now() - gtok.at > 50 * 60 * 1000) gtok = { v: await fcmAccessToken({ sa }), at: Date.now() };
+  return gtok.v;
+};
 const json = (status, body) => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
 
 Deno.serve(async () => {
-  if (!env('APNS_KEY') || !env('APNS_KEY_ID') || !env('APNS_TEAM_ID')) return json(200, { ok: false, error: 'Clé Apple absente (secrets APNS_KEY, APNS_KEY_ID, APNS_TEAM_ID).' });
+  const apple = !!(env('APNS_KEY') && env('APNS_KEY_ID') && env('APNS_TEAM_ID')), google = !!(sa?.private_key && sa?.client_email && sa?.project_id);
+  if (!apple && !google) return json(200, { ok: false, error: 'Aucune clé (secrets APNS_KEY, APNS_KEY_ID, APNS_TEAM_ID pour l’iPhone ; FCM_SERVICE_ACCOUNT pour Android).' });
   try {
     const out = await drain({
       take: (n) => rpc('push_take', { p_limit: n }),
       done: (ids) => rpc('push_done', { p_ids: ids }),
       drop: (t) => rpc('push_drop', { p_token: t }),
-      send: apnsSender({ getJwt }),
+      send: apple ? apnsSender({ getJwt }) : async () => ({ status: 0, reason: 'no-apns' }),
+      sendAndroid: google ? fcmSender({ projectId: sa.project_id, getToken: getGoogle }) : null,
     });
     return json(200, { ok: true, ...out });
   } catch (e) { return json(200, { ok: false, error: String(e?.message || e).slice(0, 200) }); }

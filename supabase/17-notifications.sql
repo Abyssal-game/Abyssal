@@ -50,7 +50,7 @@ begin
   end if;
   if not exists (select 1 from public.profiles where id = me) then return; end if;
   insert into public.push_tokens (token, user_id, platform, lang, updated_at)
-    values (lower(p_token), me, p_platform, case when p_lang in ('fr', 'en', 'es', 'de', 'it', 'pt') then p_lang else 'fr' end, now())
+    values (case when p_platform = 'ios' then lower(p_token) else p_token end, me, p_platform, /* v917 : une adresse Android distingue majuscules et minuscules */ case when p_lang in ('fr', 'en', 'es', 'de', 'it', 'pt') then p_lang else 'fr' end, now())
     on conflict (token) do update set user_id = excluded.user_id, platform = excluded.platform, lang = excluded.lang, updated_at = now();
   -- 5 téléphones au plus par compte : les plus anciens sont oubliés
   delete from public.push_tokens t where t.user_id = me and t.token not in
@@ -60,7 +60,7 @@ end $$;
 -- Notifications coupées dans les Réglages, ou déconnexion : le téléphone retire son adresse
 create or replace function public.push_unregister(p_token text)
 returns void language sql volatile security definer set search_path = public as $$
-  delete from public.push_tokens where token = lower(p_token) and user_id = auth.uid();
+  delete from public.push_tokens where token in (p_token, lower(p_token)) and user_id = auth.uid();
 $$;
 revoke execute on function public.push_register(text, text, text) from public, anon;
 revoke execute on function public.push_unregister(text) from public, anon;
@@ -187,7 +187,7 @@ returns void language sql volatile security definer set search_path = public as 
 $$;
 create or replace function public.push_drop(p_token text)
 returns void language sql volatile security definer set search_path = public as $$
-  delete from public.push_tokens where token = lower(p_token);
+  delete from public.push_tokens where token in (p_token, lower(p_token));
 $$;
 revoke execute on function public.push_take(int) from public, anon, authenticated;
 revoke execute on function public.push_done(bigint[]) from public, anon, authenticated;
@@ -216,7 +216,7 @@ end $$;
 create table if not exists public.sql_stamps (file text primary key, stamp text not null, at timestamptz not null default now());
 alter table public.sql_stamps enable row level security;
 revoke all on public.sql_stamps from public, anon, authenticated;
-insert into public.sql_stamps (file, stamp) values ('17', '18907fa281ee') on conflict (file) do update set stamp = excluded.stamp, at = now();
+insert into public.sql_stamps (file, stamp) values ('17', '2e6f02f2b22b') on conflict (file) do update set stamp = excluded.stamp, at = now();
 create or replace function public.sql_stamps() returns jsonb language sql stable security definer set search_path = public as $$
   select coalesce(jsonb_object_agg(file, stamp), '{}'::jsonb) from public.sql_stamps;
 $$;

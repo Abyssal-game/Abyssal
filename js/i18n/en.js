@@ -9694,6 +9694,12 @@ export default {
   "<b>Codex enluminé</b> débloqué : la voie enluminée de la saison est à toi.": "<b>Illuminated Codex</b> unlocked: this season’s illuminated path is yours.",
   "<b>{name}</b> : tes objets t’attendent dans Profil › Personnaliser.": "<b>{name}</b>: your items await you in Profile › Customize.",
   "dont {0} offertes": "including {0} free",
+  "Continuer avec Apple": "Continue with Apple",
+  "Continuer avec Google": "Continue with Google",
+  "ou avec ton e-mail": "or with your email",
+  "Connexion indisponible sur cet appareil.": "Sign-in is not available on this device.",
+  "La connexion n’a pas abouti. Réessaie.": "Sign-in didn’t go through. Try again.",
+  "Parties en ligne, défis et amis": "Online games, challenges and friends",
 };
 // Noms propres (créatures, gardiens, personnages, lignées, compétences) : repérés aussi au milieu d’une phrase
 export const names = {
