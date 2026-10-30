@@ -20,7 +20,7 @@ export const CODEX = {
   from: '2026-12',
   tierObs: 100,                          // v680 : prix d'un palier acheté en obsidiennes (« Acheter un palier »)
   questXp: 150,
-  shopFrom: null,                        // v684 : jour d'ouverture de l'Échoppe à tous ('AAAA-MM-JJ'), avant le Codex ; null = elle ouvre avec le Codex                          // v680 : points de Codex d'un défi de la saison (un palier)
+  shopFrom: '2026-10-30', /* v926 : ouverte avec la 1.2 (achats en euros seulement dans l'app ≥ IAP_MIN_BUILD, js/iap.js) */                        // v684 : jour d'ouverture de l'Échoppe à tous ('AAAA-MM-JJ'), avant le Codex ; null = elle ouvre avec le Codex                          // v680 : points de Codex d'un défi de la saison (un palier)
 };
 
 // ——— v474 : la monnaie payante, les Obsidiennes (achetées en euros, dépensées seulement en cosmétiques) ———

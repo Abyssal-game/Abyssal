@@ -2,7 +2,7 @@
 // Le téléphone paie ; il ne se donne rien lui-même : il demande ensuite au serveur de partie (op `iapSync`) de vérifier
 // les achats du compte auprès de RevenueCat et de les donner (une seule fois chacun). Hors de l'app, ou dans une app trop
 // ancienne pour avoir le module, les achats en euros restent fermés (avec la raison).
-import { IAP_KEY } from './config.js';
+import { IAP_KEY, IAP_MIN_BUILD } from './config.js';
 import { SHOP } from './core/codex.js';
 import * as cloud from './cloud/cloud.js';
 
@@ -12,6 +12,9 @@ const PENDING = 'abyssal.iapPending';
 const lsGet = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
 const lsSet = (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) { /* rien */ } };
 let configuredFor = null, products = {}, loading = null;
+/* v926 : numéro de build de l'app installée (une app trop ancienne n'a pas les achats validés par le magasin) */
+let nativeBuild = 0;
+try { cap()?.Plugins?.App?.getInfo?.().then((i) => { nativeBuild = Number(i?.build) || 0; }).catch(() => {}); } catch (e) { /* rien */ }
 
 /* 'ok', ou pourquoi les achats en euros ne sont pas possibles ici */
 export function iapStatus() {
@@ -19,6 +22,7 @@ export function iapStatus() {
   if (!c?.isNativePlatform?.()) return 'web';
   if (!(c.isPluginAvailable?.('Purchases') && P())) return 'old-app';
   if (!IAP_KEY[c.getPlatform?.()]) return 'closed';
+  if (nativeBuild && nativeBuild < (IAP_MIN_BUILD[c.getPlatform?.()] || 0)) return 'old-app';
   if (!cloud.isLoggedIn()) return 'login';
   return 'ok';
 }

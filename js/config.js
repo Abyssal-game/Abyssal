@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v925'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v926'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -70,6 +70,9 @@ export const LIVE_KEY = { x: 'o0UvHUxr62DiBrjrD6a-CyZiQfbXwx0UIdnVeOuWIyY', y: '
 // v680 : clés PUBLIQUES RevenueCat (paiements dans l'app ; faites pour être dans l'app). Tant qu'elles valent null,
 // les achats en euros restent fermés. La clé SECRÈTE n'est jamais ici : secret REVENUECAT_SECRET de la fonction Supabase.
 export const IAP_KEY = { ios: 'appl_MDPGtxYAssEAbwJfuGfKeZqbjeM', android: null };
+/* v926 : plus petit numéro de build de l'app qui peut acheter (la 1.2, première version envoyée à Apple avec les achats ;
+   la 1.1 = build 737 n'en a pas, ses joueurs voient « mets l'application à jour ») */
+export const IAP_MIN_BUILD = { ios: 926, android: 926 };
 /* v917 : notifications du serveur sur Android (Firebase). v920 : plus petit numéro de build Android qui contient le fichier
    google-services.json (secret GitHub GOOGLE_SERVICES_JSON, posé le 30 octobre 2026) ; une application plus ancienne, sans
    Firebase, se fermerait à l'inscription : elle ne s'inscrit pas (0 = jamais). */
