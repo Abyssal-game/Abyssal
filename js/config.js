@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v919'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v920'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -70,9 +70,10 @@ export const LIVE_KEY = { x: 'o0UvHUxr62DiBrjrD6a-CyZiQfbXwx0UIdnVeOuWIyY', y: '
 // v680 : clés PUBLIQUES RevenueCat (paiements dans l'app ; faites pour être dans l'app). Tant qu'elles valent null,
 // les achats en euros restent fermés. La clé SECRÈTE n'est jamais ici : secret REVENUECAT_SECRET de la fonction Supabase.
 export const IAP_KEY = { ios: 'appl_MDPGtxYAssEAbwJfuGfKeZqbjeM', android: null };
-/* v917 : notifications du serveur sur Android (Firebase) : à passer à true seulement quand le fichier google-services.json
-   est fourni à la construction (secret GitHub GOOGLE_SERVICES_JSON) ; sans lui, l'app Android se fermerait à l'inscription. */
-export const PUSH_ANDROID = false;
+/* v917 : notifications du serveur sur Android (Firebase). v920 : plus petit numéro de build Android qui contient le fichier
+   google-services.json (secret GitHub GOOGLE_SERVICES_JSON, posé le 30 octobre 2026) ; une application plus ancienne, sans
+   Firebase, se fermerait à l'inscription : elle ne s'inscrit pas (0 = jamais). */
+export const PUSH_ANDROID = 920;
 /* v917 : « Continuer avec Apple / Google » (js/social.js), dans l'application seulement. Apple : à passer à true quand
    le fournisseur Apple est activé dans Supabase et la capacité « Sign in with Apple » ajoutée dans Xcode (iPhone seulement).
    Google : identifiants publics des clients OAuth de Google Cloud (web : celui donné à Supabase ; ios : client iOS) ;

@@ -25,7 +25,7 @@ test('connexion Apple / Google : le jeton reçoit l’empreinte du nonce, Supaba
   assert.ok(cancelled(new Error('The user canceled the sign-in flow.')));
   assert.ok(!cancelled(new Error('invalid audience')));
   assert.equal(typeof SOCIAL.apple, 'boolean');
-  assert.equal(PUSH_ANDROID, false, 'Android : seulement quand google-services.json est fourni à la construction');
+  assert.ok(Number.isInteger(PUSH_ANDROID) && PUSH_ANDROID >= 920, 'Android : seulement les builds qui contiennent google-services.json');
 });
 
 test('tableau de bord : SQL réservé au créateur, sans e-mail ni pseudo, et vérifié par l’état du serveur', async () => {

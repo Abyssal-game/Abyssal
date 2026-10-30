@@ -19,15 +19,24 @@ export const notifSupported = () => !!LN();
 export const pushSupported = () => !!PN();
 /* v693 : notifications du serveur (iPhone) ; v917 : Android aussi, par Firebase, quand PUSH_ANDROID est vrai */
 const platform = () => (isNative() ? window.Capacitor?.getPlatform?.() : '') || '';
+let androidOk = null; /* v920 : l'app Android installée contient-elle Firebase ? (numéro de build ≥ PUSH_ANDROID) */
+async function pushReady() {
+  if (platform() !== 'android') return true;
+  if (androidOk === null) {
+    try { const b = Number((await window.Capacitor.Plugins.App.getInfo()).build) || 0; androidOk = !!PUSH_ANDROID && b >= PUSH_ANDROID; } catch (e) { androidOk = false; }
+  }
+  return androidOk;
+}
 const PN = () => {
   const C = isNative() ? window.Capacitor : null, p = platform();
-  return C && (p === 'ios' || (p === 'android' && PUSH_ANDROID)) && C.isPluginAvailable?.('PushNotifications') ? C.Plugins.PushNotifications : null;
+  return C && (p === 'ios' || (p === 'android' && androidOk === true)) && C.isPluginAvailable?.('PushNotifications') ? C.Plugins.PushNotifications : null;
 };
 const TOK = 'abyssal.pushToken';
 const tokGet = () => { try { return localStorage.getItem(TOK) || ''; } catch (e) { return ''; } };
 let wired = false;
 // Donne (ou retire) l'adresse de notification de ce téléphone au serveur, selon le réglage et le compte connecté
 export async function syncPush(app) {
+  await pushReady();
   const P = PN(); if (!P) return;
   const g = app.game;
   const cloud = await import('./cloud/cloud.js');
@@ -65,6 +74,7 @@ export async function askPermission() {
   try {
     let p = await L.checkPermissions();
     if (p.display !== 'granted') p = await L.requestPermissions();
+    await pushReady();
     const P = PN(); /* v693 : la même autorisation de l'iPhone sert aux notifications du serveur */
     if (P && p.display === 'granted') { try { const q = await P.checkPermissions(); if (q.receive !== 'granted') await P.requestPermissions(); } catch (e) { /* rien */ } }
     return p.display === 'granted';
