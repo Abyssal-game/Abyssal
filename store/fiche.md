@@ -114,6 +114,7 @@ Première version d'ABYSSAL. Bonne descente dans l'Abysse !
 ### Nouveautés de la version 1.2 (français)
 ```
 • L'Échoppe ouvre ses portes : dos de cartes vivants, sachets de booster, plaques, fonds de profil et plateaux pour les Duels des Sceaux, le Pacte, les Cryptes et les Enchères. Uniquement des objets d'apparence : rien ne rend plus fort.
+• Connexion en un toucher avec Apple ou Google.
 • Tes plateaux sont vus par ton adversaire pendant les parties en ligne.
 • Nouvelles missions du jour dans le Cercle de l'Abysse.
 • Un cadeau t'attend quand tu reviens après quelques jours d'absence.
@@ -123,6 +124,7 @@ Première version d'ABYSSAL. Bonne descente dans l'Abysse !
 ### Nouveautés de la version 1.2 (anglais, pour la fiche en anglais)
 ```
 • The Emporium opens its doors: living card backs, booster skins, nameplates, profile backgrounds and boards for Seal Duels, the Pact, the Crypts and the Auctions. Cosmetic items only: nothing makes you stronger.
+• One-tap sign-in with Apple or Google.
 • Your opponent sees your boards during online games.
 • New daily missions in the Abyss Circle.
 • A gift awaits you when you come back after a few days away.
@@ -255,6 +257,8 @@ Aucun achat qui rend plus fort, aucune publicité, aucun pistage.
 **À partir de la 1.2**, remplacer la dernière ligne des notes ci-dessus par ce paragraphe :
 ```
 Achats intégrés (nouveaux dans cette version, cosmétiques seulement) : Butin → Codex → L'Échoppe. Les obsidiennes s'achètent dans « Obtenir » (en haut de l'Échoppe) et servent uniquement à des objets d'apparence (dos de cartes, sachets de booster, plaques, fonds de profil, plateaux des mini-jeux). Le Pack du Fondateur et le Codex enluminé (voie de récompenses cosmétiques de la saison) sont aussi dans l'Échoppe. « Restaurer mes achats » se trouve en bas de la page « Obtenir ». Aucun achat ne donne de carte, de booster ni d'avantage en jeu. Aucune publicité, aucun pistage.
+
+Connexion : en plus de l'e-mail, « Continuer avec Apple » et « Continuer avec Google » sont proposés sur l'écran de compte. Quand un joueur supprime son compte (Sanctuaire → Compte → Supprimer mon compte), le lien avec son identifiant Apple est aussi révoqué auprès d'Apple.
 ```
 **Compte de démonstration :** crée un compte réservé aux vérificateurs (par exemple `review.abyssal@gmail.com` avec un pseudo « Vérificateur »). Donne son e-mail et son mot de passe dans les champs « Sign-in information ». Google demande la même chose dans **Contenu de l'appli → Accès aux applis**.
 
