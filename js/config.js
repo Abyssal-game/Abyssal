@@ -1,7 +1,7 @@
 // Configuration centrale du jeu : raretés, tables de tirage, boosters,
 // économie, variantes, progression. Toute la balance se règle ici.
 
-export const VERSION = 'v929'; // même numéro que sw.js : affiché dans Réglages > À propos
+export const VERSION = 'v930'; // même numéro que sw.js : affiché dans Réglages > À propos
 
 export const RARITIES = [
   { key: 'C',  name: 'Commune',     short: 'C',  color: '#A3ADBD' },
@@ -69,7 +69,7 @@ export const PORTRAITS = { 'x-gardien': { id: 'x-gardien', name: 'Le Gardien', r
 export const LIVE_KEY = { x: 'o0UvHUxr62DiBrjrD6a-CyZiQfbXwx0UIdnVeOuWIyY', y: '4ekFbtWuvGMmUg3_23Kyf67F-F2AAdT2-gdjpJoR0vU' }; /* v619 : clé créée par le propriétaire sur son Mac le 22 octobre 2026 */
 // v680 : clés PUBLIQUES RevenueCat (paiements dans l'app ; faites pour être dans l'app). Tant qu'elles valent null,
 // les achats en euros restent fermés. La clé SECRÈTE n'est jamais ici : secret REVENUECAT_SECRET de la fonction Supabase.
-export const IAP_KEY = { ios: 'appl_MDPGtxYAssEAbwJfuGfKeZqbjeM', android: null };
+export const IAP_KEY = { ios: 'appl_MDPGtxYAssEAbwJfuGfKeZqbjeM', android: 'goog_TspSOsJDDSFZMNwmTlKVqAMQHyY' };
 /* v926 : plus petit numéro de build de l'app qui peut acheter (la 1.2, première version envoyée à Apple avec les achats ;
    la 1.1 = build 737 n'en a pas, ses joueurs voient « mets l'application à jour ») */
 export const IAP_MIN_BUILD = { ios: 926, android: 926 };
