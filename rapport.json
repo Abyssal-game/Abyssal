@@ -1,0 +1,120 @@
+{
+ "steps": [
+  {
+   "name": "capture android-smoke/01-ouverture.png"
+  },
+  {
+   "name": "écran",
+   "W": 1080,
+   "H": 2340
+  },
+  {
+   "name": "page",
+   "url": "https://localhost/"
+  },
+  {
+   "name": "capture android-smoke/02-compte-obligatoire.png"
+  },
+  {
+   "name": "écran de compte",
+   "affiché": true
+  },
+  {
+   "name": "capture android-smoke/03-accueil.png"
+  },
+  {
+   "name": "état",
+   "native": true,
+   "classe": "native has-back",
+   "swControle": false,
+   "hash": "",
+   "plugins": [
+    "App",
+    "InAppReview",
+    "SocialLogin",
+    "PushNotifications",
+    "LiveCopy",
+    "SystemBars",
+    "LocalNotifications",
+    "SplashScreen",
+    "Haptics",
+    "Purchases",
+    "CapacitorCookies",
+    "WebView",
+    "Filesystem",
+    "Share",
+    "CapacitorHttp"
+   ],
+   "zoneSure": ""
+  },
+  {
+   "name": "retour sur le guide d’accueil",
+   "fenetresAvant": 0,
+   "fenetresApres": 0
+  },
+  {
+   "name": "capture android-smoke/04-collection.png"
+  },
+  {
+   "name": "écran collection",
+   "appEnVie": true,
+   "contenu": {
+    "panneaux": 0,
+    "visibles": 0,
+    "texte": 259
+   }
+  },
+  {
+   "name": "capture android-smoke/05-boosters.png"
+  },
+  {
+   "name": "écran boosters",
+   "appEnVie": true,
+   "contenu": {
+    "panneaux": 5,
+    "visibles": 5,
+    "texte": 1232
+   }
+  },
+  {
+   "name": "capture android-smoke/06-aventure.png"
+  },
+  {
+   "name": "écran aventure",
+   "appEnVie": true,
+   "contenu": {
+    "panneaux": 2,
+    "visibles": 2,
+    "texte": 545
+   }
+  },
+  {
+   "name": "capture android-smoke/07-reglages.png"
+  },
+  {
+   "name": "écran reglages",
+   "appEnVie": true,
+   "contenu": {
+    "panneaux": 5,
+    "visibles": 5,
+    "texte": 2184
+   }
+  },
+  {
+   "name": "retour 1",
+   "hash": "#/parametres",
+   "auPremierPlan": true
+  },
+  {
+   "name": "capture android-smoke/08-compte.png"
+  },
+  {
+   "name": "retour à l’accueil (l’app passe en arrière-plan)",
+   "focus": "mCurrentFocus=Window{1f358a u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}"
+  }
+ ],
+ "errors": [
+  "Object",
+  "Object"
+ ]
+}

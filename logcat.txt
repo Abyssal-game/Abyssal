@@ -1,0 +1,773 @@
+--------- beginning of main
+10-31 11:42:49.970  3378  3378 D Capacitor: Starting BridgeActivity
+10-31 11:42:50.012  3378  3378 D Capacitor: Registering plugin instance: CapacitorCookies
+10-31 11:42:50.018  3378  3378 D Capacitor: Registering plugin instance: WebView
+10-31 11:42:50.024  3378  3378 D Capacitor: Registering plugin instance: CapacitorHttp
+10-31 11:42:50.034  3378  3378 D Capacitor: Registering plugin instance: SystemBars
+10-31 11:42:50.040  3378  3378 D Capacitor: Registering plugin instance: LiveCopy
+10-31 11:42:50.043  3378  3378 D Capacitor: Registering plugin instance: InAppReview
+10-31 11:42:50.046  3378  3378 D Capacitor: Registering plugin instance: App
+10-31 11:42:50.050  3378  3378 D Capacitor: Registering plugin instance: Filesystem
+10-31 11:42:50.054  3378  3378 D Capacitor: Registering plugin instance: Haptics
+10-31 11:42:50.062  3378  3378 D Capacitor: Registering plugin instance: LocalNotifications
+10-31 11:42:50.077  3378  3378 D Capacitor: Registering plugin instance: PushNotifications
+10-31 11:42:50.081  3378  3378 D Capacitor: Registering plugin instance: Share
+10-31 11:42:50.087  3378  3378 D Capacitor: Registering plugin instance: SplashScreen
+10-31 11:42:50.097  3378  3378 D Capacitor: Registering plugin instance: SocialLogin
+10-31 11:42:50.103  3378  3378 D Capacitor: Registering plugin instance: Purchases
+10-31 11:42:50.232  3378  3378 W Capacitor: Unable to read file at path public/plugins
+10-31 11:42:50.238  3378  3378 D Capacitor: Loading app at https://localhost
+10-31 11:42:50.273  3378  3378 D Capacitor: App started
+10-31 11:42:50.292  3378  3378 D Capacitor: App resumed
+10-31 11:42:50.535  3378  3654 D Capacitor: Handling local request: https://localhost/
+10-31 11:42:51.034  3378  3653 D Capacitor: Handling local request: https://localhost/css/fonts.css
+10-31 11:42:51.062  3378  3686 D Capacitor: Handling local request: https://localhost/css/screens.css
+10-31 11:42:51.063  3378  3687 D Capacitor: Handling local request: https://localhost/css/army.css
+10-31 11:42:51.069  3378  3654 D Capacitor: Handling local request: https://localhost/css/base.css
+10-31 11:42:51.085  3378  3657 D Capacitor: Handling local request: https://localhost/css/card.css
+10-31 11:42:51.424  3378  3687 D Capacitor: Handling local request: https://localhost/css/diorama.css
+10-31 11:42:51.426  3378  3686 D Capacitor: Handling local request: https://localhost/assets/brand/title.webp
+10-31 11:42:51.429  3378  3654 D Capacitor: Handling local request: https://localhost/js/main.js
+10-31 11:42:53.243  3378  3653 D Capacitor: Handling local request: https://localhost/js/ui/errlog.js
+10-31 11:42:54.218  3378  3653 D Capacitor: Handling local request: https://localhost/js/i18n.js
+10-31 11:42:54.486  3378  3653 D Capacitor: Handling local request: https://localhost/js/core/catalog.js
+10-31 11:42:54.606  3378  3654 D Capacitor: Handling local request: https://localhost/js/core/game.js
+10-31 11:42:54.637  3378  3657 D Capacitor: Handling local request: https://localhost/js/art/assets.js
+10-31 11:42:54.684  3378  3686 D Capacitor: Handling local request: https://localhost/js/ui/card.js
+10-31 11:42:54.684  3378  3687 D Capacitor: Handling local request: https://localhost/js/core/army.js
+10-31 11:42:54.686  3378  3654 D Capacitor: Handling local request: https://localhost/js/core/renown.js
+10-31 11:42:54.691  3378  3653 D Capacitor: Handling local request: https://localhost/js/ui/dom.js
+10-31 11:42:54.693  3378  3687 D Capacitor: Handling local request: https://localhost/js/ui/sound.js
+10-31 11:42:54.705  3378  3687 D Capacitor: Handling local request: https://localhost/js/ui/music.js
+10-31 11:42:54.706  3378  3654 D Capacitor: Handling local request: https://localhost/js/ui/icons.js
+10-31 11:42:54.712  3378  3687 D Capacitor: Handling local request: https://localhost/js/ui/vitrine.js
+10-31 11:42:54.716  3378  3686 D Capacitor: Handling local request: https://localhost/js/ui/still.js
+10-31 11:42:54.718  3378  3686 D Capacitor: Handling local request: https://localhost/js/screens/detail.js
+10-31 11:42:54.726  3378  3687 D Capacitor: Handling local request: https://localhost/js/screens/lab.js
+10-31 11:42:54.732  3378  3687 D Capacitor: Handling local request: https://localhost/js/screens/collection.js
+10-31 11:42:54.738  3378  3653 D Capacitor: Handling local request: https://localhost/js/config.js
+10-31 11:42:54.738  3378  3686 D Capacitor: Handling local request: https://localhost/js/screens/home.js
+10-31 11:42:54.740  3378  3657 D Capacitor: Handling local request: https://localhost/js/screens/shop.js
+10-31 11:42:54.745  3378  3657 D Capacitor: Handling local request: https://localhost/js/screens/factions.js
+10-31 11:42:54.752  3378  3657 D Capacitor: Handling local request: https://localhost/js/screens/achievements.js
+10-31 11:42:54.754  3378  3654 D Capacitor: Handling local request: https://localhost/js/screens/profile.js
+10-31 11:42:54.759  3378  3687 D Capacitor: Handling local request: https://localhost/js/screens/bestiary.js
+10-31 11:42:54.766  3378  3654 D Capacitor: Handling local request: https://localhost/js/screens/descent.js
+10-31 11:42:54.772  3378  3686 D Capacitor: Handling local request: https://localhost/js/screens/account.js
+10-31 11:42:54.772  3378  3657 D Capacitor: Handling local request: https://localhost/js/screens/settings.js
+10-31 11:42:54.773  3378  3687 D Capacitor: Handling local request: https://localhost/js/screens/parrainage.js
+10-31 11:42:54.774  3378  3653 D Capacitor: Handling local request: https://localhost/js/screens/friends.js
+10-31 11:42:54.778  3378  3654 D Capacitor: Handling local request: https://localhost/js/ui/parrain.js
+10-31 11:42:54.785  3378  3686 D Capacitor: Handling local request: https://localhost/js/screens/sceaux.js
+10-31 11:42:54.786  3378  3657 D Capacitor: Handling local request: https://localhost/js/screens/menu.js
+10-31 11:42:54.792  3378  3653 D Capacitor: Handling local request: https://localhost/js/screens/codex.js
+10-31 11:42:54.793  3378  3653 D Capacitor: Handling local request: https://localhost/js/core/codex.js
+10-31 11:42:54.797  3378  3654 D Capacitor: Handling local request: https://localhost/js/screens/games.js
+10-31 11:42:54.798  3378  3687 D Capacitor: Handling local request: https://localhost/js/screens/encheres.js
+10-31 11:42:54.805  3378  3657 D Capacitor: Handling local request: https://localhost/js/screens/versus.js
+10-31 11:42:54.810  3378  3687 D Capacitor: Handling local request: https://localhost/js/screens/cryptes.js
+10-31 11:42:54.811  3378  3686 D Capacitor: Handling local request: https://localhost/js/screens/pacte.js
+10-31 11:42:54.812  3378  3653 D Capacitor: Handling local request: https://localhost/js/screens/trials.js
+10-31 11:42:54.813  3378  3687 D Capacitor: Handling local request: https://localhost/js/screens/shadow.js
+10-31 11:42:54.821  3378  3657 D Capacitor: Handling local request: https://localhost/js/screens/forge.js
+10-31 11:42:54.825  3378  3653 D Capacitor: Handling local request: https://localhost/js/screens/army.js
+10-31 11:42:54.831  3378  3654 D Capacitor: Handling local request: https://localhost/js/cloud/sync.js
+10-31 11:42:54.836  3378  3686 D Capacitor: Handling local request: https://localhost/js/cloud/partie.js
+10-31 11:42:54.838  3378  3657 D Capacitor: Handling local request: https://localhost/js/iap.js
+10-31 11:42:54.840  3378  3686 D Capacitor: Handling local request: https://localhost/js/cloud/cloud.js
+10-31 11:42:54.849  3378  3686 D Capacitor: Handling local request: https://localhost/js/cloud/presence.js
+10-31 11:42:54.866  3378  3687 D Capacitor: Handling local request: https://localhost/js/screens/opening.js
+10-31 11:42:54.874  3378  3653 D Capacitor: Handling local request: https://localhost/js/screens/welcome.js
+10-31 11:42:54.882  3378  3654 D Capacitor: Handling local request: https://localhost/js/screens/ending.js
+10-31 11:42:54.934  3378  3654 D Capacitor: Handling local request: https://localhost/js/core/lore-lines.js
+10-31 11:42:54.935  3378  3657 D Capacitor: Handling local request: https://localhost/js/ui/depth.js
+10-31 11:42:54.936  3378  3686 D Capacitor: Handling local request: https://localhost/js/ui/voice.js
+10-31 11:42:54.943  3378  3687 D Capacitor: Handling local request: https://localhost/js/ui/gate.js
+10-31 11:42:54.943  3378  3653 D Capacitor: Handling local request: https://localhost/js/cloud/mpwatch.js
+10-31 11:42:54.951  3378  3657 D Capacitor: Handling local request: https://localhost/js/notify.js
+10-31 11:42:54.953  3378  3654 D Capacitor: Handling local request: https://localhost/js/ui/scene.js
+10-31 11:42:54.953  3378  3686 D Capacitor: Handling local request: https://localhost/js/native.js
+10-31 11:42:54.954  3378  3654 D Capacitor: Handling local request: https://localhost/js/live.js
+10-31 11:42:55.234  3378  3653 D Capacitor: Handling local request: https://localhost/js/ui/perf.js
+10-31 11:42:55.246  3378  3653 D Capacitor: Handling local request: https://localhost/js/art/geometry.js
+10-31 11:42:55.251  3378  3653 D Capacitor: Handling local request: https://localhost/js/screens/furnace.js
+10-31 11:42:55.328  3378  3654 D Capacitor: Handling local request: https://localhost/js/core/boosters.js
+10-31 11:42:55.344  3378  3657 D Capacitor: Handling local request: https://localhost/js/core/forms.js
+10-31 11:42:55.348  3378  3653 D Capacitor: Handling local request: https://localhost/js/core/relations.js
+10-31 11:42:55.351  3378  3657 D Capacitor: Handling local request: https://localhost/js/ui/share-card.js
+10-31 11:42:55.351  3378  3687 D Capacitor: Handling local request: https://localhost/js/screens/defense-lab.js
+10-31 11:42:55.364  3378  3657 D Capacitor: Handling local request: https://localhost/js/core/lab.js
+10-31 11:42:55.365  3378  3653 D Capacitor: Handling local request: https://localhost/js/core/bosses.js
+10-31 11:42:55.373  3378  3654 D Capacitor: Handling local request: https://localhost/js/screens/lab-forge.js
+10-31 11:42:55.379  3378  3653 D Capacitor: Handling local request: https://localhost/js/core/kits.js
+10-31 11:42:55.380  3378  3654 D Capacitor: Handling local request: https://localhost/js/core/unlocks.js
+10-31 11:42:55.382  3378  3657 D Capacitor: Handling local request: https://localhost/js/ui/tutos.js
+10-31 11:42:55.382  3378  3686 D Capacitor: Handling local request: https://localhost/js/screens/duel-ui.js
+10-31 11:42:55.383  3378  3653 D Capacitor: Handling local request: https://localhost/js/ui/choc.js
+10-31 11:42:55.384  3378  3687 D Capacitor: Handling local request: https://localhost/js/art/procedural.js
+10-31 11:42:55.401  3378  3686 D Capacitor: Handling local request: https://localhost/js/ui/report.js
+10-31 11:42:55.411  3378  3657 D Capacitor: Handling local request: https://localhost/js/core/synergy.js
+10-31 11:42:55.433  3378  3687 D Capacitor: Handling local request: https://localhost/js/core/skills.js
+10-31 11:42:55.434  3378  3657 D Capacitor: Handling local request: https://localhost/js/core/descent.js
+10-31 11:42:55.435  3378  3657 D Capacitor: Handling local request: https://localhost/js/core/lore.js
+10-31 11:42:55.436  3378  3657 D Capacitor: Handling local request: https://localhost/js/core/story.js
+10-31 11:42:55.480  3378  3654 D Capacitor: Handling local request: https://localhost/js/core/friends.js
+10-31 11:42:55.481  3378  3653 D Capacitor: Handling local request: https://localhost/js/core/save.js
+10-31 11:42:55.624  3378  3654 D Capacitor: Handling local request: https://localhost/js/ui/coach.js
+10-31 11:42:55.643  3378  3653 D Capacitor: Handling local request: https://localhost/js/screens/creator.js
+10-31 11:42:55.644  3378  3653 D Capacitor: Handling local request: https://localhost/js/core/moderation.js
+10-31 11:42:55.653  3378  3654 D Capacitor: Handling local request: https://localhost/js/social.js
+10-31 11:42:55.655  3378  3657 D Capacitor: Handling local request: https://localhost/js/core/choc.js
+10-31 11:42:55.665  3378  3653 D Capacitor: Handling local request: https://localhost/js/core/versus.js
+10-31 11:42:55.736  3378  3686 D Capacitor: Handling local request: https://localhost/js/core/sceaux.js
+10-31 11:42:55.738  3378  3686 D Capacitor: Handling local request: https://localhost/js/core/cryptes.js
+10-31 11:42:55.740  3378  3657 D Capacitor: Handling local request: https://localhost/js/core/duel.js
+10-31 11:42:55.741  3378  3657 D Capacitor: Handling local request: https://localhost/js/ui/chest.js
+10-31 11:42:55.743  3378  3657 D Capacitor: Handling local request: https://localhost/js/ui/braise.js
+10-31 11:42:55.753  3378  3657 D Capacitor: Handling local request: https://localhost/js/review.js
+10-31 11:42:55.755  3378  3657 D Capacitor: Handling local request: https://localhost/js/ui/tourney.js
+10-31 11:42:55.758  3378  3686 D Capacitor: Handling local request: https://localhost/js/core/mp.js
+10-31 11:42:55.761  3378  3687 D Capacitor: Handling local request: https://localhost/js/core/encheres.js
+10-31 11:42:55.762  3378  3687 D Capacitor: Handling local request: https://localhost/js/screens/sceaux-mp.js
+10-31 11:42:55.764  3378  3654 D Capacitor: Handling local request: https://localhost/js/core/pacts.js
+10-31 11:42:55.778  3378  3653 D Capacitor: Handling local request: https://localhost/js/core/pacte.js
+10-31 11:42:55.782  3378  3654 D Capacitor: Handling local request: https://localhost/js/screens/encheres-mp.js
+10-31 11:42:55.784  3378  3654 D Capacitor: Handling local request: https://localhost/js/screens/mp-lobby.js
+10-31 11:42:55.786  3378  3687 D Capacitor: Handling local request: https://localhost/js/screens/versus-duel.js
+10-31 11:42:55.788  3378  3687 D Capacitor: Handling local request: https://localhost/js/screens/choc-game.js
+10-31 11:42:55.789  3378  3686 D Capacitor: Handling local request: https://localhost/js/ui/sceaux-demo.js
+10-31 11:42:55.790  3378  3687 D Capacitor: Handling local request: https://localhost/js/screens/choc-hall.js
+10-31 11:42:55.797  3378  3653 D Capacitor: Handling local request: https://localhost/js/screens/choc-dev.js
+10-31 11:42:55.798  3378  3653 D Capacitor: Handling local request: https://localhost/js/screens/pacte-mp.js
+10-31 11:42:55.802  3378  3686 D Capacitor: Handling local request: https://localhost/js/screens/chest-open.js
+10-31 11:42:55.803  3378  3686 D Capacitor: Handling local request: https://localhost/js/core/oprec.js
+10-31 11:42:55.804  3378  3686 D Capacitor: Handling local request: https://localhost/js/core/ops.js
+10-31 11:42:55.826  3378  3657 D Capacitor: Handling local request: https://localhost/js/core/voices.js
+10-31 11:42:55.832  3378  3654 D Capacitor: Handling local request: https://localhost/js/screens/cryptes-mp.js
+10-31 11:42:55.842  3378  3657 D Capacitor: Handling local request: https://localhost/js/ui/voice-key.js
+10-31 11:42:55.936  3378  3654 D Capacitor: Handling local request: https://localhost/js/ui/def-tune.js
+10-31 11:42:55.953  3378  3687 D Capacitor: Handling local request: https://localhost/js/ui/def-bar.js
+10-31 11:42:56.270  3378  3653 D Capacitor: Handling local request: https://localhost/js/core/kits-data.js
+10-31 11:42:56.348  3378  3653 D Capacitor: Handling local request: https://localhost/js/art/creatures.js
+10-31 11:42:56.365  3378  3653 D Capacitor: Handling local request: https://localhost/js/art/scenes.js
+10-31 11:42:56.410  3378  3653 D Capacitor: Handling local request: https://localhost/js/core/def-seq.js
+10-31 11:42:56.487  3378  3653 D Capacitor: Handling local request: https://localhost/js/core/relics.js
+10-31 11:42:56.501  3378  3653 D Capacitor: Handling local request: https://localhost/js/ui/diorama.js
+10-31 11:42:56.514  3378  3653 D Capacitor: Handling local request: https://localhost/js/ui/combat-log.js
+10-31 11:42:56.590  3378  3653 D Capacitor: Handling local request: https://localhost/js/screens/server-state.js
+10-31 11:42:56.602  3378  3653 D Capacitor: Handling local request: https://localhost/js/screens/dashboard.js
+10-31 11:42:56.645  3378  3653 D Capacitor: Handling local request: https://localhost/js/core/detmath.js
+10-31 11:42:56.719  3378  3653 D Capacitor: Handling local request: https://localhost/js/cloud/sql-stamps.js
+10-31 11:42:56.740  3378  3653 D Capacitor: Handling local request: https://localhost/js/i18n/en.js
+10-31 11:42:56.847  3378  3653 D Capacitor: Handling local request: https://localhost/assets/ui/def/rosace.webp
+10-31 11:42:56.851  3378  3378 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+10-31 11:42:56.852  3378  3653 D Capacitor: Handling local request: https://localhost/assets/ui/def/seal.webp
+10-31 11:42:56.857  3378  3378 V Capacitor: callback: 89118172, pluginId: App, methodName: getInfo, methodData: {}
+10-31 11:42:56.863  3378  3657 D Capacitor: Handling local request: https://localhost/assets/ui/def/ring.webp
+10-31 11:42:56.868  3378  3653 D Capacitor: Handling local request: https://localhost/assets/ui/def/target.webp
+10-31 11:42:56.876  3378  3653 D Capacitor: Handling local request: https://localhost/assets/ui/def/ring-fast.webp
+10-31 11:42:57.374  3378  3653 D Capacitor: Handling local request: https://localhost/data/factions.json
+10-31 11:42:57.397  3378  3653 D Capacitor: Handling local request: https://localhost/assets/art/manifest.json
+10-31 11:42:57.468  3378  3378 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+10-31 11:42:57.510  3378  3378 V Capacitor: callback: 89118173, pluginId: App, methodName: addListener, methodData: {"eventName":"backButton"}
+10-31 11:42:57.519  3378  3378 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+10-31 11:42:57.532  3378  3378 V Capacitor: callback: 89118174, pluginId: App, methodName: addListener, methodData: {"eventName":"appStateChange"}
+10-31 11:42:57.532  3378  3378 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+10-31 11:42:57.534  3378  3378 V Capacitor: callback: 89118175, pluginId: WebView, methodName: getServerBasePath, methodData: {}
+10-31 11:42:57.694  3378  3654 D Capacitor: Handling local request: https://localhost/icons/favicon.png
+10-31 11:42:57.704  3378  3654 D Capacitor: Handling local request: https://localhost/data/cards/infernal.json
+10-31 11:42:57.705  3378  3654 D Capacitor: Handling local request: https://localhost/data/cards/abyssal.json
+10-31 11:42:57.772  3378  3657 D Capacitor: Handling local request: https://localhost/data/cards/celeste.json
+10-31 11:42:57.785  3378  3654 D Capacitor: Handling local request: https://localhost/data/cards/sauvage.json
+10-31 11:42:57.791  3378  3686 D Capacitor: Handling local request: https://localhost/data/cards/necrotique.json
+10-31 11:42:57.793  3378  3686 D Capacitor: Handling local request: https://localhost/data/cards/artificiel.json
+10-31 11:42:57.799  3378  3378 I Capacitor/Console: File:  - Line 333 - Msg: {"name":"ABYSSAL","id":"com.abyssalgame.abyssal","build":"930","version":"1.0 (v930)"}
+10-31 11:42:57.803  3378  3378 I Capacitor/Console: File:  - Line 333 - Msg: {"path":"public"}
+10-31 11:42:57.803  3378  3378 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+10-31 11:42:57.807  3378  3378 V Capacitor: callback: 89118176, pluginId: App, methodName: addListener, methodData: {"eventName":"appStateChange"}
+10-31 11:42:57.810  3378  3687 D Capacitor: Handling local request: https://localhost/data/cards/primordial.json
+10-31 11:42:57.817  3378  3654 D Capacitor: Handling local request: https://localhost/data/sets.json
+10-31 11:42:57.829  3378  3687 D Capacitor: Handling local request: https://localhost/data/abilities.json
+10-31 11:42:57.854  3378  3687 D Capacitor: Handling local request: https://localhost/data/achievements.json
+10-31 11:42:57.859  3378  3657 D Capacitor: Handling local request: https://localhost/data/lore.json
+10-31 11:42:58.952  3378  3686 D Capacitor: Handling local request: https://localhost/assets/brand/emblem.webp
+10-31 11:42:58.954  3378  3686 D Capacitor: Handling local request: https://localhost/assets/icons/cur-shard.webp
+10-31 11:42:58.960  3378  3654 D Capacitor: Handling local request: https://localhost/assets/icons/cur-ash.webp
+10-31 11:42:58.963  3378  3686 D Capacitor: Handling local request: https://localhost/assets/icons/obsidienne.webp
+10-31 11:42:59.256  3378  3687 D Capacitor: Handling local request: https://localhost/assets/icons/tab-home.webp
+10-31 11:42:59.262  3378  3686 D Capacitor: Handling local request: https://localhost/assets/icons/tab-collection.webp
+10-31 11:42:59.268  3378  3657 D Capacitor: Handling local request: https://localhost/assets/icons/tab-butin.webp
+10-31 11:42:59.288  3378  3654 D Capacitor: Handling local request: https://localhost/assets/icons/tab-adventure.webp
+10-31 11:42:59.290  3378  3687 D Capacitor: Handling local request: https://localhost/assets/icons/tab-more.webp
+10-31 11:42:59.549  3378  3657 D Capacitor: Handling local request: https://localhost/assets/icons/ticket.webp
+10-31 11:42:59.554  3378  3686 D Capacitor: Handling local request: https://localhost/assets/icons/ui-next.webp
+10-31 11:42:59.555  3378  3654 D Capacitor: Handling local request: https://localhost/assets/chests/fer.webp
+10-31 11:42:59.555  3378  3687 D Capacitor: Handling local request: https://localhost/assets/icons/offrande.webp
+10-31 11:42:59.564  3378  4144 D Capacitor: Handling local request: https://localhost/assets/icons/book.webp
+10-31 11:42:59.566  3378  3657 D Capacitor: Handling local request: https://localhost/assets/icons/seal.webp
+10-31 11:42:59.591  3378  3657 D Capacitor: Handling local request: https://localhost/assets/icons/booster.webp
+10-31 11:42:59.597  3378  3657 D Capacitor: Handling local request: https://localhost/assets/icons/chest.webp
+10-31 11:42:59.600  3378  3687 D Capacitor: Handling local request: https://localhost/assets/scenes/home.webp
+10-31 11:42:59.602  3378  4144 D Capacitor: Handling local request: https://localhost/assets/frames/pf-base-4.webp
+10-31 11:42:59.608  3378  3654 D Capacitor: Handling local request: https://localhost/assets/ui/today.webp
+10-31 11:42:59.614  3378  3654 D Capacitor: Handling local request: https://localhost/assets/ui/bn-streak.webp
+10-31 11:42:59.616  3378  3654 D Capacitor: Handling local request: https://localhost/assets/ui/gauge-track.webp
+10-31 11:42:59.618  3378  3654 D Capacitor: Handling local request: https://localhost/assets/fonts/AlegreyaSans-8bed4c5f.woff2
+10-31 11:42:59.631  3378  3686 D Capacitor: Handling local request: https://localhost/assets/fonts/Cinzel-1bec9af0.woff2
+10-31 11:42:59.639  3378  3687 D Capacitor: Handling local request: https://localhost/assets/fonts/AlegreyaSans-f03ce63a.woff2
+10-31 11:42:59.679  3378  3654 D Capacitor: Handling local request: https://localhost/assets/fonts/AlegreyaSans-8a53b32d.woff2
+10-31 11:43:03.717  3620  3647 I chromium: [INFO:audio_latency.cc(179)] audioHardwareBufferSize = 4360
+10-31 11:43:04.290  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/manifest.json?v=v930
+10-31 11:43:04.623  3378  3653 D Capacitor: Handling local request: https://localhost/assets/music/manifest.json?v=v930
+10-31 11:43:04.794  3378  3653 D Capacitor: Handling local request: https://localhost/assets/backs/back.webp
+10-31 11:43:04.914  3378  3378 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+10-31 11:43:04.922  3378  3378 V Capacitor: callback: 89118177, pluginId: Filesystem, methodName: readdir, methodData: {"directory":"DATA","path":"live"}
+10-31 11:43:05.100  3378  3653 D Capacitor: Handling local request: https://localhost/assets/music/antre.mp3
+10-31 11:43:05.116  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/achievement.mp3
+10-31 11:43:05.118  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/actor.mp3
+10-31 11:43:05.121  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/apogee.mp3
+10-31 11:43:05.131  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/block.mp3
+10-31 11:43:05.144  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/boost.mp3
+10-31 11:43:05.158  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/boss.mp3
+10-31 11:43:05.169  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/bossvictory.mp3
+10-31 11:43:05.180  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/burn.mp3
+10-31 11:43:05.186  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/burnall.mp3
+10-31 11:43:05.200  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/cancel.mp3
+10-31 11:43:05.208  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/capture.mp3
+10-31 11:43:05.209  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/chain.mp3
+10-31 11:43:05.251  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/chest.mp3
+10-31 11:43:05.326  3378  3657 D Capacitor: Handling local request: https://localhost/assets/sfx/ci-chute.mp3
+10-31 11:43:05.330  3378  3687 D Capacitor: Handling local request: https://localhost/assets/sfx/ci-dechirer.mp3
+10-31 11:43:05.331  3378  3686 D Capacitor: Handling local request: https://localhost/assets/sfx/ci-forge.mp3
+10-31 11:43:05.336  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/ci-oeil.mp3
+10-31 11:43:05.341  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/ci-abime.mp3
+10-31 11:43:05.364  3378  3687 D Capacitor: Handling local request: https://localhost/assets/sfx/ci-page.mp3
+10-31 11:43:05.411  3378  3657 D Capacitor: Handling local request: https://localhost/assets/sfx/ci-plume.mp3
+10-31 11:43:05.585  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/ci-reveil.mp3
+10-31 11:43:05.607  3378  3657 D Capacitor: Handling local request: https://localhost/assets/sfx/ci-sceller.mp3
+10-31 11:43:05.607  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/ci-trophee.mp3
+10-31 11:43:05.609  3378  3686 D Capacitor: Handling local request: https://localhost/assets/sfx/coin.mp3
+10-31 11:43:05.609  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/cr-flip.mp3
+10-31 11:43:05.614  3378  3687 D Capacitor: Handling local request: https://localhost/assets/sfx/cr-miss.mp3
+10-31 11:43:05.616  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/cr-pair.mp3
+10-31 11:43:05.647  3378  3687 D Capacitor: Handling local request: https://localhost/assets/sfx/cr-power.mp3
+10-31 11:43:05.652  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/crit.mp3
+10-31 11:43:05.654  3378  3687 D Capacitor: Handling local request: https://localhost/assets/sfx/death.mp3
+10-31 11:43:05.681  3378  3686 D Capacitor: Handling local request: https://localhost/assets/sfx/defeat.mp3
+10-31 11:43:05.683  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/dice.mp3
+10-31 11:43:05.705  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/dodge.mp3
+10-31 11:43:05.720  3378  3686 D Capacitor: Handling local request: https://localhost/assets/sfx/enemyturn.mp3
+10-31 11:43:05.720  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/enrage.mp3
+10-31 11:43:05.724  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/en-coin.mp3
+10-31 11:43:05.729  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/enter.mp3
+10-31 11:43:05.731  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/error.mp3
+10-31 11:43:05.736  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/fame.mp3
+10-31 11:43:05.737  3378  3686 D Capacitor: Handling local request: https://localhost/assets/sfx/explode.mp3
+10-31 11:43:05.739  3378  3657 D Capacitor: Handling local request: https://localhost/assets/sfx/finisher.mp3
+10-31 11:43:05.742  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/flip.mp3
+10-31 11:43:05.747  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/freeze.mp3
+10-31 11:43:05.751  3378  3687 D Capacitor: Handling local request: https://localhost/assets/sfx/fumble.mp3
+10-31 11:43:05.753  3378  3687 D Capacitor: Handling local request: https://localhost/assets/sfx/fury.mp3
+10-31 11:43:05.756  3378  3687 D Capacitor: Handling local request: https://localhost/assets/sfx/hit.mp3
+10-31 11:43:05.759  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/gavel.mp3
+10-31 11:43:05.760  3378  3657 D Capacitor: Handling local request: https://localhost/assets/sfx/levelup.mp3
+10-31 11:43:05.762  3378  3657 D Capacitor: Handling local request: https://localhost/assets/sfx/miss.mp3
+10-31 11:43:05.763  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/mark.mp3
+10-31 11:43:05.765  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/nav.mp3
+10-31 11:43:05.767  3378  3686 D Capacitor: Handling local request: https://localhost/assets/sfx/heal.mp3
+10-31 11:43:05.770  3378  3687 D Capacitor: Handling local request: https://localhost/assets/sfx/pa.mp3
+10-31 11:43:05.772  3378  3686 D Capacitor: Handling local request: https://localhost/assets/sfx/pa-bank.mp3
+10-31 11:43:05.774  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/pa-bust.mp3
+10-31 11:43:05.776  3378  3657 D Capacitor: Handling local request: https://localhost/assets/sfx/pa-draw.mp3
+10-31 11:43:05.779  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/pa-guard.mp3
+10-31 11:43:05.781  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/pa-offer.mp3
+10-31 11:43:05.783  3378  3657 D Capacitor: Handling local request: https://localhost/assets/sfx/pa-seal.mp3
+10-31 11:43:05.784  3378  3686 D Capacitor: Handling local request: https://localhost/assets/sfx/pa-seven.mp3
+10-31 11:43:05.789  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/page.mp3
+10-31 11:43:05.798  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/parry.mp3
+10-31 11:43:05.800  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/passive.mp3
+10-31 11:43:05.808  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/poison.mp3
+10-31 11:43:05.809  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/perfect.mp3
+10-31 11:43:05.812  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/pose.mp3
+10-31 11:43:05.818  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/reveal-c.mp3
+10-31 11:43:05.821  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/reveal-hr.mp3
+10-31 11:43:05.832  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/recover.mp3
+10-31 11:43:05.835  3378  3687 D Capacitor: Handling local request: https://localhost/assets/sfx/reveal-m-full.mp3
+10-31 11:43:05.837  3378  3657 D Capacitor: Handling local request: https://localhost/assets/sfx/reveal-pc.mp3
+10-31 11:43:05.838  3378  3686 D Capacitor: Handling local request: https://localhost/assets/sfx/reveal-r.mp3
+10-31 11:43:05.840  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/reveal-s.mp3
+10-31 11:43:05.841  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/reveal-m.mp3
+10-31 11:43:05.844  3378  3687 D Capacitor: Handling local request: https://localhost/assets/sfx/season.mp3
+10-31 11:43:05.844  3378  3657 D Capacitor: Handling local request: https://localhost/assets/sfx/shatter.mp3
+10-31 11:43:05.845  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/reveal-s-full.mp3
+10-31 11:43:05.846  3378  3686 D Capacitor: Handling local request: https://localhost/assets/sfx/sheet.mp3
+10-31 11:43:05.846  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/shield.mp3
+10-31 11:43:05.848  3378  3686 D Capacitor: Handling local request: https://localhost/assets/sfx/skill.mp3
+10-31 11:43:05.850  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/slash.mp3
+10-31 11:43:05.851  3378  3686 D Capacitor: Handling local request: https://localhost/assets/sfx/smash.mp3
+10-31 11:43:05.854  3378  3687 D Capacitor: Handling local request: https://localhost/assets/sfx/suspense.mp3
+10-31 11:43:05.855  3378  3687 D Capacitor: Handling local request: https://localhost/assets/sfx/suspensebig.mp3
+10-31 11:43:05.857  3378  3687 D Capacitor: Handling local request: https://localhost/assets/sfx/swipe.mp3
+10-31 11:43:05.859  3378  3687 D Capacitor: Handling local request: https://localhost/assets/sfx/synergy.mp3
+10-31 11:43:05.861  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/tap.mp3
+10-31 11:43:05.863  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/taunt.mp3
+10-31 11:43:05.864  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/tear.mp3
+10-31 11:43:05.866  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/ult.mp3
+10-31 11:43:05.867  3378  3686 D Capacitor: Handling local request: https://localhost/assets/sfx/summon.mp3
+10-31 11:43:05.875  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/unlock.mp3
+10-31 11:43:05.877  3378  3687 D Capacitor: Handling local request: https://localhost/assets/sfx/vd-flip.mp3
+10-31 11:43:05.879  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/vd-lose.mp3
+10-31 11:43:05.880  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/vd-rare.mp3
+10-31 11:43:05.881  3378  3657 D Capacitor: Handling local request: https://localhost/assets/sfx/vd-tear.mp3
+10-31 11:43:05.883  3378  3686 D Capacitor: Handling local request: https://localhost/assets/sfx/vd-win.mp3
+10-31 11:43:05.886  3378  3653 D Capacitor: Handling local request: https://localhost/assets/icons/ui-user.webp
+10-31 11:43:05.887  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/yourturn.mp3
+10-31 11:43:05.890  3378  3653 D Capacitor: Handling local request: https://localhost/assets/icons/mysteries.webp
+10-31 11:43:05.891  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/victory.mp3
+10-31 11:43:09.629  3378  3378 D Capacitor: Sending plugin error: {"save":false,"callbackId":"89118177","pluginId":"Filesystem","methodName":"readdir","success":false,"error":{"message":"'readdir' failed because file at '\/data\/user\/0\/com.abyssalgame.abyssal\/files\/live\/' does not exist.","code":"OS-PLUG-FILE-0008"}}
+10-31 11:43:10.019  3378  3653 D Capacitor: Handling local request: https://localhost/assets/ui/tab-on.webp
+10-31 11:43:10.023  3378  3654 D Capacitor: Handling local request: https://localhost/assets/ui/tab-track.webp
+10-31 11:43:10.047  3378  3653 D Capacitor: Handling local request: https://localhost/assets/ui/field.webp
+10-31 11:43:10.295  3378  3378 E Capacitor/Console: File:  - Line 330 - Msg: [object Object]
+10-31 11:43:10.828  3378  3653 D Capacitor: Handling local request: https://localhost/assets/scenes/collection.webp
+10-31 11:43:12.084  3378  3378 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+10-31 11:43:12.085  3378  3378 V Capacitor: callback: 89118178, pluginId: LocalNotifications, methodName: addListener, methodData: {"eventName":"localNotificationActionPerformed"}
+10-31 11:43:12.086  3378  3378 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+10-31 11:43:12.087  3378  3378 V Capacitor: callback: 89118179, pluginId: LocalNotifications, methodName: cancel, methodData: {"notifications":[{"id":1001}]}
+10-31 11:43:12.089  3378  3378 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+10-31 11:43:12.090  3378  3378 V Capacitor: callback: 89118180, pluginId: App, methodName: getInfo, methodData: {}
+10-31 11:43:12.106  3378  3654 D Capacitor: Handling local request: https://localhost/
+10-31 11:43:13.098  3378  4384 W chromium: [WARNING:sync_reader.cc(175)] ASR: No room in socket buffer.: Broken pipe (32)
+10-31 11:43:13.156  3378  3654 D Capacitor: Handling local request: https://localhost/css/fonts.css
+10-31 11:43:13.182  3378  3655 D Capacitor: Handling local request: https://localhost/css/card.css
+10-31 11:43:13.187  3378  3654 D Capacitor: Handling local request: https://localhost/css/base.css
+10-31 11:43:13.187  3378  3657 D Capacitor: Handling local request: https://localhost/css/screens.css
+10-31 11:43:13.194  3378  3686 D Capacitor: Handling local request: https://localhost/css/diorama.css
+10-31 11:43:13.197  3378  3654 D Capacitor: Handling local request: https://localhost/css/army.css
+10-31 11:43:13.199  3378  3654 D Capacitor: Handling local request: https://localhost/js/main.js
+10-31 11:43:13.486  3378  3653 D Capacitor: Handling local request: https://localhost/assets/brand/title.webp
+10-31 11:43:14.244  3378  3378 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+10-31 11:43:14.246  3378  3378 V Capacitor: callback: 89118181, pluginId: LocalNotifications, methodName: cancel, methodData: {"notifications":[{"id":1001}]}
+10-31 11:43:17.732  3378  3653 D Capacitor: Handling local request: https://localhost/js/ui/errlog.js
+10-31 11:43:17.737  3378  3653 D Capacitor: Handling local request: https://localhost/js/core/game.js
+10-31 11:43:17.737  3378  3657 D Capacitor: Handling local request: https://localhost/js/art/assets.js
+10-31 11:43:17.737  3378  3654 D Capacitor: Handling local request: https://localhost/js/core/catalog.js
+10-31 11:43:17.738  3378  3657 D Capacitor: Handling local request: https://localhost/js/ui/card.js
+10-31 11:43:17.739  3378  3653 D Capacitor: Handling local request: https://localhost/js/core/renown.js
+10-31 11:43:17.739  3378  3654 D Capacitor: Handling local request: https://localhost/js/core/army.js
+10-31 11:43:17.746  3378  3686 D Capacitor: Handling local request: https://localhost/js/i18n.js
+10-31 11:43:17.776  3378  3655 D Capacitor: Handling local request: https://localhost/js/ui/icons.js
+10-31 11:43:17.776  3378  3687 D Capacitor: Handling local request: https://localhost/js/ui/dom.js
+10-31 11:43:17.777  3378  3654 D Capacitor: Handling local request: https://localhost/js/ui/sound.js
+10-31 11:43:17.777  3378  3655 D Capacitor: Handling local request: https://localhost/js/ui/music.js
+10-31 11:43:17.777  3378  3654 D Capacitor: Handling local request: https://localhost/js/ui/vitrine.js
+10-31 11:43:17.778  3378  3655 D Capacitor: Handling local request: https://localhost/js/ui/still.js
+10-31 11:43:17.779  3378  3686 D Capacitor: Handling local request: https://localhost/js/screens/home.js
+10-31 11:43:17.780  3378  3686 D Capacitor: Handling local request: https://localhost/js/screens/collection.js
+10-31 11:43:17.785  3378  3687 D Capacitor: Handling local request: https://localhost/js/screens/bestiary.js
+10-31 11:43:17.789  3378  3687 D Capacitor: Handling local request: https://localhost/js/screens/factions.js
+10-31 11:43:17.790  3378  3687 D Capacitor: Handling local request: https://localhost/js/screens/profile.js
+10-31 11:43:17.792  3378  3653 D Capacitor: Handling local request: https://localhost/js/screens/achievements.js
+10-31 11:43:17.793  3378  3653 D Capacitor: Handling local request: https://localhost/js/screens/descent.js
+10-31 11:43:17.809  3378  3653 D Capacitor: Handling local request: https://localhost/js/screens/account.js
+10-31 11:43:17.814  3378  3657 D Capacitor: Handling local request: https://localhost/js/screens/detail.js
+10-31 11:43:17.819  3378  3654 D Capacitor: Handling local request: https://localhost/js/config.js
+10-31 11:43:17.820  3378  3654 D Capacitor: Handling local request: https://localhost/js/screens/parrainage.js
+10-31 11:43:17.820  3378  3657 D Capacitor: Handling local request: https://localhost/js/screens/friends.js
+10-31 11:43:17.821  3378  3657 D Capacitor: Handling local request: https://localhost/js/screens/menu.js
+10-31 11:43:17.822  3378  3657 D Capacitor: Handling local request: https://localhost/js/screens/sceaux.js
+10-31 11:43:17.825  3378  3686 D Capacitor: Handling local request: https://localhost/js/screens/shop.js
+10-31 11:43:17.834  3378  3687 D Capacitor: Handling local request: https://localhost/js/screens/settings.js
+10-31 11:43:17.839  3378  3655 D Capacitor: Handling local request: https://localhost/js/screens/lab.js
+10-31 11:43:17.844  3378  3654 D Capacitor: Handling local request: https://localhost/js/ui/parrain.js
+10-31 11:43:17.891  3378  3686 D Capacitor: Handling local request: https://localhost/js/screens/games.js
+10-31 11:43:18.089  3378  3654 D Capacitor: Handling local request: https://localhost/js/screens/codex.js
+10-31 11:43:18.100  3378  3687 D Capacitor: Handling local request: https://localhost/js/screens/encheres.js
+10-31 11:43:18.108  3378  3657 D Capacitor: Handling local request: https://localhost/js/screens/versus.js
+10-31 11:43:18.108  3378  3657 D Capacitor: Handling local request: https://localhost/js/screens/shadow.js
+10-31 11:43:18.110  3378  3655 D Capacitor: Handling local request: https://localhost/js/screens/trials.js
+10-31 11:43:18.111  3378  3653 D Capacitor: Handling local request: https://localhost/js/screens/pacte.js
+10-31 11:43:18.118  3378  3657 D Capacitor: Handling local request: https://localhost/js/screens/forge.js
+10-31 11:43:18.119  3378  3657 D Capacitor: Handling local request: https://localhost/js/screens/army.js
+10-31 11:43:18.129  3378  3654 D Capacitor: Handling local request: https://localhost/js/core/codex.js
+10-31 11:43:18.133  3378  3686 D Capacitor: Handling local request: https://localhost/js/screens/cryptes.js
+10-31 11:43:18.143  3378  3686 D Capacitor: Handling local request: https://localhost/js/screens/welcome.js
+10-31 11:43:18.144  3378  3655 D Capacitor: Handling local request: https://localhost/js/iap.js
+10-31 11:43:18.145  3378  3655 D Capacitor: Handling local request: https://localhost/js/screens/opening.js
+10-31 11:43:18.146  3378  3653 D Capacitor: Handling local request: https://localhost/js/cloud/partie.js
+10-31 11:43:18.147  3378  3653 D Capacitor: Handling local request: https://localhost/js/screens/ending.js
+10-31 11:43:18.147  3378  3653 D Capacitor: Handling local request: https://localhost/js/core/lore-lines.js
+10-31 11:43:18.148  3378  3653 D Capacitor: Handling local request: https://localhost/js/ui/depth.js
+10-31 11:43:18.149  3378  3653 D Capacitor: Handling local request: https://localhost/js/ui/voice.js
+10-31 11:43:18.166  3378  3687 D Capacitor: Handling local request: https://localhost/js/cloud/cloud.js
+10-31 11:43:18.167  3378  3687 D Capacitor: Handling local request: https://localhost/js/ui/gate.js
+10-31 11:43:18.177  3378  3655 D Capacitor: Handling local request: https://localhost/js/cloud/mpwatch.js
+10-31 11:43:18.178  3378  3655 D Capacitor: Handling local request: https://localhost/js/native.js
+10-31 11:43:18.178  3378  3655 D Capacitor: Handling local request: https://localhost/js/live.js
+10-31 11:43:18.186  3378  3654 D Capacitor: Handling local request: https://localhost/js/cloud/presence.js
+10-31 11:43:18.188  3378  3686 D Capacitor: Handling local request: https://localhost/js/ui/scene.js
+10-31 11:43:18.199  3378  3657 D Capacitor: Handling local request: https://localhost/js/cloud/sync.js
+10-31 11:43:18.212  3378  3657 D Capacitor: Handling local request: https://localhost/js/core/boosters.js
+10-31 11:43:18.215  3378  3687 D Capacitor: Handling local request: https://localhost/js/notify.js
+10-31 11:43:18.216  3378  3686 D Capacitor: Handling local request: https://localhost/js/core/choc.js
+10-31 11:43:18.217  3378  3686 D Capacitor: Handling local request: https://localhost/js/core/versus.js
+10-31 11:43:18.219  3378  3653 D Capacitor: Handling local request: https://localhost/js/core/synergy.js
+10-31 11:43:18.225  3378  3653 D Capacitor: Handling local request: https://localhost/js/core/descent.js
+10-31 11:43:18.242  3378  3687 D Capacitor: Handling local request: https://localhost/js/core/save.js
+10-31 11:43:18.243  3378  3687 D Capacitor: Handling local request: https://localhost/js/core/forms.js
+10-31 11:43:18.244  3378  3657 D Capacitor: Handling local request: https://localhost/js/core/duel.js
+10-31 11:43:18.244  3378  3687 D Capacitor: Handling local request: https://localhost/js/core/sceaux.js
+10-31 11:43:18.245  3378  3687 D Capacitor: Handling local request: https://localhost/js/core/pacte.js
+10-31 11:43:18.245  3378  3657 D Capacitor: Handling local request: https://localhost/js/core/encheres.js
+10-31 11:43:18.246  3378  3655 D Capacitor: Handling local request: https://localhost/js/core/cryptes.js
+10-31 11:43:18.246  3378  3653 D Capacitor: Handling local request: https://localhost/js/core/bosses.js
+10-31 11:43:18.247  3378  3655 D Capacitor: Handling local request: https://localhost/js/core/mp.js
+10-31 11:43:18.248  3378  3686 D Capacitor: Handling local request: https://localhost/js/core/skills.js
+10-31 11:43:18.248  3378  3686 D Capacitor: Handling local request: https://localhost/js/art/geometry.js
+10-31 11:43:18.300  3378  3653 D Capacitor: Handling local request: https://localhost/js/art/procedural.js
+10-31 11:43:18.315  3378  3657 D Capacitor: Handling local request: https://localhost/js/screens/furnace.js
+10-31 11:43:18.316  3378  3654 D Capacitor: Handling local request: https://localhost/js/core/pacts.js
+10-31 11:43:18.326  3378  3657 D Capacitor: Handling local request: https://localhost/js/ui/share-card.js
+10-31 11:43:18.326  3378  3653 D Capacitor: Handling local request: https://localhost/js/ui/report.js
+10-31 11:43:18.327  3378  3653 D Capacitor: Handling local request: https://localhost/js/ui/tutos.js
+10-31 11:43:18.329  3378  3653 D Capacitor: Handling local request: https://localhost/js/core/kits.js
+10-31 11:43:18.330  3378  3653 D Capacitor: Handling local request: https://localhost/js/core/lore.js
+10-31 11:43:18.332  3378  3653 D Capacitor: Handling local request: https://localhost/js/core/story.js
+10-31 11:43:18.332  3378  3654 D Capacitor: Handling local request: https://localhost/js/core/friends.js
+10-31 11:43:18.334  3378  3653 D Capacitor: Handling local request: https://localhost/js/core/moderation.js
+10-31 11:43:18.334  3378  3657 D Capacitor: Handling local request: https://localhost/js/ui/choc.js
+10-31 11:43:18.336  3378  3686 D Capacitor: Handling local request: https://localhost/js/ui/perf.js
+10-31 11:43:18.339  3378  3653 D Capacitor: Handling local request: https://localhost/js/screens/creator.js
+10-31 11:43:18.341  3378  3653 D Capacitor: Handling local request: https://localhost/js/screens/sceaux-mp.js
+10-31 11:43:18.344  3378  3654 D Capacitor: Handling local request: https://localhost/js/ui/sceaux-demo.js
+10-31 11:43:18.345  3378  3654 D Capacitor: Handling local request: https://localhost/js/ui/coach.js
+10-31 11:43:18.346  3378  3657 D Capacitor: Handling local request: https://localhost/js/ui/tourney.js
+10-31 11:43:18.347  3378  3654 D Capacitor: Handling local request: https://localhost/js/ui/chest.js
+10-31 11:43:18.349  3378  3653 D Capacitor: Handling local request: https://localhost/js/screens/duel-ui.js
+10-31 11:43:18.349  3378  3657 D Capacitor: Handling local request: https://localhost/js/ui/braise.js
+10-31 11:43:18.350  3378  3654 D Capacitor: Handling local request: https://localhost/js/review.js
+10-31 11:43:18.361  3378  3657 D Capacitor: Handling local request: https://localhost/js/core/unlocks.js
+10-31 11:43:18.369  3378  3655 D Capacitor: Handling local request: https://localhost/js/core/relations.js
+10-31 11:43:18.390  3378  3653 D Capacitor: Handling local request: https://localhost/js/social.js
+10-31 11:43:18.392  3378  3657 D Capacitor: Handling local request: https://localhost/js/screens/lab-forge.js
+10-31 11:43:18.394  3378  3687 D Capacitor: Handling local request: https://localhost/js/screens/defense-lab.js
+10-31 11:43:18.396  3378  3654 D Capacitor: Handling local request: https://localhost/js/core/lab.js
+10-31 11:43:18.985  3378  3653 D Capacitor: Handling local request: https://localhost/js/screens/versus-duel.js
+10-31 11:43:18.986  3378  3654 D Capacitor: Handling local request: https://localhost/js/screens/mp-lobby.js
+10-31 11:43:18.996  3378  3653 D Capacitor: Handling local request: https://localhost/js/screens/choc-game.js
+10-31 11:43:18.997  3378  3654 D Capacitor: Handling local request: https://localhost/js/screens/choc-hall.js
+10-31 11:43:19.006  3378  3653 D Capacitor: Handling local request: https://localhost/js/screens/choc-dev.js
+10-31 11:43:19.014  3378  3653 D Capacitor: Handling local request: https://localhost/js/screens/chest-open.js
+10-31 11:43:19.017  3378  3653 D Capacitor: Handling local request: https://localhost/js/screens/pacte-mp.js
+10-31 11:43:19.028  3378  3653 D Capacitor: Handling local request: https://localhost/js/screens/encheres-mp.js
+10-31 11:43:19.031  3378  3654 D Capacitor: Handling local request: https://localhost/js/screens/cryptes-mp.js
+10-31 11:43:19.033  3378  3653 D Capacitor: Handling local request: https://localhost/js/core/oprec.js
+10-31 11:43:19.036  3378  3654 D Capacitor: Handling local request: https://localhost/js/core/ops.js
+10-31 11:43:19.055  3378  3653 D Capacitor: Handling local request: https://localhost/js/core/voices.js
+10-31 11:43:19.057  3378  3654 D Capacitor: Handling local request: https://localhost/js/ui/voice-key.js
+10-31 11:43:19.069  3378  3653 D Capacitor: Handling local request: https://localhost/js/core/detmath.js
+10-31 11:43:19.093  3378  3654 D Capacitor: Handling local request: https://localhost/js/art/creatures.js
+10-31 11:43:19.095  3378  3653 D Capacitor: Handling local request: https://localhost/js/art/scenes.js
+10-31 11:43:19.114  3378  3654 D Capacitor: Handling local request: https://localhost/js/core/kits-data.js
+10-31 11:43:19.117  3378  3653 D Capacitor: Handling local request: https://localhost/js/screens/server-state.js
+10-31 11:43:19.135  3378  3654 D Capacitor: Handling local request: https://localhost/js/screens/dashboard.js
+10-31 11:43:19.139  3378  3654 D Capacitor: Handling local request: https://localhost/js/ui/combat-log.js
+10-31 11:43:19.144  3378  3653 D Capacitor: Handling local request: https://localhost/js/core/relics.js
+10-31 11:43:19.172  3378  3653 D Capacitor: Handling local request: https://localhost/js/ui/diorama.js
+10-31 11:43:19.186  3378  3654 D Capacitor: Handling local request: https://localhost/js/core/def-seq.js
+10-31 11:43:19.205  3378  3653 D Capacitor: Handling local request: https://localhost/js/ui/def-bar.js
+10-31 11:43:19.207  3378  3654 D Capacitor: Handling local request: https://localhost/js/ui/def-tune.js
+10-31 11:43:19.467  3378  3653 D Capacitor: Handling local request: https://localhost/js/cloud/sql-stamps.js
+10-31 11:43:19.507  3378  3653 D Capacitor: Handling local request: https://localhost/js/i18n/en.js
+10-31 11:43:19.596  3378  3654 D Capacitor: Handling local request: https://localhost/assets/ui/def/seal.webp
+10-31 11:43:19.597  3378  3378 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+10-31 11:43:19.598  3378  3378 V Capacitor: callback: 30790441, pluginId: App, methodName: getInfo, methodData: {}
+10-31 11:43:19.603  3378  3653 D Capacitor: Handling local request: https://localhost/assets/ui/def/rosace.webp
+10-31 11:43:19.606  3378  3686 D Capacitor: Handling local request: https://localhost/assets/ui/def/target.webp
+10-31 11:43:19.649  3378  3687 D Capacitor: Handling local request: https://localhost/assets/ui/def/ring-fast.webp
+10-31 11:43:19.653  3378  3657 D Capacitor: Handling local request: https://localhost/assets/ui/def/ring.webp
+10-31 11:43:19.673  3378  3378 I Capacitor/Console: File:  - Line 333 - Msg: {"name":"ABYSSAL","id":"com.abyssalgame.abyssal","build":"930","version":"1.0 (v930)"}
+10-31 11:43:19.962  3378  3378 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+10-31 11:43:19.963  3378  3653 D Capacitor: Handling local request: https://localhost/data/factions.json
+10-31 11:43:19.968  3378  3378 V Capacitor: callback: 30790442, pluginId: App, methodName: addListener, methodData: {"eventName":"backButton"}
+10-31 11:43:19.969  3378  3378 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+10-31 11:43:19.970  3378  3378 V Capacitor: callback: 30790443, pluginId: App, methodName: addListener, methodData: {"eventName":"appStateChange"}
+10-31 11:43:19.970  3378  3378 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+10-31 11:43:19.971  3378  3378 V Capacitor: callback: 30790444, pluginId: WebView, methodName: getServerBasePath, methodData: {}
+10-31 11:43:19.981  3378  3653 D Capacitor: Handling local request: https://localhost/assets/art/manifest.json
+10-31 11:43:20.054  3378  3653 D Capacitor: Handling local request: https://localhost/icons/favicon.png
+10-31 11:43:20.061  3378  3378 I Capacitor/Console: File:  - Line 333 - Msg: {"path":"public"}
+10-31 11:43:20.074  3378  3378 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+10-31 11:43:20.075  3378  3378 V Capacitor: callback: 30790445, pluginId: App, methodName: addListener, methodData: {"eventName":"appStateChange"}
+10-31 11:43:20.099  3378  3654 D Capacitor: Handling local request: https://localhost/data/cards/infernal.json
+10-31 11:43:20.133  3378  3655 D Capacitor: Handling local request: https://localhost/data/cards/celeste.json
+10-31 11:43:20.163  3378  3655 D Capacitor: Handling local request: https://localhost/data/cards/sauvage.json
+10-31 11:43:20.164  3378  3657 D Capacitor: Handling local request: https://localhost/data/cards/necrotique.json
+10-31 11:43:20.168  3378  3657 D Capacitor: Handling local request: https://localhost/data/abilities.json
+10-31 11:43:20.172  3378  3657 D Capacitor: Handling local request: https://localhost/data/achievements.json
+10-31 11:43:20.173  3378  3653 D Capacitor: Handling local request: https://localhost/data/cards/abyssal.json
+10-31 11:43:20.174  3378  3686 D Capacitor: Handling local request: https://localhost/data/cards/artificiel.json
+10-31 11:43:20.180  3378  3687 D Capacitor: Handling local request: https://localhost/data/cards/primordial.json
+10-31 11:43:20.183  3378  3654 D Capacitor: Handling local request: https://localhost/data/sets.json
+10-31 11:43:20.193  3378  3655 D Capacitor: Handling local request: https://localhost/data/lore.json
+10-31 11:43:21.517  3620  3647 I chromium: [INFO:audio_latency.cc(179)] audioHardwareBufferSize = 4360
+10-31 11:43:21.765  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/manifest.json?v=v930
+10-31 11:43:22.080  3378  3653 D Capacitor: Handling local request: https://localhost/assets/music/manifest.json?v=v930
+10-31 11:43:22.102  3378  3654 D Capacitor: Handling local request: https://localhost/assets/brand/emblem.webp
+10-31 11:43:22.103  3378  3657 D Capacitor: Handling local request: https://localhost/assets/icons/cur-shard.webp
+10-31 11:43:22.105  3378  3657 D Capacitor: Handling local request: https://localhost/assets/icons/cur-ash.webp
+10-31 11:43:22.117  3378  3655 D Capacitor: Handling local request: https://localhost/assets/icons/obsidienne.webp
+10-31 11:43:22.315  3378  3653 D Capacitor: Handling local request: https://localhost/assets/icons/tab-home.webp
+10-31 11:43:22.319  3378  3653 D Capacitor: Handling local request: https://localhost/assets/icons/tab-collection.webp
+10-31 11:43:22.325  3378  3653 D Capacitor: Handling local request: https://localhost/assets/icons/tab-butin.webp
+10-31 11:43:22.331  3378  3653 D Capacitor: Handling local request: https://localhost/assets/icons/tab-adventure.webp
+10-31 11:43:22.334  3378  3655 D Capacitor: Handling local request: https://localhost/assets/icons/tab-more.webp
+10-31 11:43:22.335  3378  3657 D Capacitor: Handling local request: https://localhost/assets/icons/ticket.webp
+10-31 11:43:22.345  3378  3653 D Capacitor: Handling local request: https://localhost/assets/icons/ui-next.webp
+10-31 11:43:22.349  3378  3657 D Capacitor: Handling local request: https://localhost/assets/icons/offrande.webp
+10-31 11:43:22.351  3378  3655 D Capacitor: Handling local request: https://localhost/assets/chests/fer.webp
+10-31 11:43:22.375  3378  3654 D Capacitor: Handling local request: https://localhost/assets/icons/book.webp
+10-31 11:43:22.383  3378  3655 D Capacitor: Handling local request: https://localhost/assets/icons/seal.webp
+10-31 11:43:22.384  3378  3653 D Capacitor: Handling local request: https://localhost/assets/icons/booster.webp
+10-31 11:43:22.391  3378  3654 D Capacitor: Handling local request: https://localhost/assets/icons/chest.webp
+10-31 11:43:22.404  3378  3654 D Capacitor: Handling local request: https://localhost/assets/scenes/home.webp
+10-31 11:43:22.447  3378  3653 D Capacitor: Handling local request: https://localhost/assets/frames/pf-base-4.webp
+10-31 11:43:22.481  3378  3653 D Capacitor: Handling local request: https://localhost/assets/ui/today.webp
+10-31 11:43:22.515  3378  3653 D Capacitor: Handling local request: https://localhost/assets/ui/bn-streak.webp
+10-31 11:43:22.533  3378  3653 D Capacitor: Handling local request: https://localhost/assets/ui/gauge-track.webp
+10-31 11:43:22.622  3378  3653 D Capacitor: Handling local request: https://localhost/assets/fonts/AlegreyaSans-8bed4c5f.woff2
+10-31 11:43:22.639  3378  3653 D Capacitor: Handling local request: https://localhost/assets/fonts/AlegreyaSans-8a53b32d.woff2
+10-31 11:43:22.664  3378  3653 D Capacitor: Handling local request: https://localhost/assets/fonts/Cinzel-1bec9af0.woff2
+10-31 11:43:22.674  3378  3653 D Capacitor: Handling local request: https://localhost/assets/fonts/AlegreyaSans-f03ce63a.woff2
+10-31 11:43:23.177  3378  3654 D Capacitor: Handling local request: https://localhost/assets/backs/back.webp
+10-31 11:43:23.178  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/achievement.mp3
+10-31 11:43:23.232  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/actor.mp3
+10-31 11:43:23.234  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/boost.mp3
+10-31 11:43:23.236  3378  3657 D Capacitor: Handling local request: https://localhost/assets/sfx/boss.mp3
+10-31 11:43:23.237  3378  3686 D Capacitor: Handling local request: https://localhost/assets/sfx/burnall.mp3
+10-31 11:43:23.238  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/apogee.mp3
+10-31 11:43:23.239  3378  3687 D Capacitor: Handling local request: https://localhost/assets/sfx/bossvictory.mp3
+10-31 11:43:23.240  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/block.mp3
+10-31 11:43:23.243  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/burn.mp3
+10-31 11:43:23.249  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/chest.mp3
+10-31 11:43:23.250  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/capture.mp3
+10-31 11:43:23.253  3378  3657 D Capacitor: Handling local request: https://localhost/assets/sfx/ci-abime.mp3
+10-31 11:43:23.257  3378  3686 D Capacitor: Handling local request: https://localhost/assets/sfx/cancel.mp3
+10-31 11:43:23.259  3378  3687 D Capacitor: Handling local request: https://localhost/assets/sfx/chain.mp3
+10-31 11:43:23.284  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/ci-forge.mp3
+10-31 11:43:23.287  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/ci-dechirer.mp3
+10-31 11:43:23.290  3378  3657 D Capacitor: Handling local request: https://localhost/assets/sfx/ci-oeil.mp3
+10-31 11:43:23.292  3378  3687 D Capacitor: Handling local request: https://localhost/assets/sfx/ci-page.mp3
+10-31 11:43:23.307  3378  3687 D Capacitor: Handling local request: https://localhost/assets/sfx/coin.mp3
+10-31 11:43:23.310  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/ci-chute.mp3
+10-31 11:43:23.310  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/ci-reveil.mp3
+10-31 11:43:23.311  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/ci-trophee.mp3
+10-31 11:43:23.311  3378  3657 D Capacitor: Handling local request: https://localhost/assets/sfx/ci-sceller.mp3
+10-31 11:43:23.315  3378  3686 D Capacitor: Handling local request: https://localhost/assets/sfx/ci-plume.mp3
+10-31 11:43:23.324  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/cr-flip.mp3
+10-31 11:43:23.336  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/cr-pair.mp3
+10-31 11:43:23.337  3378  3657 D Capacitor: Handling local request: https://localhost/assets/sfx/cr-power.mp3
+10-31 11:43:23.342  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/dice.mp3
+10-31 11:43:23.347  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/cr-miss.mp3
+10-31 11:43:23.352  3378  3657 D Capacitor: Handling local request: https://localhost/assets/sfx/dodge.mp3
+10-31 11:43:23.363  3378  3686 D Capacitor: Handling local request: https://localhost/assets/sfx/defeat.mp3
+10-31 11:43:23.365  3378  3686 D Capacitor: Handling local request: https://localhost/assets/sfx/en-coin.mp3
+10-31 11:43:23.371  3378  3687 D Capacitor: Handling local request: https://localhost/assets/sfx/crit.mp3
+10-31 11:43:23.402  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/death.mp3
+10-31 11:43:23.431  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/enter.mp3
+10-31 11:43:23.437  3378  3686 D Capacitor: Handling local request: https://localhost/assets/sfx/explode.mp3
+10-31 11:43:23.438  3378  3657 D Capacitor: Handling local request: https://localhost/assets/sfx/error.mp3
+10-31 11:43:23.443  3378  3657 D Capacitor: Handling local request: https://localhost/assets/sfx/finisher.mp3
+10-31 11:43:23.453  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/enemyturn.mp3
+10-31 11:43:23.456  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/enrage.mp3
+10-31 11:43:23.459  3378  3657 D Capacitor: Handling local request: https://localhost/assets/sfx/freeze.mp3
+10-31 11:43:23.460  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/fumble.mp3
+10-31 11:43:23.462  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/fury.mp3
+10-31 11:43:23.465  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/levelup.mp3
+10-31 11:43:23.469  3378  3687 D Capacitor: Handling local request: https://localhost/assets/sfx/fame.mp3
+10-31 11:43:23.470  3378  3657 D Capacitor: Handling local request: https://localhost/assets/sfx/hit.mp3
+10-31 11:43:23.472  3378  3657 D Capacitor: Handling local request: https://localhost/assets/sfx/mark.mp3
+10-31 11:43:23.474  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/heal.mp3
+10-31 11:43:23.478  3378  3686 D Capacitor: Handling local request: https://localhost/assets/sfx/flip.mp3
+10-31 11:43:23.478  3378  3687 D Capacitor: Handling local request: https://localhost/assets/sfx/miss.mp3
+10-31 11:43:23.483  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/gavel.mp3
+10-31 11:43:23.488  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/nav.mp3
+10-31 11:43:23.492  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/pa-bank.mp3
+10-31 11:43:23.493  3378  3686 D Capacitor: Handling local request: https://localhost/assets/sfx/pa-bust.mp3
+10-31 11:43:23.498  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/pa-guard.mp3
+10-31 11:43:23.501  3378  3687 D Capacitor: Handling local request: https://localhost/assets/sfx/pa.mp3
+10-31 11:43:23.505  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/pa-seal.mp3
+10-31 11:43:23.507  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/pa-seven.mp3
+10-31 11:43:23.509  3378  3657 D Capacitor: Handling local request: https://localhost/assets/sfx/pa-draw.mp3
+10-31 11:43:23.523  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/page.mp3
+10-31 11:43:23.537  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/parry.mp3
+10-31 11:43:23.539  3378  3687 D Capacitor: Handling local request: https://localhost/assets/sfx/pa-offer.mp3
+10-31 11:43:23.541  3378  3657 D Capacitor: Handling local request: https://localhost/assets/sfx/passive.mp3
+10-31 11:43:23.550  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/poison.mp3
+10-31 11:43:23.556  3378  3686 D Capacitor: Handling local request: https://localhost/assets/sfx/pose.mp3
+10-31 11:43:23.561  3378  3686 D Capacitor: Handling local request: https://localhost/assets/sfx/recover.mp3
+10-31 11:43:23.563  3378  3687 D Capacitor: Handling local request: https://localhost/assets/sfx/perfect.mp3
+10-31 11:43:23.594  3378  3657 D Capacitor: Handling local request: https://localhost/assets/sfx/reveal-c.mp3
+10-31 11:43:23.610  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/reveal-m.mp3
+10-31 11:43:23.614  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/reveal-m-full.mp3
+10-31 11:43:23.618  3378  3657 D Capacitor: Handling local request: https://localhost/assets/sfx/reveal-hr.mp3
+10-31 11:43:23.621  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/reveal-pc.mp3
+10-31 11:43:23.627  3378  3687 D Capacitor: Handling local request: https://localhost/assets/sfx/reveal-r.mp3
+10-31 11:43:23.629  3378  3686 D Capacitor: Handling local request: https://localhost/assets/sfx/reveal-s-full.mp3
+10-31 11:43:23.640  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/reveal-s.mp3
+10-31 11:43:23.645  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/season.mp3
+10-31 11:43:23.646  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/skill.mp3
+10-31 11:43:23.648  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/shatter.mp3
+10-31 11:43:23.681  3378  3657 D Capacitor: Handling local request: https://localhost/assets/sfx/sheet.mp3
+10-31 11:43:23.686  3378  3657 D Capacitor: Handling local request: https://localhost/assets/sfx/smash.mp3
+10-31 11:43:23.688  3378  3657 D Capacitor: Handling local request: https://localhost/assets/sfx/summon.mp3
+10-31 11:43:23.723  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/suspense.mp3
+10-31 11:43:23.726  3378  3687 D Capacitor: Handling local request: https://localhost/assets/sfx/shield.mp3
+10-31 11:43:23.729  3378  3687 D Capacitor: Handling local request: https://localhost/assets/sfx/swipe.mp3
+10-31 11:43:23.730  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/synergy.mp3
+10-31 11:43:23.733  3378  3687 D Capacitor: Handling local request: https://localhost/assets/sfx/tap.mp3
+10-31 11:43:23.742  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/taunt.mp3
+10-31 11:43:23.747  3378  3687 D Capacitor: Handling local request: https://localhost/assets/sfx/tear.mp3
+10-31 11:43:23.757  3378  3687 D Capacitor: Handling local request: https://localhost/assets/sfx/unlock.mp3
+10-31 11:43:23.760  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/vd-flip.mp3
+10-31 11:43:23.763  3378  3686 D Capacitor: Handling local request: https://localhost/assets/sfx/suspensebig.mp3
+10-31 11:43:23.768  3378  3657 D Capacitor: Handling local request: https://localhost/assets/sfx/vd-lose.mp3
+10-31 11:43:23.772  3378  3653 D Capacitor: Handling local request: https://localhost/assets/sfx/vd-tear.mp3
+10-31 11:43:23.775  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/slash.mp3
+10-31 11:43:23.776  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/vd-win.mp3
+10-31 11:43:23.777  3378  3687 D Capacitor: Handling local request: https://localhost/assets/sfx/vd-rare.mp3
+10-31 11:43:23.778  3378  3655 D Capacitor: Handling local request: https://localhost/assets/sfx/victory.mp3
+10-31 11:43:23.785  3378  3686 D Capacitor: Handling local request: https://localhost/assets/sfx/yourturn.mp3
+10-31 11:43:23.789  3378  3654 D Capacitor: Handling local request: https://localhost/assets/sfx/ult.mp3
+10-31 11:43:23.796  3378  3655 D Capacitor: Handling local request: https://localhost/assets/music/antre.mp3
+10-31 11:43:24.803  3378  3378 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+10-31 11:43:24.821  3378  3378 V Capacitor: callback: 30790446, pluginId: Haptics, methodName: impact, methodData: {"style":"MEDIUM"}
+10-31 11:43:25.523  3378  3378 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+10-31 11:43:25.526  3378  3378 V Capacitor: callback: 30790447, pluginId: Filesystem, methodName: readdir, methodData: {"directory":"DATA","path":"live"}
+10-31 11:43:25.532  3378  3378 I Capacitor/Console: File:  - Line 333 - Msg: undefined
+10-31 11:43:25.969  3378  3653 D Capacitor: Handling local request: https://localhost/assets/scenes/collection.webp
+10-31 11:43:30.265  3378  3378 D Capacitor: Sending plugin error: {"save":false,"callbackId":"30790447","pluginId":"Filesystem","methodName":"readdir","success":false,"error":{"message":"'readdir' failed because file at '\/data\/user\/0\/com.abyssalgame.abyssal\/files\/live\/' does not exist.","code":"OS-PLUG-FILE-0008"}}
+10-31 11:43:31.526  3378  3378 I Capacitor/Console: File:  - Line 333 - Msg: {"canGoBack":false}
+10-31 11:43:31.527  3378  3378 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+10-31 11:43:31.532  3378  3378 V Capacitor: callback: 30790448, pluginId: App, methodName: minimizeApp, methodData: {}
+10-31 11:43:31.533  3378  3378 E Capacitor/Console: File:  - Line 330 - Msg: [object Object]
+10-31 11:43:32.032  3378  3378 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+10-31 11:43:32.206  3378  3378 V Capacitor: callback: 30790449, pluginId: LocalNotifications, methodName: addListener, methodData: {"eventName":"localNotificationActionPerformed"}
+10-31 11:43:32.224  3378  3378 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+10-31 11:43:32.258  3378  3378 V Capacitor: callback: 30790450, pluginId: LocalNotifications, methodName: cancel, methodData: {"notifications":[{"id":1001}]}
+10-31 11:43:32.276  3378  3378 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+10-31 11:43:32.316  3378  3378 V Capacitor: callback: 30790451, pluginId: App, methodName: getInfo, methodData: {}
+10-31 11:43:32.388  3378  3653 D Capacitor: Handling local request: https://localhost/assets/scenes/menu.webp
+10-31 11:43:32.424  3378  3378 D Capacitor: App paused
+10-31 11:43:32.497  3378  3378 I Capacitor/Console: File:  - Line 333 - Msg: undefined
+10-31 11:43:32.569  3378  3378 I Capacitor/Console: File:  - Line 333 - Msg: undefined
+10-31 11:43:32.570  3378  3378 I Capacitor/Console: File:  - Line 333 - Msg: {"name":"ABYSSAL","id":"com.abyssalgame.abyssal","build":"930","version":"1.0 (v930)"}
+10-31 11:43:32.574  3378  3378 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+10-31 11:43:32.579  3378  3378 V Capacitor: callback: 30790452, pluginId: PushNotifications, methodName: addListener, methodData: {"eventName":"registration"}
+10-31 11:43:32.581  3378  3378 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+10-31 11:43:32.583  3378  3378 V Capacitor: callback: 30790453, pluginId: PushNotifications, methodName: createChannel, methodData: {"id":"abyssal","name":"ABYSSAL","description":"Online games, challenges and friends","importance":4,"visibility":1}
+10-31 11:43:32.753  3378  3378 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+10-31 11:43:32.784  3378  3654 D Capacitor: Handling local request: https://localhost/assets/icons/team-ic.webp
+10-31 11:43:32.786  3378  3655 D Capacitor: Handling local request: https://localhost/assets/icons/furnace.webp
+10-31 11:43:32.790  3378  3686 D Capacitor: Handling local request: https://localhost/assets/icons/ui-filter.webp
+10-31 11:43:32.791  3378  3657 D Capacitor: Handling local request: https://localhost/assets/icons/ui-search.webp
+10-31 11:43:32.792  3378  3653 D Capacitor: Handling local request: https://localhost/assets/icons/cards.webp
+10-31 11:43:32.792  3378  3687 D Capacitor: Handling local request: https://localhost/icons/favicon.png
+10-31 11:43:32.793  3378  3378 V Capacitor: callback: 30790454, pluginId: Haptics, methodName: selectionStart, methodData: {}
+10-31 11:43:32.795  3378  3378 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+10-31 11:43:32.796  3378  3378 V Capacitor: callback: 30790455, pluginId: Haptics, methodName: selectionChanged, methodData: {}
+10-31 11:43:32.797  3378  3378 I Capacitor/Console: File:  - Line 333 - Msg: undefined
+10-31 11:43:32.798  3378  3378 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+10-31 11:43:32.799  3378  3378 V Capacitor: callback: 30790456, pluginId: PushNotifications, methodName: addListener, methodData: {"eventName":"pushNotificationActionPerformed"}
+10-31 11:43:32.835  3378  3654 D Capacitor: Handling local request: https://localhost/assets/ui/bn-collection.webp
+10-31 11:43:32.837  3378  3653 D Capacitor: Handling local request: https://localhost/assets/ui/tab-track.webp
+10-31 11:43:32.918  3378  3378 I Capacitor/Console: File:  - Line 333 - Msg: undefined
+10-31 11:43:33.150  3378  3653 D Capacitor: Handling local request: https://localhost/assets/ui/tab-on.webp
+10-31 11:43:33.151  3378  3657 D Capacitor: Handling local request: https://localhost/assets/ui/btn-red.webp
+10-31 11:43:33.152  3378  3655 D Capacitor: Handling local request: https://localhost/assets/ui/field.webp
+10-31 11:43:33.276  3378  3653 D Capacitor: Handling local request: https://localhost/assets/scenes/descent.webp
+10-31 11:43:34.182  3378  3378 I Capacitor/Console: File:  - Line 333 - Msg: undefined
+10-31 11:43:37.255  3378  3378 D Capacitor: App stopped
+10-31 11:43:37.258  3378  3378 D Capacitor: Saving instance state!
+10-31 11:43:37.271  3378  3378 I Capacitor/Console: File:  - Line 333 - Msg: {"isActive":false}
+10-31 11:43:37.275  3378  3378 I Capacitor/Console: File:  - Line 333 - Msg: {"isActive":false}
+10-31 11:43:37.364  3378  3378 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+10-31 11:43:37.384  3378  3378 V Capacitor: callback: 30790457, pluginId: LocalNotifications, methodName: cancel, methodData: {"notifications":[{"id":1001}]}
+10-31 11:43:37.504  3378  3378 I Capacitor/Console: File:  - Line 333 - Msg: undefined
+10-31 11:43:37.722  3378  3654 D Capacitor: Handling local request: https://localhost/assets/scenes/shop.webp
+10-31 11:43:40.348  3378  3378 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+10-31 11:43:40.361  3378  3378 V Capacitor: callback: 30790458, pluginId: Haptics, methodName: selectionChanged, methodData: {}
+10-31 11:43:40.437  3378  3653 D Capacitor: Handling local request: https://localhost/assets/ui/rar-HR.webp
+10-31 11:43:40.450  3378  3653 D Capacitor: Handling local request: https://localhost/assets/ui/rar-M.webp
+10-31 11:43:40.466  3378  3653 D Capacitor: Handling local request: https://localhost/assets/ui/bn-standard.webp
+10-31 11:43:40.542  3378  3378 I Capacitor/Console: File:  - Line 333 - Msg: undefined
+10-31 11:43:40.549  3378  3653 D Capacitor: Handling local request: https://localhost/assets/packs/standard3.webp
+10-31 11:43:40.562  3378  3653 D Capacitor: Handling local request: https://localhost/icons/favicon.png
+10-31 11:43:40.563  3378  3654 D Capacitor: Handling local request: https://localhost/assets/ui/bn-faction2.webp
+10-31 11:43:40.576  3378  3653 D Capacitor: Handling local request: https://localhost/assets/ui/btn-dark.webp
+10-31 11:43:40.579  3378  3654 D Capacitor: Handling local request: https://localhost/assets/ui/bn-alliances.webp
+10-31 11:43:40.595  3378  3653 D Capacitor: Handling local request: https://localhost/assets/ui/bn-premium.webp
+10-31 11:43:40.615  3378  3653 D Capacitor: Handling local request: https://localhost/assets/packs/event4.webp
+10-31 11:43:40.616  3378  3654 D Capacitor: Handling local request: https://localhost/assets/icons/booster.webp
+10-31 11:43:40.621  3378  3653 D Capacitor: Handling local request: https://localhost/assets/icons/chest.webp
+10-31 11:43:40.629  3378  3654 D Capacitor: Handling local request: https://localhost/assets/icons/swords.webp
+10-31 11:43:40.635  3378  3655 D Capacitor: Handling local request: https://localhost/assets/packs/standard3.webp
+10-31 11:43:40.635  3378  3653 D Capacitor: Handling local request: https://localhost/assets/icons/book.webp
+10-31 11:43:40.648  3378  3654 D Capacitor: Handling local request: https://localhost/assets/packs/standard3-glow.webp
+10-31 11:43:40.654  3378  3653 D Capacitor: Handling local request: https://localhost/assets/icons/ticket.webp
+10-31 11:43:40.654  3378  3655 D Capacitor: Handling local request: https://localhost/assets/icons/xp2.webp
+10-31 11:43:40.674  3378  3653 D Capacitor: Handling local request: https://localhost/assets/icons/ui-info.webp
+10-31 11:43:40.689  3378  3653 D Capacitor: Handling local request: https://localhost/assets/icons/free-pack.webp
+10-31 11:43:40.689  3378  3654 D Capacitor: Handling local request: https://localhost/assets/packs/infernal.webp
+10-31 11:43:40.700  3378  3654 D Capacitor: Handling local request: https://localhost/assets/factions/infernal.webp
+10-31 11:43:40.705  3378  3655 D Capacitor: Handling local request: https://localhost/assets/factions/abyssal.webp
+10-31 11:43:40.705  3378  3654 D Capacitor: Handling local request: https://localhost/assets/factions/celeste.webp
+10-31 11:43:40.733  3378  3653 D Capacitor: Handling local request: https://localhost/assets/factions/sauvage.webp
+10-31 11:43:40.736  3378  3655 D Capacitor: Handling local request: https://localhost/assets/factions/necrotique.webp
+10-31 11:43:40.740  3378  3655 D Capacitor: Handling local request: https://localhost/assets/factions/primordial.webp
+10-31 11:43:40.751  3378  3653 D Capacitor: Handling local request: https://localhost/assets/factions/artificiel.webp
+10-31 11:43:40.757  3378  3654 D Capacitor: Handling local request: https://localhost/assets/packs/event4.webp
+10-31 11:43:40.758  3378  3655 D Capacitor: Handling local request: https://localhost/assets/packs/premium.webp
+10-31 11:43:46.248  3378  3378 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+10-31 11:43:46.250  3378  3378 V Capacitor: callback: 30790459, pluginId: Haptics, methodName: selectionChanged, methodData: {}
+10-31 11:43:46.259  3378  3653 D Capacitor: Handling local request: https://localhost/assets/icons/descend.webp
+10-31 11:43:46.263  3378  3653 D Capacitor: Handling local request: https://localhost/assets/icons/crest-elite.webp
+10-31 11:43:46.266  3378  3653 D Capacitor: Handling local request: https://localhost/assets/icons/seal.webp
+10-31 11:43:46.275  3378  3378 I Capacitor/Console: File:  - Line 333 - Msg: undefined
+10-31 11:43:46.278  3378  3653 D Capacitor: Handling local request: https://localhost/icons/favicon.png
+10-31 11:43:46.283  3378  3653 D Capacitor: Handling local request: https://localhost/assets/chapitres/chap-1.webp
+10-31 11:43:46.287  3378  3653 D Capacitor: Handling local request: https://localhost/assets/icons/crown2.webp
+10-31 11:43:46.292  3378  3653 D Capacitor: Handling local request: https://localhost/assets/icons/torch-on.webp
+10-31 11:43:46.298  3378  3653 D Capacitor: Handling local request: https://localhost/assets/icons/braise.webp
+10-31 11:43:46.304  3378  3653 D Capacitor: Handling local request: https://localhost/assets/icons/team-ic.webp
+10-31 11:43:46.310  3378  3653 D Capacitor: Handling local request: https://localhost/assets/icons/level-up.webp
+10-31 11:43:46.315  3378  3653 D Capacitor: Handling local request: https://localhost/assets/packs/abysse2.webp
+10-31 11:43:46.323  3378  3653 D Capacitor: Handling local request: https://localhost/assets/icons/ui-next.webp
+10-31 11:43:46.330  3378  3653 D Capacitor: Handling local request: https://localhost/assets/icons/help.webp
+10-31 11:43:51.142  3378  3653 D Capacitor: Handling local request: https://localhost/assets/ui/bn-descente.webp
+10-31 11:43:51.174  3378  3378 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+10-31 11:43:51.176  3378  3378 V Capacitor: callback: 30790460, pluginId: Haptics, methodName: selectionChanged, methodData: {}
+10-31 11:43:51.190  3378  3653 D Capacitor: Handling local request: https://localhost/assets/icons/ui-prev.webp
+10-31 11:43:51.201  3378  3653 D Capacitor: Handling local request: https://localhost/assets/icons/set-game.webp
+10-31 11:43:51.202  3378  3654 D Capacitor: Handling local request: https://localhost/assets/icons/set-tutos.webp
+10-31 11:43:51.204  3378  3378 I Capacitor/Console: File:  - Line 333 - Msg: undefined
+10-31 11:43:51.209  3378  3655 D Capacitor: Handling local request: https://localhost/assets/icons/set-about.webp
+10-31 11:43:51.209  3378  3657 D Capacitor: Handling local request: https://localhost/icons/favicon.png
+10-31 11:43:51.215  3378  3653 D Capacitor: Handling local request: https://localhost/assets/icons/ui-trash.webp
+10-31 11:43:56.229  3378  3653 D Capacitor: Handling local request: https://localhost/assets/ui/btn-round.webp
+10-31 11:43:56.231  3378  3654 D Capacitor: Handling local request: https://localhost/assets/ui/bn-settings2.webp
+10-31 11:43:56.235  3378  3655 D Capacitor: Handling local request: https://localhost/assets/ui/switch-track.webp
+10-31 11:43:56.258  3378  3653 D Capacitor: Handling local request: https://localhost/assets/ui/knob.webp
+10-31 11:43:57.995  3378  3378 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+10-31 11:43:58.002  3378  3378 V Capacitor: callback: 30790461, pluginId: Haptics, methodName: selectionChanged, methodData: {}
+10-31 11:43:58.038  3378  3653 D Capacitor: Handling local request: https://localhost/assets/icons/ui-user.webp
+10-31 11:43:58.049  3378  3653 D Capacitor: Handling local request: https://localhost/assets/icons/mysteries.webp
+10-31 11:43:58.060  3378  3653 D Capacitor: Handling local request: https://localhost/icons/favicon.png
+10-31 11:43:58.067  3378  3378 I Capacitor/Console: File:  - Line 333 - Msg: undefined
+10-31 11:43:58.325  3378  3653 D Capacitor: Handling local request: https://localhost/assets/ui/bn-account.webp
+10-31 11:44:01.951  3378  3378 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+10-31 11:44:01.954  3378  3378 V Capacitor: callback: 30790462, pluginId: Haptics, methodName: selectionChanged, methodData: {}
+10-31 11:44:01.997  3378  3653 D Capacitor: Handling local request: https://localhost/assets/icons/offrande.webp
+10-31 11:44:02.006  3378  3653 D Capacitor: Handling local request: https://localhost/assets/chests/fer.webp
+10-31 11:44:02.023  3378  3653 D Capacitor: Handling local request: https://localhost/icons/favicon.png
+10-31 11:44:02.042  3378  3378 I Capacitor/Console: File:  - Line 333 - Msg: undefined
